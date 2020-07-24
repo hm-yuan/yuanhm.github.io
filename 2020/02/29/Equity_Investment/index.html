@@ -1,473 +1,218 @@
-<?xml version="1.0" encoding="utf-8"?>
-<search>
-  <entry>
-    <title>[CFA-1] 投资组合</title>
-    <url>/2020/02/29/Portfolio_Management/</url>
-    <content><![CDATA[<h2 id="Portfolio-Management"><a href="#Portfolio-Management" class="headerlink" title="Portfolio Management"></a>Portfolio Management</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p><strong>「投资组合的好处：一定条件下，多元化有助于降低整体风险」</strong></p>
-<h5 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h5><ul>
-<li><p>组合视角（portfolio perspective）</p>
-<p>  组合视角：通过一只股票对整个组合<strong>收益</strong>、<strong>风险</strong>的影响来对其评估。</p>
-</li>
-<li><p>多元化的价值（risk-reduction benefits of diversification）</p>
-<p> <strong>在资产不是绝对正相关的情况下</strong>，多元化有助于降低资产组合的风险。<strong>随着相关性增加</strong>，多元化带来的收益将下降。</p>
-<blockquote>
-<p>  多元化比率（diversification ratio）：$R_{p}/R_i$</p>
-<ul>
-<li>度量多元化带来的风险减少收益。</li>
-</ul>
-</blockquote>
-</li>
-<li><p>组合管理步骤（portfolio management process）</p>
-<ol>
-<li>计划阶段：设定各类参数<sup id="fnref:1" class="footnote-ref"><a href="#fn:1" rel="footnote"><span class="hint--top hint--rounded" aria-label="预期收益水平、风险承受能力、时间偏好、税率、流动性
-">[1]</span></a></sup>。形成<strong>investment policy statement (IPS)</strong>，包含盈利目标和条件。</li>
-<li>执行阶段：通过分析，决定资产组合方案。</li>
-<li>反馈阶段：评估风险、收益，并作出调整。</li>
-</ol>
-</li>
-</ul>
-<h5 id="投资者、基金类型"><a href="#投资者、基金类型" class="headerlink" title="投资者、基金类型"></a>投资者、基金类型</h5><ul>
-<li><p>固定缴存计划（defined contribution）、固定收益计划（defined benefit pension）</p>
-<ul>
-<li>固定缴存承诺过程，固定收益承诺回报。</li>
-</ul>
-</li>
-<li><p>资产管理行业</p>
-<ul>
-<li>passive management：较低管理费用，较低风险，较低但相对稳定的收益</li>
-<li>active management</li>
-</ul>
-</li>
-<li><p>:question:几种类型的混合基金 </p>
-<ul>
-<li><p>共同基金</p>
-<ul>
-<li><p>可分为：开放式和封闭式</p>
-<ul>
-<li>open-end：可赎回、可交易</li>
-</ul>
-<blockquote>
-<p>  投资者数量、基金池总额变动。</p>
-</blockquote>
-</li>
-<li><p>closed-end：不可赎回、可交易</p>
-<blockquote>
-<p>  大多为主动管理</p>
-<p>  直接与市场进行基金交易</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>其它几种类型</p>
-<pre><code>-   货币基金：购买货币
-</code></pre><ul>
-<li>债券基金<ul>
-<li>股票基金</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>exchange-traded fund（ETF）</p>
-<ul>
-<li><p>与closed-end基金比较：</p>
-<p>相似：可交易、不可赎回</p>
-<p>不同：大多为采用消极管理，紧跟指数收益。</p>
-</li>
-<li><p>与open-end基金比较：</p>
-<p>不同：经纪人佣金（brokerage cost）较高；open-end能够以资产净值（NAV）进行买卖，而ETF买卖价格由</p>
-</li>
-</ul>
-</li>
-<li><p>私募、风险投资、套利基金（hedge funds）</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="Portfolio-Risk-and-Return-Ⅰ"><a href="#Portfolio-Risk-and-Return-Ⅰ" class="headerlink" title="Portfolio Risk and Return Ⅰ"></a>Portfolio Risk and Return Ⅰ</h3><p><strong>「选取最优的投资组合：风险、收益以及投资者偏好」</strong></p>
-<h5 id="收益计算"><a href="#收益计算" class="headerlink" title="收益计算"></a>收益计算</h5><ul>
-<li><p>持有期收益(Holding period return)</p>
-<blockquote>
-<p>  $HPR = P_t-P_0+Div_t/P_0$</p>
-</blockquote>
-</li>
-<li><p>平均收益</p>
-<ul>
-<li>算术平均：</li>
-<li>几何平均：当各期收益率不同实，几何平均＜算术平均</li>
-</ul>
-</li>
-<li><p>真实收益：<strong>近似</strong>等于名义收益—通货膨胀率</p>
-</li>
-<li><p>货币加权收益（money-weighted return）：考虑所有资金流入、流出的收益</p>
-<ul>
-<li><p>$PV<em>{inflow} = PV</em>{outflow}$</p>
-</li>
-<li><p>由于越往后账户中的货币越多，所以越往后期间内的权重可能变大。</p>
-<blockquote>
-<p>  如果追加投入后，收益下降，那么货币加权收益也将偏低。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>时间加权收益（time-weighted return）</p>
-<ul>
-<li>单独计算每期收益，最终求各期算术平均。</li>
-</ul>
-</li>
-</ul>
-<h5 id="协方差和相关性"><a href="#协方差和相关性" class="headerlink" title="协方差和相关性"></a>协方差和相关性</h5><ul>
-<li><p>协方差：</p>
-<ul>
-<li>协方差的量级取决于：①单个对象收益标准差大小；②两个对象收益的同步变化程度</li>
-<li>使用算术平均计算单个对象的平均收益</li>
-</ul>
-</li>
-<li><p>相关性：对协方差剔除单个因子的影响（标准化后的协方差）</p>
-<p>$ρ_{1,2}=COV/δ_1δ_2$</p>
-<ul>
-<li>相关性系数值域在【0，1】</li>
-</ul>
-</li>
-</ul>
-<h5 id="效率前沿-star"><a href="#效率前沿-star" class="headerlink" title="效率前沿:star:"></a>效率前沿:star:</h5><ul>
-<li><p>组合方差、标准差的计算</p>
-<p>$Var_{portfolio}=w_1^2σ_1^2+w_2^2σ_2^2+2w_1w_2Cov_12$</p>
-<p>$σ<em>{portfolio}=Var</em>{portfolio}^{0.5}$</p>
-<blockquote>
-<p>  当两个对象呈正相关时，投资组合风险才等于各个资产的加权平均：</p>
-<p>  $σ_{portfolio}=w_1σ_1+w_2σ_2$</p>
-</blockquote>
-<ul>
-<li><p>相关系数越小时，组合方差越小。（多元化的优势）</p>
-<p>-1 &gt; 0 &gt; 1</p>
-</li>
-</ul>
-</li>
-<li><p>效率前沿概念</p>
-<ul>
-<li><p>最小方差效率前沿：<strong>给定收益</strong>的所有可能的最小方差组合（minimum-variance portfolios）构成最小方差的效率前沿。</p>
-</li>
-<li><p>效率前沿：<strong>给定风险水平</strong>的收益最高的投资组合的集合</p>
-<blockquote>
-<p>  风险厌恶者只会选择位于效率前沿上的投资组合。</p>
-</blockquote>
-</li>
-<li><p>全局最小方差组合：效率前沿上风险最低的投资组合</p>
-</li>
-</ul>
-</li>
-<li><p>资本分配曲线</p>
-<ul>
-<li>two-fund separation theorem：最优的投资者组合应<strong>优化的风险资产</strong>与<strong>无风险资产</strong>的组合</li>
-</ul>
-</li>
-</ul>
-<pre><code>-   资本分配线（capital allocation line，**CAL**）
+<!DOCTYPE html>
+<html lang="zh-CN">
 
-    一条带有截距项的直线：
 
-    $R=R_F+W_AR_A$
 
-    &gt;   **资产分配线**与投资者**无差异曲线**的**切点**即为最优投资组合
 
--   与风险偏好相结合：
 
-    一个风险厌恶程度更低的人，将获得更高收益，但更高风险的最优投资组合。
-</code></pre><h3 id="Portfolio-Risk-and-Return-Ⅱ"><a href="#Portfolio-Risk-and-Return-Ⅱ" class="headerlink" title="Portfolio Risk and Return Ⅱ"></a>Portfolio Risk and Return Ⅱ</h3><p><strong>「风险与收益并不总是成正比：承担额外的非系统性风险并不会增加收益」</strong></p>
-<h5 id="系统性风险"><a href="#系统性风险" class="headerlink" title="系统性风险"></a>系统性风险</h5><ul>
-<li><p>将无风险资产加入投资组合：</p>
-<p>$σ_{portfolio}=W_Aσ_A$</p>
-<p>$E(R_p)=W_AE(R_A)+W_BE(R_B)$</p>
-</li>
-<li><p>能增加收益的风险</p>
-<ol>
-<li><p><strong>确定最优的无风险资产和有风险资产比例</strong></p>
-<p>最优的CAL：与投资者无差别曲线相切的CAL</p>
-</li>
-<li><p><strong>确定CML和最优风险资产组合</strong></p>
-<p>最优风险资产组合：最优CAL与效率前沿的切点</p>
-<blockquote>
-<p>  :star: 确定最优的市场回报点（$E(R_M)$），以此为依据判断具体资产是否值得买入：</p>
-<ul>
-<li><p>某项资产收益＞$E(R_M)$：买入</p>
-</li>
-<li><p>某项资产收益＜$E(R_M)$：卖出</p>
-</li>
-</ul>
-</blockquote>
-</li>
-</ol>
-<p>$E(R_p)=R_f+(E(R_M)-R_f)(σ_P/σ_M)$</p>
-<ul>
-<li>关于$σ_P$的函数</li>
-<li><p>市场风险回报（market risk premium）：$E(R_M)-R_f$</p>
-<blockquote>
-<p>  :star: 为额外承受的每一单位市场风险（$σ_M$）获取市场风险回报</p>
-<p>  承担额外的非系统性风险并不会增加收益</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>系统系风险：不能被多元化所抵消的风险（risk of well-diversified portfolio）</p>
-<ul>
-<li><p>系统性风险是相对的：由组合的具体情况决定。</p>
-<blockquote>
-<p>  一般弹性较大的资产组合具有较高的系统性风险。例如奢侈品具有较高的系统系风险。</p>
-</blockquote>
-</li>
-<li><p>高风险股票不意味着高<strong>预期收益</strong>：只有背负系统性风险才能获取更高的<strong>预期收益</strong>（equilibrium return）。</p>
-</li>
-</ul>
-</li>
-</ul>
-<h5 id="β"><a href="#β" class="headerlink" title="β"></a>β</h5><ul>
-<li><p>计算单个资产的超额收益：超额收益是单个资产对多种因素敏感性的</p>
-<ol>
-<li><p>FAMA多因子模型：超额收益 = 敏感性1×因素1+敏感性2×因素2</p>
-</li>
-<li><p>单因子模型：资产的超额收益是β与市场超额收益的乘积</p>
-<p>$E(R_i)-R_f=β_i×[E(R_m)-R_f]$</p>
-</li>
-<li><p>市场模型（market model）：</p>
-<p>$R_i=α_i+β_iR_m+e_i$</p>
-<ul>
-<li><p>截距项$α_i=(1-β_i)$</p>
-</li>
-<li><p>预期收益$E(R_i)=α_i+β_iR_m$</p>
-</li>
-</ul>
-<blockquote>
-<p>  <strong>β表示一项资产对市场组合（market portfolio）的敏感性程度。</strong></p>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>BETA（β）的计算</p>
-<p>:star: β是特殊标准化处理后的资产回报与市场回报的协方差: </p>
-<ol>
-<li>基本表达式：$β<em>i=COV</em>{im}/σ_M^2$</li>
-<li>用相关系数代表协方差：$β<em>i=ρ</em>{im}(σ_i/σ_M)$</li>
-</ol>
-</li>
-</ul>
-<h5 id="CAPM模型"><a href="#CAPM模型" class="headerlink" title="CAPM模型"></a>CAPM模型</h5><ul>
-<li><p>模型：描述预期资产回报与系统性风险的关系</p>
-<p>$E(R<em>i)=R_f+β_i[E(R</em>{mkt}-R_f)]$</p>
-<blockquote>
-<p>  <strong>关于β的另一种理解：β是标准化后的系统性风险</strong></p>
-<ul>
-<li><p>$β=COV<em>{i,mkt}/σ</em>{mkt}^2$</p>
-<p>:star:<strong>贝塔系数越高，投资该股的系统风险越高，投资者所要求的回报率也就越高</strong></p>
-</li>
-</ul>
-</blockquote>
-</li>
-<li><p>内涵：资产的预期收益率等于无风险收益率加上β调整后的市场风险回报（market risk premium，$E(R_M)-R_f$）</p>
-<ul>
-<li>当β＞1时，资产收益大于市场收益</li>
-<li>前提假设：①市场厌恶；②效用最大化；③无摩擦市场；④单期决定；⑤同质性假设；⑥所有资产可以随意拆分；⑦完全竞争市场</li>
-</ul>
-</li>
-<li><p>CML与SML的区别:question:</p>
-<ul>
-<li><p>CML（capital market line）考虑了所有风险因素（total risk），所有CML上的点都是各自风险水平下最有效的（<strong>well-diversified</strong>）投资组合</p>
-<blockquote>
-<p>  <strong>没有完全多元化的</strong>的出现在与CML相切的效率前沿内。</p>
-<p>  CML曲线上比切点高还是低来判断买入无风险资产来投资，或是投资无风险资产</p>
-</blockquote>
-</li>
-<li><p>SML（security market line）考虑系统性风险（systematic risk），只要是定价合理的投资组合都在SML上</p>
-<blockquote>
-<p>  所有没在SML上的点都是在相同市场风险水平下，被错误定价的：</p>
-<p>  SML下方：定价过高，卖出</p>
-<p>  SML上方：定价过低，买入</p>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-<h5 id="几种重要的比率"><a href="#几种重要的比率" class="headerlink" title="几种重要的比率"></a>几种重要的比率</h5><ul>
-<li><p>Sharp ratio：风险调整的收益</p>
-<p>Sharp ratio = $E(R<em>{portfolio}-R_f)/σ</em>{portfolio}$</p>
-<ul>
-<li>是CAL的斜率</li>
-<li>sharp ratio 越高，表现越好</li>
-<li>基于总风险，而非系统风险：适用于各类投资类型分析。</li>
-</ul>
-</li>
-<li><p>treynor ratio</p>
-</li>
-</ul>
-<ul>
-<li><p>$M^2$：承担每一份系统性风险的收益</p>
-<p>$M^2 = R_p-R_f/β_p$</p>
-</li>
-<li><p>Jensen‘s alpha</p>
-</li>
-</ul>
-<h3 id="Basic-of-Portfolio-Planning-and-Construction"><a href="#Basic-of-Portfolio-Planning-and-Construction" class="headerlink" title="Basic of Portfolio Planning and Construction"></a>Basic of Portfolio Planning and Construction</h3><h5 id="投资政策说明书（investment-policy-statement）"><a href="#投资政策说明书（investment-policy-statement）" class="headerlink" title="投资政策说明书（investment policy statement）"></a>投资政策说明书（investment policy statement）</h5><ul>
-<li><p>组成要素：</p>
-<ul>
-<li><p>投资者环境（circumstance）：风险承受水平、预期收益</p>
-<blockquote>
-<p>  objectives and constraints</p>
-</blockquote>
-</li>
-<li><p>投资策略（investment strategy）</p>
-</li>
-<li><p>对标（benchmark）：评估绩效</p>
-</li>
-</ul>
-</li>
-<li><p>投资者方面</p>
-<ul>
-<li>投资与风险目标（objectives）<ul>
-<li>绝对风险目标与相对风险目标：对标benchmark设置收益不足预期的范围</li>
-</ul>
-</li>
-<li>投资局限性（constraints）<ul>
-<li>流动性要求</li>
-<li>时间期限</li>
-<li>税务</li>
-<li>合规性</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>资产投资策略（strategic asset allocation）</p>
-<ol>
-<li><p>分清不同资产的收益与风险级别</p>
-<blockquote>
-<p>  包含：</p>
-<p>  growth assets：指数、股票等</p>
-<p>  downturn hedging assets：短期高质量信用贷款、固定收益（core）</p>
-<p>  inflation hedging assets：房地产（core）、基础设施、抗通胀债券</p>
-</blockquote>
-</li>
-<li><p>将投资策略与IPS相结合：选取最优投资组合</p>
-<ul>
-<li>主要根据objective（预期风险和收益目标）来选择</li>
-<li>主动投资管理：可能带来更高风险与收益<ul>
-<li>为获取短期收益进行技术性调整：tactical asset allocation</li>
-<li>risk budgeting：①设定总风险水平；②设定技术性操作的风险额度。<ul>
-<li>多个不同主动投资管理的风险可以对冲</li>
-<li>多个主动投资管理可能带来更高的税务问题</li>
-</ul>
-</li>
-<li>核卫星策略（core-statellite approach）：将核心资产（大部分资产）投资于被动管理的指数基金</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<h3 id="Introduction-to-Risk-Management"><a href="#Introduction-to-Risk-Management" class="headerlink" title="Introduction to Risk Management"></a>Introduction to Risk Management</h3><h5 id="关于风险管理"><a href="#关于风险管理" class="headerlink" title="关于风险管理"></a>关于风险管理</h5><ul>
-<li><p>目的：风险管理的目的并非要最小化风险，而是<strong>在一定的风险水平下获取最大的收益</strong>。</p>
-</li>
-<li><p>风险管控（risk governance）：明确各项风险管理政策。</p>
-</li>
-<li><p>风险承受水平（risk tolerance）：关于确定总风险水平，由企业的能力及环境决定。</p>
-</li>
-<li><p>风险预算（risk budgeting）：关于向各资产分配风险配额。</p>
-<blockquote>
-<p>  重点在于结合具体股票的风险特点和总的风险水平，来<strong>选择</strong>资产组合，从而通过风险对冲等方式找到最佳组合，</p>
-</blockquote>
-</li>
-</ul>
-<h5 id="关于风险"><a href="#关于风险" class="headerlink" title="关于风险"></a>关于风险</h5><ul>
-<li>财务风险：来源于金融市场的风险<ul>
-<li>信用风险：企业无法按时履约</li>
-<li>流动性风险：需要以低于真实价格来出售资产</li>
-<li>市场风险：利率及资本定价的调整</li>
-</ul>
-</li>
-<li><p>非财务风险</p>
-<ul>
-<li>经营风险</li>
-<li>偿债风险</li>
-<li>政策风险</li>
-<li>合规性风险</li>
-<li>会计风险</li>
-<li>模型风险：分析模型错误</li>
-<li>尾部风险：低估小概率时间的爆发</li>
-</ul>
-</li>
-<li><p>风险度量方式</p>
-<ul>
-<li><p>标准差：度量资产定价及收益（price &amp; interest rates）</p>
-<ul>
-<li>适用于独立的（stand-alone）资产</li>
-</ul>
-</li>
-<li><p>β：度量收益对市场风险（不稳定性/变化）的敏感性</p>
-<ul>
-<li>β的本质是资产收益与市场收益的协方差，现实中可以用个股对指数间的关系来计算。</li>
-</ul>
-</li>
-<li><p>久期：度量债券价格对利率变化的敏感性</p>
-<ul>
-<li><p>度量债券的利率风险</p>
-<blockquote>
-<p>  久期越短，债券价格的波动越小，风险越小；</p>
-<p>  久期越长，债券价格的波动越大，风险越大。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>Var：风险资产</p>
-<ul>
-<li>CVar：在最小损失已经确实后，预期的损失</li>
-<li>压力测试：设定关键变量，评估后果</li>
-<li>情景分析：改变多个输入变量，评估后果</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>风险应对策略</p>
-<ul>
-<li>avoid：不参与</li>
-<li>prevent：补充监管，弥补数据漏洞</li>
-<li>management：多元化<ul>
-<li>risk transfer：保险、担保（surety bond）</li>
-<li>risk shifting：改变风险的结果（风险发生了，但结果不一样）。<strong>一般选择衍生品。</strong></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="技术性分析"><a href="#技术性分析" class="headerlink" title="技术性分析"></a>技术性分析</h3><h5 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h5><ul>
-<li>概念：结合市场情绪对买卖双方的行为进行预测<ul>
-<li>考虑市场理性和非理性因素，<strong>认为投资者的行为模式是可预测的</strong>（不基于市场有效性假说）</li>
-<li>与基本面分析的区别<ul>
-<li>基本面分析重在发现资产内在价值，技术性分析在于分析交易发生逻辑</li>
-<li>基本面分析依据公司财报等多方面信息，技术性分析只考虑股价及交易量。</li>
-<li>技术性分析不关注买卖双方的原因，仅关注已发生的交易。</li>
-</ul>
-</li>
-<li>技术分析的优缺点<ul>
-<li>优点：①基于客观且可观测数据；②可用于对未来不产生现金流的资产的定价，如原油。</li>
-<li>缺点：不能反映资产真正的供需关系</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>常见类型<ul>
-<li>反转形态（reversal patterns）</li>
-</ul>
-</li>
-</ul>
-<h3 id="Fintech-in-Investment-Management"><a href="#Fintech-in-Investment-Management" class="headerlink" title="Fintech in Investment Management"></a>Fintech in Investment Management</h3><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>预期收益水平、风险承受能力、时间偏好、税率、流动性
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <tags>
-        <tag>CFA</tag>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>[CFA-1] 权益投资</title>
-    <url>/2020/02/29/Equity_Investment/</url>
-    <content><![CDATA[<h2 id="Equity-Investment"><a href="#Equity-Investment" class="headerlink" title="Equity Investment"></a>Equity Investment</h2><h3 id="Market-Organization-and-Structure"><a href="#Market-Organization-and-Structure" class="headerlink" title="Market Organization and Structure"></a>Market Organization and Structure</h3><h5 id="金融市场基本概念"><a href="#金融市场基本概念" class="headerlink" title="金融市场基本概念"></a>金融市场基本概念</h5><ul>
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>[CFA-1] 权益投资 - Hexo</title>
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/github-markdown-css/4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    <link  rel="stylesheet" href="https://cdn.staticfile.org/highlight.js/10.0.0/styles/github-gist.min.css" />
+  
+
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_yg9cfy8wd6.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_pjno9b9zyxs.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script  src="/js/utils.js" ></script>
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>HM-BLOG</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="view intro-2" id="background" parallax=true
+         style="background: url('/img/post-cfa-equity.jfif') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              
+  <div class="mt-3 post-meta">
+    <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+    <time datetime="2020-02-29 12:00">
+      2020年2月29日 中午
+    </time>
+  </div>
+
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      3.8k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      27
+       分钟
+    </span>
+  
+
+  
+  
+    
+      <!-- 不蒜子统计文章PV -->
+      <span id="busuanzi_container_page_pv" style="display: none">
+        <i class="iconfont icon-eye" aria-hidden="true"></i>
+        <span id="busuanzi_value_page_pv"></span> 次
+      </span>
+    
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="container nopadding-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <div class="post-content mx-auto" id="post">
+            
+            <article class="markdown-body">
+              <h2 id="Equity-Investment"><a href="#Equity-Investment" class="headerlink" title="Equity Investment"></a>Equity Investment</h2><h3 id="Market-Organization-and-Structure"><a href="#Market-Organization-and-Structure" class="headerlink" title="Market Organization and Structure"></a>Market Organization and Structure</h3><h5 id="金融市场基本概念"><a href="#金融市场基本概念" class="headerlink" title="金融市场基本概念"></a>金融市场基本概念</h5><ul>
 <li>金融市场的作用<ul>
 <li>通过利率决定资金供给</li>
 <li>有效配置资源</li>
@@ -1065,16 +810,299 @@
 </ul>
 </li>
 </ul>
-]]></content>
-      <tags>
-        <tag>CFA</tag>
-        <tag>笔记</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>show me the money</title>
-    <url>/2020/07/22/show-me-the-money/</url>
-    <content><![CDATA[<p>show me the money</p>
-]]></content>
-  </entry>
-</search>
+
+            </article>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/CFA/">CFA</a>
+                    
+                      <a class="hover-with-bg" href="/tags/%E7%AC%94%E8%AE%B0/">笔记</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" target="_blank" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext row">
+                  <div class="post-prev col-6">
+                    
+                    
+                      <a href="/2020/02/29/Portfolio_Management/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[CFA-1] 投资组合</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </div>
+                  <div class="post-next col-6">
+                    
+                    
+                  </div>
+                </div>
+              
+            </div>
+
+            
+              <!-- Comments -->
+              <div class="comments" id="comments">
+                
+                
+
+              </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div id="tocbot"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+  </main>
+
+  
+    <a id="scroll-top-button" href="#" role="button">
+      <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  
+
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <div>
+      <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
+      <i class="iconfont icon-love"></i>
+      <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener">
+        <span>Fluid</span></a>
+    </div>
+    
+
+    
+
+    
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script  src="https://cdn.staticfile.org/jquery/3.4.1/jquery.min.js" ></script>
+<script  src="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/main.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  <script defer src="https://cdn.staticfile.org/clipboard.js/2.0.6/clipboard.min.js" ></script>
+  <script  src="/js/clipboard-use.js" ></script>
+
+
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+  <script  src="https://cdn.staticfile.org/tocbot/4.11.1/tocbot.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      var boardCtn = $('#board-ctn');
+      var boardTop = boardCtn.offset().top;
+
+      tocbot.init({
+        tocSelector: '#tocbot',
+        contentSelector: 'article.markdown-body',
+        headingSelector: 'h1,h2,h3,h4,h5,h6',
+        linkClass: 'tocbot-link',
+        activeLinkClass: 'tocbot-active-link',
+        listClass: 'tocbot-list',
+        isCollapsedClass: 'tocbot-is-collapsed',
+        collapsibleClass: 'tocbot-is-collapsible',
+        collapseDepth: 0,
+        scrollSmooth: true,
+        headingsOffset: -boardTop
+      });
+      if ($('.toc-list-item').length > 0) {
+        $('#toc').css('visibility', 'visible');
+      }
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/typed.js/2.0.11/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Equity Investment &nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/anchor-js/4.2.2/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "hover",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      searchFunc(path, 'local-search-input', 'local-search-result');
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script  src="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.staticfile.org/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <script>
+    $('#post img:not(.no-zoom img, img[no-zoom]), img[zoom]').each(
+      function () {
+        var element = document.createElement('a');
+        $(element).attr('data-fancybox', 'images');
+        $(element).attr('href', $(this).attr('src'));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>
