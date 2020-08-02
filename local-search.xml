@@ -38,6 +38,25 @@
   
   
   <entry>
+    <title>[Advanced-R] cp2. 名称与对象</title>
+    <link href="/2020/02/29/Names_and_Values/"/>
+    <url>/2020/02/29/Names_and_Values/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote><p>  对象（object）没有名字（name），只是名字有了对象</p></blockquote><h4 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h4><ol><li><p>名字与对象通过<strong>“ &lt;- ”</strong>相连：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom:20%;" /></p><ul><li>名字和对象是独立的，名字与对象直接相连。名字只是对象的<strong>查询编码（Reference）</strong>。</li><li>修改y并不会改变x的值，只是新生成了一个对象。同时，新生成的对象是<strong>在原有对象基础上修改的（Copy-on-modify）</strong>。</li></ul><pre><code class="hljs &#123;r&#125;"># 变量与对象的关系x &lt;- c(1, 2, 3)y &lt;- x# 修改y并不改变x的值y[[3]] &lt;- 4Lx# [1] 1 2 3y# [1] 1 2 4</code></pre></li><li><p>list指向对象的查询编码（Reference）：<img src="https://d33wubrfki0l68.cloudfront.net/52bc0e3da3382cba957a9d83397b6c9200906ce2/c72aa/diagrams/name-value/l-modify-1.png" srcset="/img/loading.gif" style="zoom:20%;" />，也只修改部分的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom:20%;" /></p></li></ol>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>R</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>[CFA-1] 投资组合</title>
     <link href="/2020/02/29/Portfolio_Management/"/>
     <url>/2020/02/29/Portfolio_Management/</url>
