@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>show me the money - Hexo</title>
+  <title>[Advanced R] cp2. 名称与对象 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/default.jpg') no-repeat center center;
+         style="background: url('/img/binding-f1.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-07-22 09:31">
-      2020年7月22日 上午
+    <time datetime="2020-08-02 20:20">
+      2020年8月2日 晚上
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      4 字
+      1.1k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      1
+      9
        分钟
     </span>
   
@@ -212,13 +212,161 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <p>show me the money</p>
+              <h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
+<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
+</blockquote>
+<h4 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h4><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
+<ul>
+<li>每个对象在R中都有自己的编号（如下的 “0x1deb7a5c530”）。</li>
+<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
+x &lt;- c(1, 2, 3)
+y &lt;- x
 
+# x, y实际指向了同一个对象
+lobstr::obj_addr(x)
+# [1] &quot;0x1deba3bd8f8&quot;
+lobstr::obj_addr(y)
+# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
+<h4 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h4><ol>
+<li><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong><ul>
+<li>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></li>
+</ul>
+</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
+tracemem(x)
+#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
+y[[3]] &lt;- 4L
+#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
+
+# 修改y并不会改变x的值
+x
+#&gt; [1] 1 2 3
+y
+#&gt; [1] 1 2 4
+
+# 修改y实际上新生成了一个变量
+lobstr::obj_addr(y)
+#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
+<ol>
+<li><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则<ul>
+<li>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></li>
+</ul>
+</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
+x &lt;- c(1, 2, 3)
+tracemem(x)
+z &lt;- f(x)
+# 没有复制发生！</code></pre>
+<ol>
+<li><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合。<ul>
+<li>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
+</ul>
+</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
+l2 &lt;- l1
+l2[[3]] &lt;- 4L
+lobstr:ref(l1, l2)
+#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
+#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
+#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
+ 
+#&gt; o [5:0x1deba41de78] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] 
+#&gt; +-[3:0x1deba502778] 
+#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
+<ol>
+<li><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制。<ul>
+<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
+<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
+</ul>
+</li>
+<li><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
+y &lt;- x
+y[[1]] &lt;- &quot;c&quot;
+# 指向的对象不同了
+ref(x, y)
+#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
+
+#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
+
+# 实际是具体修改的字符串查询编码变化了
+ref(x, y, character &#x3D; T)
+#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
+#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
+#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
+ 
+#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
+#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] 
+#&gt; \-[4:0x1deb150d048]</code></pre>
+<h4 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h4><ol>
+<li>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
+lobstr::obj_size(x)
+#&gt; 8,000,048 B
+y &lt;- list(x, x, x)
+lobstr::obj_size(y)
+#&gt; 8,000,128 B</code></pre>
+<ol>
+<li>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
+obj_size(banana)
+#&gt; 136 B
+obj_size(rep(banana, 100))
+#&gt; 928 B</code></pre>
+<ol>
+<li>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</li>
+</ol>
+<h4 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h4><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
+<ol>
+<li>仅有单一链接（binding）的对象</li>
+</ol>
+<ol>
+<li><p>环境（environment）</p>
+<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
+</li>
+</ol>
+<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+e2 &lt;- e1
+
+# 修改e1中的对象后，e2同步改变了
+e1$c &lt;- 4
+e2$c
+#&gt; [1] 4</code></pre>
+<h4 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h4><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
+<ul>
+<li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
+<li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记来自于<a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
             <div>
               <div class="post-metas mb-3">
                 
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/R/">R</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Programming/">Programming</a>
+                    
+                  </div>
                 
               </div>
               
@@ -229,18 +377,12 @@
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/02/Names_and_Values/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] cp2. 名称与对象</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/02/29/Equity_Investment/">
-                        <span class="hidden-mobile">[CFA-1] 权益投资</span>
+                      <a href="/2020/07/22/show-me-the-money/">
+                        <span class="hidden-mobile">show me the money</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -388,7 +530,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "show me the money&nbsp;",
+        "Names and Values &nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
@@ -449,6 +591,45 @@
 
 
 
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.staticfile.org/mathjax/3.0.5/es5/tex-svg.js" ></script>
+
+  
 
 
 
