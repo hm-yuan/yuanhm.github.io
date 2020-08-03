@@ -168,9 +168,60 @@
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/08/02/Names_and_Values/">[Advanced R] cp2. 名称与对象</a>
+      <a class="index-header" href="/2020/08/03/Advanced_R/Vectors/">[Advanced R] cp3. 向量</a>
 
-      <a href="/2020/08/02/Names_and_Values/" class="index-excerpt">
+      <a href="/2020/08/03/Advanced_R/Vectors/" class="index-excerpt">
+        
+        
+          
+        
+        <div>Vectors
+  向量由原子向量（atomic vector）和列表（list）组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。
+
+
+原子向量原子向量（atomic vector）有四种基础类别：logical，integer，double，character。
+
+
+绝大多数情况下与缺失值（NA）相关的表达式输出的都是NA。
+NA &gt; 5
+#&gt; </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2020-08-03
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/R/">R</a>
+            
+              <a href="/tags/Programming/">Programming</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2020/08/02/Advanced_R/Names_and_Values/">[Advanced R] cp2. 名称与对象</a>
+
+      <a href="/2020/08/02/Advanced_R/Names_and_Values/" class="index-excerpt">
         
         
           
@@ -195,6 +246,13 @@ y &lt;- x
             <i class="iconfont icon-date"></i>&nbsp;2020-08-02
           </div>
         
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+            
+          </div>
         
         
           <div class="post-meta">
@@ -459,6 +517,56 @@ y &lt;- x
 
 
 
+
+  
+  
+    <script type="text/javascript">
+      //定义获取词语下标
+      var a_idx = 0;
+      jQuery(document).ready(function ($) {
+        //点击body时触发事件
+        $("body").click(function (e) {
+          //需要显示的词语
+          var a = new Array("富强", "民主", "文明", "和谐", "自由", "平等", "公正", "法治", "爱国", "敬业", "诚信", "友善");
+          //设置词语给span标签
+          var $i = $("<span/>").text(a[a_idx]);
+          //下标等于原来下标+1  余 词语总数
+          a_idx = (a_idx + 1) % a.length;
+          //获取鼠标指针的位置，分别相对于文档的左和右边缘。
+          //获取x和y的指针坐标
+          var x = e.pageX, y = e.pageY;
+          //在鼠标的指针的位置给$i定义的span标签添加css样式
+          $i.css({
+            "z-index": 999,
+            "top": y - 20,
+            "left": x,
+            "position": "absolute",
+            "font-weight": "bold",
+            "color": rand_color()
+          });
+          // 随机颜色
+          function rand_color() {
+            return "rgb(" + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + "," + ~~(255 * Math.random()) + ")"
+          }
+          //在body添加这个标签
+          $("body").append($i);
+          //animate() 方法执行 CSS 属性集的自定义动画。
+          //该方法通过CSS样式将元素从一个状态改变为另一个状态。CSS属性值是逐渐改变的，这样就可以创建动画效果。
+          //详情请看http://www.w3school.com.cn/jquery/effect_animate.asp
+          $i.animate({
+            //将原来的位置向上移动180
+            "top": y - 180,
+            "opacity": 0
+            //1500动画的速度
+          }, 1500, function () {
+            //时间到了自动删除
+            $i.remove();
+          });
+        });
+      })
+      ;
+    </script>
+  
 
 
 

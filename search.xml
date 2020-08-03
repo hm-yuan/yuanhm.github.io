@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>show me the money</title>
+    <url>/2020/07/22/show-me-the-money/</url>
+    <content><![CDATA[<p>show me the money</p>
+]]></content>
+  </entry>
+  <entry>
     <title>[CFA-1] 权益投资</title>
     <url>/2020/02/29/Equity_Investment/</url>
     <content><![CDATA[<h2 id="Equity-Investment"><a href="#Equity-Investment" class="headerlink" title="Equity Investment"></a>Equity Investment</h2><h3 id="Market-Organization-and-Structure"><a href="#Market-Organization-and-Structure" class="headerlink" title="Market Organization and Structure"></a>Market Organization and Structure</h3><h5 id="金融市场基本概念"><a href="#金融市场基本概念" class="headerlink" title="金融市场基本概念"></a>金融市场基本概念</h5><ul>
@@ -608,182 +614,6 @@
       </tags>
   </entry>
   <entry>
-    <title>[Advanced R] cp2. 名称与对象</title>
-    <url>/2020/08/02/Names_and_Values/</url>
-    <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
-<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
-</blockquote>
-<h4 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h4><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
-<ul>
-<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
-<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
-</ul>
-<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
-x &lt;- c(1, 2, 3)
-y &lt;- x
-
-# x, y实际指向了同一个对象
-lobstr::obj_addr(x)
-# [1] &quot;0x1deba3bd8f8&quot;
-lobstr::obj_addr(y)
-# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h4 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h4><ol>
-<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
-<ul>
-<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
-tracemem(x)
-#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
-y[[3]] &lt;- 4L
-#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
-
-# 修改y并不会改变x的值
-x
-#&gt; [1] 1 2 3
-y
-#&gt; [1] 1 2 4
-
-# 修改y实际上新生成了一个变量
-lobstr::obj_addr(y)
-#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
-<ul>
-<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
-x &lt;- c(1, 2, 3)
-tracemem(x)
-z &lt;- f(x)
-# 没有复制发生！</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
-<ul>
-<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
-l2 &lt;- l1
-l2[[3]] &lt;- 4L
-lobstr:ref(l1, l2)
-#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
-#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
-#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
- 
-#&gt; o [5:0x1deba41de78] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] 
-#&gt; +-[3:0x1deba502778] 
-#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
-<ul>
-<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
-<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
-</ul>
-</li>
-<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
-y &lt;- x
-y[[1]] &lt;- &quot;c&quot;
-# 指向的对象不同了
-ref(x, y)
-#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
-
-#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
-
-# 实际是具体修改的字符串查询编码变化了
-ref(x, y, character &#x3D; T)
-#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
-#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
-#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
- 
-#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
-#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] 
-#&gt; \-[4:0x1deb150d048]</code></pre>
-</li>
-</ol>
-<h4 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h4><ol>
-<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
-lobstr::obj_size(x)
-#&gt; 8,000,048 B
-y &lt;- list(x, x, x)
-lobstr::obj_size(y)
-#&gt; 8,000,128 B</code></pre>
-</li>
-<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
-obj_size(banana)
-#&gt; 136 B
-obj_size(rep(banana, 100))
-#&gt; 928 B</code></pre>
-</li>
-<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
-</li>
-</ol>
-<h4 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h4><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
-<ol>
-<li><p>仅有单一链接（binding）的对象</p>
-<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
-<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
-medians &lt;- sapply(x, median, numeric(i))
-tracemem(x)
-#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
-
-# 直接使用循环，对象在每次迭代中被复制了两次
-for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
-#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
-#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
-#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
-#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
-#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
-
-# 将data.frame转换为list，仅有一次复制发生
-y &lt;- as.list(x)
-#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
-for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
-</li>
-</ol>
-<ol>
-<li><p>环境（environment）</p>
-<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
-<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-e2 &lt;- e1
-
-# 修改e1中的对象后，e2同步改变了
-e1$c &lt;- 4
-e2$c
-#&gt; [1] 4</code></pre>
-</li>
-</ol>
-<h4 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h4><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
-<ul>
-<li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
-<li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
-</ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记来自于<a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>[CFA-1] 投资组合</title>
     <url>/2020/02/29/Portfolio_Management/</url>
     <content><![CDATA[<h2 id="Portfolio-Management"><a href="#Portfolio-Management" class="headerlink" title="Portfolio Management"></a>Portfolio Management</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p><strong>「投资组合的好处：一定条件下，多元化有助于降低整体风险」</strong></p>
@@ -1248,9 +1078,374 @@ e2$c
       </tags>
   </entry>
   <entry>
-    <title>show me the money</title>
-    <url>/2020/07/22/show-me-the-money/</url>
-    <content><![CDATA[<p>show me the money</p>
-]]></content>
+    <title>[Advanced R] cp2. 名称与对象</title>
+    <url>/2020/08/02/Advanced_R/Names_and_Values/</url>
+    <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
+<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
+</blockquote>
+<h4 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h4><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
+<ul>
+<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
+<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
+x &lt;- c(1, 2, 3)
+y &lt;- x
+
+# x, y实际指向了同一个对象
+lobstr::obj_addr(x)
+# [1] &quot;0x1deba3bd8f8&quot;
+lobstr::obj_addr(y)
+# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
+<h4 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h4><ol>
+<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
+<ul>
+<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
+tracemem(x)
+#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
+y[[3]] &lt;- 4L
+#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
+
+# 修改y并不会改变x的值
+x
+#&gt; [1] 1 2 3
+y
+#&gt; [1] 1 2 4
+
+# 修改y实际上新生成了一个变量
+lobstr::obj_addr(y)
+#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
+<ul>
+<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
+x &lt;- c(1, 2, 3)
+tracemem(x)
+z &lt;- f(x)
+# 没有复制发生！</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
+<ul>
+<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
+l2 &lt;- l1
+l2[[3]] &lt;- 4L
+lobstr:ref(l1, l2)
+#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
+#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
+#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
+ 
+#&gt; o [5:0x1deba41de78] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] 
+#&gt; +-[3:0x1deba502778] 
+#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
+<ul>
+<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
+<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
+</ul>
+</li>
+<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
+y &lt;- x
+y[[1]] &lt;- &quot;c&quot;
+# 指向的对象不同了
+ref(x, y)
+#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
+
+#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
+
+# 实际是具体修改的字符串查询编码变化了
+ref(x, y, character &#x3D; T)
+#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
+#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
+#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
+ 
+#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
+#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] 
+#&gt; \-[4:0x1deb150d048]</code></pre>
+</li>
+</ol>
+<h4 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h4><ol>
+<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
+lobstr::obj_size(x)
+#&gt; 8,000,048 B
+y &lt;- list(x, x, x)
+lobstr::obj_size(y)
+#&gt; 8,000,128 B</code></pre>
+</li>
+<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
+<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
+obj_size(banana)
+#&gt; 136 B
+obj_size(rep(banana, 100))
+#&gt; 928 B</code></pre>
+</li>
+<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
+</li>
+</ol>
+<h4 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h4><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
+<ol>
+<li><p>仅有单一链接（binding）的对象</p>
+<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
+<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
+medians &lt;- sapply(x, median, numeric(i))
+tracemem(x)
+#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
+
+# 直接使用循环，对象在每次迭代中被复制了两次
+for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
+#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
+#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
+#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
+#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
+#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
+#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
+
+# 将data.frame转换为list，仅有一次复制发生
+y &lt;- as.list(x)
+#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
+for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
+#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
+</li>
+</ol>
+<ol>
+<li><p>环境（environment）</p>
+<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
+<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+e2 &lt;- e1
+
+# 修改e1中的对象后，e2同步改变了
+e1$c &lt;- 4
+e2$c
+#&gt; [1] 4</code></pre>
+</li>
+</ol>
+<h4 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h4><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
+<ul>
+<li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
+<li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记来自于<a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] cp3. 向量</title>
+    <url>/2020/08/03/Advanced_R/Vectors/</url>
+    <content><![CDATA[<h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
+<p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
+</blockquote>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/2ff3a6cebf1bb80abb2a814ae1cfc67b12817713/ae848/diagrams/vectors/summary-tree.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<h4 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h4><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<ul>
+<li><p>绝大多数情况下与缺失值（NA）相关的表达式输出的都是NA。</p>
+<pre><code class="hljs &#123;r&#125;">NA &gt; 5
+#&gt; [1] NA
+10 * NA
+#&gt; [1] NA
+!NA
+#&gt; [1] NA
+
+# 以下为特殊情况
+NA ^ 0
+#&gt; [1] 1
+NA | TRUE
+#&gt; [1] TRUE
+NA &amp; FALSE
+#&gt; [1] FALSE</code></pre>
+</li>
+<li><p>由于原子向量中的所有元素具有相同的属性，当试图合并两个不同类别的向量时，<strong>R</strong>会自动按照一个固定的顺序来强行调整类别（coerce）：<strong>character → double → integer → logical</strong>。对于logical向量，在使用数学函数时，其会自动转换为numeric。当强行调整类别失败时，<strong>R</strong>会返回NA。</p>
+<pre><code class="hljs &#123;r&#125;">str(c(&quot;a&quot;, 1))
+#&gt;  chr [1:2] &quot;a&quot; &quot;1&quot;
+
+# 对于logical向量，在使用数学函数时，其会自动转换为numeric
+x &lt;- c(FALSE, FALSE, TRUE)
+as.numeric(x)
+#&gt; [1] 0 0 1
+sum(x)
+#&gt; [1] 1
+
+# 当强行调整类别失败时，R会返回NA
+as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
+#&gt; Warning: NAs introduced by coercion
+#&gt; [1]  1  1 NA</code></pre>
+</li>
+</ul>
+<h4 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h4><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
+<ul>
+<li><p>使用<strong>attr( )</strong>来获取和编辑单个属性，使用<strong>attributes( )</strong>来获取对象的所有属性信息。</p>
+</li>
+<li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
+<pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
+attr(a, &quot;x&quot;) &lt;- &quot;abc&quot;
+attr(a, &quot;x&quot;)
+#&gt; [1] &quot;abc&quot;
+
+# 丧失属性
+attributes(a[1])
+#&gt; NULL</code></pre>
+</li>
+<li><p>名字（name）和维度（dim）是仅有的两个会提前预设的属性。</p>
+<pre><code class="hljs &#123;r&#125;"># 三种命名方式
+x &lt;- c(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+
+x &lt;- 1:3
+names(x) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+# 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
+<ul>
+<li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
+<p>|      Vector       |           Matrix           |      Array       |<br>| :———————-: | :————————————: | :———————: |<br>|     <code>names()</code>     | <code>rownames()</code>, <code>colnames()</code> |   <code>dimnames()</code>   |<br>|    <code>length()</code>     |     <code>nrow()</code>, <code>ncol()</code>     |     <code>dim()</code>      |<br>|       <code>c()</code>       |    <code>rbind()</code>, <code>cbind()</code>    | <code>abind::abind()</code> |<br>|         —         |           <code>t()</code>            |    <code>aperm()</code>     |<br>| <code>is.null(dim(x))</code> |       <code>is.matrix()</code>        |   <code>is.array()</code>   |</p>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="S3原子向量"><a href="#S3原子向量" class="headerlink" title="S3原子向量"></a>S3原子向量</h4><p>拥有<strong>class</strong>的向量即转换成了<strong>S3对象（S3 object）</strong>，有四种重要的S3对象：</p>
+<ul>
+<li><p>类别变量（category data）：<strong>factor</strong>是基于integer的S3对象，内含提前预设的值。</p>
+<pre><code class="hljs &#123;r&#125;"># 基于integer的对象
+x &lt;- factor(c(&quot;a&quot;, &quot;b&quot;, &quot;b&quot;, &quot;a&quot;))
+typeof(x)
+#&gt; [1] &quot;integer&quot;
+class(x)
+#&gt; [1] &quot;factor&quot;
+
+attributes(x)
+#&gt; $levels
+#&gt; [1] &quot;a&quot; &quot;b&quot;
+
+#&gt; $class
+#&gt; [1] &quot;factor&quot;
+
+# factor中规定的level数量可多余实际对象中的元素类别数量
+x &lt;- factor(x, levels &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+table(x)
+#&gt; x
+#&gt; a b c 
+#&gt; 2 2 0</code></pre>
+</li>
+<li><p>日期（dates）：<strong>Date</strong>是基于double的S3对象，是距离1970-01-01的天数。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(Sys.Date())
+#&gt; [1] &quot;double&quot;
+class(Sys.Date())
+#&gt; [1] &quot;Date&quot;
+unclass(Sys.Date())
+#&gt; [1] 18477</code></pre>
+</li>
+<li><p>时间（date-times）：<strong>POSIXct</strong>和<strong>POSIXlt</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">now_ct &lt;- as.POSIXct(&quot;2018-08-01 22:00&quot;, tz &#x3D; &quot;UTC&quot;)
+now_ct
+#&gt; [1] &quot;2018-08-01 22:00:00 UTC&quot;
+
+typeof(now_ct)
+#&gt; [1] &quot;double&quot;
+attributes(now_ct)
+#&gt; $class
+#&gt; [1] &quot;POSIXct&quot; &quot;POSIXt&quot; 
+#&gt; 
+#&gt; $tzone
+#&gt; [1] &quot;UTC&quot;</code></pre>
+</li>
+<li><p>区间（durations）：<strong>difftime</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">one_week_1 &lt;- as.difftime(1, units &#x3D; &quot;weeks&quot;)
+one_week_1
+#&gt; Time difference of 1 weeks
+typeof(one_week_1)
+#&gt; [1] &quot;double&quot;
+attributes(one_week_1)
+#&gt; $class
+#&gt; [1] &quot;difftime&quot;
+#&gt; 
+#&gt; $units
+#&gt; [1] &quot;weeks&quot;</code></pre>
+</li>
+</ul>
+<h4 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h4><p>使用<strong>list( )</strong>来生成列表，使用<strong>as.list( )</strong>来将对象转换为列表。</p>
+<h4 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h4><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
+<ul>
+<li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
+<ul>
+<li><p>Data Frame会自动修改无效变量名，tibbles不会修改。</p>
+</li>
+<li><p>Data Frame和tibble都会自动循环填充较短的变量，但是tibble只有在变量为1的时候才会循环填充。</p>
+</li>
+<li><p>tibble在创建变量时即可引用</p>
+<pre><code class="hljs &#123;r&#125;">tibble(
+  x &#x3D; 1:3,
+  y &#x3D; x * 2
+)
+#&gt; # A tibble: 3 x 2
+#&gt;       x     y
+#&gt;   &lt;int&gt; &lt;dbl&gt;
+#&gt; 1     1     2
+#&gt; 2     2     4
+#&gt; 3     3     6</code></pre>
+</li>
+</ul>
+</li>
+<li><p>tibbles不支持rownames，相反，其提供<strong>rownames_to_column( )</strong>和<strong>rownames</strong>来将现有的行名称转换为变量。</p>
+</li>
+<li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
+<pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
+dfm$y &lt;- matrix(1:9, nrow &#x3D; 3) #矩阵变量
+dfm$z &lt;- data.frame(a &#x3D; 3:1, b &#x3D; letters[1:3], stringsAsFactors &#x3D; FALSE) #data.frame变量
+
+str(dfm)
+#&gt; &#39;data.frame&#39;:	3 obs. of  3 variables:
+#&gt;  $ x: num  10 20 30
+#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9
+#&gt;  $ z:&#39;data.frame&#39;:	3 obs. of  2 variables:
+#&gt;   ..$ a: int  3 2 1
+#&gt;   ..$ b: chr  &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/38c47352b8062a6d59318b3bbd1f86b062419322/7780c/diagrams/vectors/data-frame-matrix.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+</li>
+</ul>
+<h4 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h4><p><strong>NULL</strong>是特殊的类型，长度（length）为0，不能有任何属性（attributes）</p>
+<pre><code class="hljs &#123;r&#125;">typeof(NULL)
+#&gt; [1] &quot;NULL&quot;
+
+length(NULL)
+#&gt; [1] 0
+
+is.null(c())
+#&gt; [1] TRUE</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
   </entry>
 </search>
