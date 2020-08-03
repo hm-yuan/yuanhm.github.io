@@ -215,7 +215,7 @@
               <h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
 <p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
 </blockquote>
-<h4 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h4><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
+<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
 <ul>
 <li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
 <li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
@@ -229,7 +229,7 @@ lobstr::obj_addr(x)
 # [1] &quot;0x1deba3bd8f8&quot;
 lobstr::obj_addr(y)
 # [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h4 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h4><ol>
+<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
 <li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
 <ul>
 <li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
@@ -312,7 +312,7 @@ ref(x, y, character &#x3D; T)
 #&gt; \-[4:0x1deb150d048]</code></pre>
 </li>
 </ol>
-<h4 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h4><ol>
+<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
 <li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
 <pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
 lobstr::obj_size(x)
@@ -331,7 +331,7 @@ obj_size(rep(banana, 100))
 <li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
 </li>
 </ol>
-<h4 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h4><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
+<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
 <ol>
 <li><p>仅有单一链接（binding）的对象</p>
 <p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
@@ -373,7 +373,7 @@ e2$c
 #&gt; [1] 4</code></pre>
 </li>
 </ol>
-<h4 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h4><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
+<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
 <ul>
 <li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
 <li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
