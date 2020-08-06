@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] 4. 切片 - Hexo</title>
+  <title>[Advanced R] 3. 向量 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/cover.png') no-repeat center center;
+         style="background: url('/img/atomic.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-04 17:00">
-      2020年8月4日 下午
+    <time datetime="2020-08-03 17:00">
+      2020年8月3日 下午
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.4k 字
+      1.3k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      14
+      15
        分钟
     </span>
   
@@ -212,184 +212,186 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Subsetting"><a href="#Subsetting" class="headerlink" title="Subsetting"></a>Subsetting</h2><blockquote>
-<p>  <strong>切片（Subsetting）是str( )的延续步骤。</strong></p>
+              <h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
+<p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
 </blockquote>
-<h3 id="R中的六种切片方式"><a href="#R中的六种切片方式" class="headerlink" title="R中的六种切片方式"></a>R中的六种切片方式</h3><ul>
-<li><p>原子向量（atomic vector）中有六种切片方式，本质是通过逻辑值、序号、名字指定出特定元素。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(2, 1, 3, 4)
-# positive integers——保留选择
-x[order(x)]
-#&gt; [1] 1 2 3 4
-x[c(2.1, 2.2, 2.3, 2.6, 2.7, 2.8)] #R自动向下取整
-#&gt; [1] 1 1 1 1 1 1
-
-# negative integers——删去选择
-x[-c(3, 1)]
-#&gt; [1] 1 4
-
-# logical vectors
-x[c(T, T, F, T)]
-#&gt; [1] 2 1 4
-x[c(T, T, F)] #缺失的默认为TRUE
-#&gt; [1] 2 1 4
-x[c(T, F)] #长度不够自动循环
-#&gt; [1] 2 3
-
-# Nothing——返回原向量
-x[]
-#&gt; [1] 2 1 3 4
-
-# zero——返回长度为0的向量
-x[0]
-#&gt; numeric(0)
-
-# character vectors——如果原向量含有名字，那么通过选择名字来筛选</code></pre>
-</li>
-<li><p><strong>列表（list）</strong>的切片方式与原子向量相似，使用<strong>[ ]</strong>来返回list；使用<strong>[[ ]]</strong>和<strong>$</strong>来返回数值。</p>
-</li>
-<li><p>在处理多维结构的向量（如矩阵、数据框）时，可以选择三种方式来切片：</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/2ff3a6cebf1bb80abb2a814ae1cfc67b12817713/ae848/diagrams/vectors/summary-tree.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<h3 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h3><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 <ul>
-<li><p>多维向量：分别选定行、列</p>
-</li>
-<li><p>单一向量：由于多为结构本质上是向量，因而可以使用单一向量的方式来按顺序切片。</p>
-<pre><code class="hljs &#123;r&#125;">vals &lt;- outer(1:5, 1:5, FUN &#x3D; &quot;paste&quot;, sep &#x3D; &quot;,&quot;)
-vals
-#&gt;      [,1]  [,2]  [,3]  [,4]  [,5] 
-#&gt; [1,] &quot;1,1&quot; &quot;1,2&quot; &quot;1,3&quot; &quot;1,4&quot; &quot;1,5&quot;
-#&gt; [2,] &quot;2,1&quot; &quot;2,2&quot; &quot;2,3&quot; &quot;2,4&quot; &quot;2,5&quot;
-#&gt; [3,] &quot;3,1&quot; &quot;3,2&quot; &quot;3,3&quot; &quot;3,4&quot; &quot;3,5&quot;
-#&gt; [4,] &quot;4,1&quot; &quot;4,2&quot; &quot;4,3&quot; &quot;4,4&quot; &quot;4,5&quot;
-#&gt; [5,] &quot;5,1&quot; &quot;5,2&quot; &quot;5,3&quot; &quot;5,4&quot; &quot;5,5&quot;
+<li><p>绝大多数情况下与缺失值（<code>NA</code>）相关的表达式输出的都是<code>NA</code>。</p>
+<pre><code class="hljs &#123;r&#125;">NA &gt; 5
+#&gt; [1] NA
+10 * NA
+#&gt; [1] NA
+!NA
+#&gt; [1] NA
 
-vals[c(1, 4, 15)] #从第一列开始顺序筛选
-[1] &quot;1,1&quot; &quot;4,1&quot; &quot;5,3&quot;</code></pre>
-</li>
-<li><p>矩阵（matrix）：使用<strong>2-column矩阵来筛选矩阵</strong>；使用<strong>3-column矩阵来筛选数组</strong>。</p>
-<pre><code class="hljs &#123;r&#125;">select &lt;- matrix(ncol &#x3D; 2, byrow &#x3D; TRUE, c(
-  1, 1,
-  3, 1,
-  2, 4
-))
-vals[select] #行、列分别用来指定特定位置
-#&gt; [1] &quot;1,1&quot; &quot;3,1&quot; &quot;2,4&quot;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Data.Frame</strong>同时具有list和matrix两方面特征</p>
-<ul>
-<li><p>输入单一参数时，<strong>Data.Frame</strong>表现得像lists，输入的参数<strong>对列进行切片</strong>。</p>
-</li>
-<li><p>输入两个参数时，<strong>Data.Frame</strong>表现得像matrices。但注意data.frame如下的细节，相对地，tibbles总是返回tibbles。<strong>这是因为在对data.frame或其它matrices进行切片时，R总是会返回降维后的值（除非使用drop = FALSE）</strong>。对此，tibbles默认了drop = FALSE。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
-df[&quot;x&quot;]
-#&gt;   x
-#&gt; 1 1
-#&gt; 2 2
-#&gt; 3 3
-df[,&quot;x&quot;]
-#&gt; [1] 1 2 3</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>因子向量（Factor）</strong>在进行切片时，如果不使用<strong>drop = FALSE</strong>，因子的level可能被遗弃。</p>
-<pre><code class="hljs &#123;r&#125;">z &lt;- factor(c(&quot;a&quot;, &quot;b&quot;))
-z[1]
-#&gt; [1] a
-#&gt; Levels: a b
-z[1, drop &#x3D; TRUE]
-#&gt; [1] a
-#&gt; Levels: a</code></pre>
-</li>
-</ul>
-<h3 id="选择特定变量"><a href="#选择特定变量" class="headerlink" title="选择特定变量"></a>选择特定变量</h3><p>使用<strong>[[ ]]</strong> 与 <strong>$</strong>来选择特定变量（$是[[ ]]的简写），效果相似，但存在如下区别：</p>
-<ul>
-<li><p><strong>$</strong>和<strong>[[</strong>在呼叫用另一个对象存储的变量时可能存在区别：x$y将被翻译为x[[“y”]]</p>
-<pre><code class="hljs &#123;r&#125;">var &lt;- &quot;cyl&quot;
-mtcars$var
-#&gt; NULL
-mtcars[[var]]
-#&gt; [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4</code></pre>
-</li>
-<li><p><strong>$</strong>可以适用于部分匹配，而<strong>[[</strong>不行。</p>
-</li>
-</ul>
-<h3 id="切片与赋值"><a href="#切片与赋值" class="headerlink" title="切片与赋值"></a>切片与赋值</h3><p><strong>x[i] &lt;- value</strong>是切片赋值的基本形式</p>
-<ul>
-<li><p>使用x[ ]空白切片来赋值具有一些特殊用法：</p>
-<pre><code class="hljs &#123;r&#125;">mtcars &lt;- lapply(mtcars, as.integer) # 按column对对象使用函数
-is.data.frame(mtcars)
+# 以下为特殊情况
+NA ^ 0
+#&gt; [1] 1
+NA | TRUE
 #&gt; [1] TRUE
-
-mtcars &lt;- lapply(mtcars, as.integer) # 相当于新赋予了一个变量
-is.data.frame(mtcars)
+NA &amp; FALSE
 #&gt; [1] FALSE</code></pre>
 </li>
+<li><p>由于原子向量中的所有元素具有相同的属性，当试图合并两个不同类别的向量时，<strong>R</strong>会自动按照一个固定的顺序来强行调整类别（coerce）：<strong>character → double → integer → logical</strong>。对于logical向量，在使用数学函数时，其会自动转换为numeric。当强行调整类别失败时，<strong>R</strong>会返回NA。</p>
+<pre><code class="hljs &#123;r&#125;">str(c(&quot;a&quot;, 1))
+#&gt;  chr [1:2] &quot;a&quot; &quot;1&quot;
+
+# 对于logical向量，在使用数学函数时，其会自动转换为numeric
+x &lt;- c(FALSE, FALSE, TRUE)
+as.numeric(x)
+#&gt; [1] 0 0 1
+sum(x)
+#&gt; [1] 1
+
+# 当强行调整类别失败时，R会返回NA
+as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
+#&gt; Warning: NAs introduced by coercion
+#&gt; [1]  1  1 NA</code></pre>
+</li>
 </ul>
-<h3 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h3><h4 id="查询表格"><a href="#查询表格" class="headerlink" title="查询表格"></a>查询表格</h4><p>通过「字符串匹配」的方式，制作索引向量来替换变量：①字符串匹配；②<strong>[ ]</strong>查询是无限次的。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;m&quot;, &quot;f&quot;, &quot;u&quot;, &quot;f&quot;, &quot;f&quot;, &quot;m&quot;, &quot;m&quot;)
-lookup &lt;- c(m &#x3D; &quot;Male&quot;, f &#x3D; &quot;Female&quot;, u &#x3D; NA)
-lookup
-#&gt;        m        f        u 
-#&gt;   &quot;Male&quot; &quot;Female&quot;       NA
-
-lookup[x]
-#&gt;        m        f        u        f        f        m        m 
-#&gt;   &quot;Male&quot; &quot;Female&quot;       NA &quot;Female&quot; &quot;Female&quot;   &quot;Male&quot;   &quot;Male&quot;</code></pre>
-<h4 id="通过匹配合并"><a href="#通过匹配合并" class="headerlink" title="通过匹配合并"></a>通过匹配合并</h4><p>制作信息表来方向匹配。</p>
-<pre><code class="hljs &#123;r&#125;"># 数据
-grades &lt;- c(1, 2, 2, 3, 2, 2, 1, 3, 1)
-
-info_table &lt;- data.frame(
-	grade &#x3D; 3:1,
-    desc &#x3D; c(&quot;Excellent&quot;, &quot;Good&quot;, &quot;Poor&quot;),
-    fail &#x3D; c(F, F, T)
-)
-
-# 匹配
-id &lt;- match(grades, info_table$grade)
-id 
-#&gt; [1] 3 2 2 1 2 2 3 1 3
-info_table[id,]
-#&gt;   grade desc      fail 
-#&gt;   &lt;int&gt; &lt;chr&gt;     &lt;lgl&gt;
-#&gt; 1     1 Poor      TRUE 
-#&gt; 2     2 Good      FALSE
-#&gt; 3     2 Good      FALSE
-#&gt; 4     3 Excellent FALSE
-#&gt; 5     2 Good      FALSE
-#&gt; 6     2 Good      FALSE
-#&gt; 7     1 Poor      TRUE 
-#&gt; 8     3 Excellent FALSE
-#&gt; 9     1 Poor      TRUE</code></pre>
-<h4 id="随机样本"><a href="#随机样本" class="headerlink" title="随机样本"></a>随机样本</h4><p>使用<strong>sample(n)</strong>来对矩阵、数据框随机切片（<strong>df[sample()]</strong>）。</p>
-<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>使用<strong>c(1, 2, 3, …)</strong>，通过<strong>[[ ]]</strong>来对数据框重新排序。</p>
-<h4 id="移除"><a href="#移除" class="headerlink" title="移除"></a>移除</h4><p>将选出的对象设置为NULL来移除特定变量，或者保留想要的。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
-df[setdiff(names(df), &quot;z&quot;)]
-#&gt;   x y
-#&gt; 1 1 3
-#&gt; 2 2 2
-#&gt; 3 3 1</code></pre>
-<h4 id="结合逻辑值"><a href="#结合逻辑值" class="headerlink" title="结合逻辑值"></a>结合逻辑值</h4><p>注意逻辑值和数值之间的转换，主要差别在于存在缺失值（<strong>NA</strong>）时：</p>
+<h3 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h3><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
 <ul>
-<li><strong>c[which(x)]</strong>会在遇到NA时，直接遗弃对应值。</li>
-<li><strong>c[x]</strong>会在遇到NA时，返回NA。</li>
+<li><p>使用<code>attr( )</code>来获取和编辑单个属性，使用<code>attributes( )</code>来获取对象的所有属性信息。</p>
+</li>
+<li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
+<pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
+attr(a, &quot;x&quot;) &lt;- &quot;abc&quot;
+attr(a, &quot;x&quot;)
+#&gt; [1] &quot;abc&quot;
+
+# 丧失属性
+attributes(a[1])
+#&gt; NULL</code></pre>
+</li>
+<li><p>名字（name）和维度（dim）是仅有的两个会提前预设的属性。</p>
+<pre><code class="hljs &#123;r&#125;"># 三种命名方式
+x &lt;- c(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+
+x &lt;- 1:3
+names(x) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+# 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
+<ul>
+<li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
+<p>|    Vector    |         Matrix         |     Array      |<br>| :—————: | :——————————: | :——————: |<br>|    ames()    | rownames(), colnames() |   dimnames()   |<br>|    gth()`    |     nrow(), ncol()     |     dim()      |<br>|     c()      |    rbind(), cbind()    | abind::abind() |<br>|      —       |          t()           |    aperm()     |<br>| null(dim(x)) |      is.matrix()       |   is.array()   |</p>
+</li>
 </ul>
-<pre><code class="hljs &#123;r&#125;">c &lt;- c(1:10)
+</li>
+</ul>
+<h3 id="S3原子向量"><a href="#S3原子向量" class="headerlink" title="S3原子向量"></a>S3原子向量</h3><p>拥有<strong>class</strong>的向量即转换成了<strong>S3对象（S3 object）</strong>，有四种重要的S3对象：</p>
+<ul>
+<li><p>类别变量（category data）：<strong>factor</strong>是基于integer的S3对象，内含提前预设的值。</p>
+<pre><code class="hljs &#123;r&#125;"># 基于integer的对象
+x &lt;- factor(c(&quot;a&quot;, &quot;b&quot;, &quot;b&quot;, &quot;a&quot;))
+typeof(x)
+#&gt; [1] &quot;integer&quot;
+class(x)
+#&gt; [1] &quot;factor&quot;
 
-# 设置切片条件
-(x &lt;- sample(10) &lt; 4)
-#&gt; [1] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE
-which(x) #将逻辑值转换为数值
-#&gt; [1]  6  9 10
+attributes(x)
+#&gt; $levels
+#&gt; [1] &quot;a&quot; &quot;b&quot;
 
-# 切片
-(c[which(x)])
-#&gt; [1] 3 6 9
-(c[x])
-#&gt; [1] 3 6 9</code></pre>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+#&gt; $class
+#&gt; [1] &quot;factor&quot;
+
+# factor中规定的level数量可多余实际对象中的元素类别数量
+x &lt;- factor(x, levels &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+table(x)
+#&gt; x
+#&gt; a b c 
+#&gt; 2 2 0</code></pre>
+</li>
+<li><p>日期（dates）：<strong>Date</strong>是基于double的S3对象，是距离1970-01-01的天数。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(Sys.Date())
+#&gt; [1] &quot;double&quot;
+class(Sys.Date())
+#&gt; [1] &quot;Date&quot;
+unclass(Sys.Date())
+#&gt; [1] 18477</code></pre>
+</li>
+<li><p>时间（date-times）：<strong>POSIXct</strong>和<strong>POSIXlt</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">now_ct &lt;- as.POSIXct(&quot;2018-08-01 22:00&quot;, tz &#x3D; &quot;UTC&quot;)
+now_ct
+#&gt; [1] &quot;2018-08-01 22:00:00 UTC&quot;
+
+typeof(now_ct)
+#&gt; [1] &quot;double&quot;
+attributes(now_ct)
+#&gt; $class
+#&gt; [1] &quot;POSIXct&quot; &quot;POSIXt&quot; 
+#&gt; 
+#&gt; $tzone
+#&gt; [1] &quot;UTC&quot;</code></pre>
+</li>
+<li><p>区间（durations）：<strong>difftime</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">one_week_1 &lt;- as.difftime(1, units &#x3D; &quot;weeks&quot;)
+one_week_1
+#&gt; Time difference of 1 weeks
+typeof(one_week_1)
+#&gt; [1] &quot;double&quot;
+attributes(one_week_1)
+#&gt; $class
+#&gt; [1] &quot;difftime&quot;
+#&gt; 
+#&gt; $units
+#&gt; [1] &quot;weeks&quot;</code></pre>
+</li>
+</ul>
+<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<code>list( )</code>来生成列表，使用<code>as.list( )</code>来将对象转换为列表。</p>
+<h3 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h3><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
+<ul>
+<li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
+<ul>
+<li><p>Data Frame会自动修改无效变量名，tibbles不会修改。</p>
+</li>
+<li><p>Data Frame和tibble都会自动循环填充较短的变量，但是tibble只有在变量为1的时候才会循环填充。</p>
+</li>
+<li><p>tibble在创建变量时即可引用</p>
+<pre><code class="hljs &#123;r&#125;">tibble(
+  x &#x3D; 1:3,
+  y &#x3D; x * 2
+)
+#&gt; # A tibble: 3 x 2
+#&gt;       x     y
+#&gt;   &lt;int&gt; &lt;dbl&gt;
+#&gt; 1     1     2
+#&gt; 2     2     4
+#&gt; 3     3     6</code></pre>
+</li>
+</ul>
+</li>
+<li><p>tibbles不支持行名称，相反，其提供<code>rownames_to_column( )</code>和<code>rownames</code>来将现有的行名称转换为变量。</p>
+</li>
+<li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
+<pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
+dfm$y &lt;- matrix(1:9, nrow &#x3D; 3) #矩阵变量
+dfm$z &lt;- data.frame(a &#x3D; 3:1, b &#x3D; letters[1:3], stringsAsFactors &#x3D; FALSE) #data.frame变量
+
+str(dfm)
+#&gt; &#39;data.frame&#39;:	3 obs. of  3 variables:
+#&gt;  $ x: num  10 20 30
+#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9
+#&gt;  $ z:&#39;data.frame&#39;:	3 obs. of  2 variables:
+#&gt;   ..$ a: int  3 2 1
+#&gt;   ..$ b: chr  &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/38c47352b8062a6d59318b3bbd1f86b062419322/7780c/diagrams/vectors/data-frame-matrix.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+</li>
+</ul>
+<h3 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h3><p><strong>NULL</strong>是特殊的类型，长度（length）为0，不能有任何属性（attributes）</p>
+<pre><code><pre><code class="hljs &#123;r&#125;">typeof(NULL)
+#&gt; [1] &quot;NULL&quot;
+
+length(NULL)
+#&gt; [1] 0
+
+is.null(c())
+#&gt; [1] TRUE</code></pre>
+</code></pre><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -422,12 +424,18 @@ which(x) #将逻辑值转换为数值
                   <div class="post-prev col-6">
                     
                     
+                      <a href="/2020/08/04/Advanced_R/4.%20Subsetting/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[Advanced R] 4. 切片</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/08/03/Advanced_R/Vectors/">
-                        <span class="hidden-mobile">[Advanced R] 3. 向量</span>
+                      <a href="/2020/08/02/Advanced_R/2.%20Names_and_Values/">
+                        <span class="hidden-mobile">[Advanced R] 2. 名称与对象</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -442,6 +450,31 @@ which(x) #将逻辑值转换为数值
               <div class="comments" id="comments">
                 
                 
+  <div id="vcomments"></div>
+  <script type="text/javascript">
+    function loadValine() {
+      addScript('https://cdn.staticfile.org/valine/1.4.14/Valine.min.js', function () {
+        new Valine({
+          el: "#vcomments",
+          app_id: "TIwGpobNKf5SGDuXSM37uWlL-gzGzoHsz",
+          app_key: "acevM8xtX5cGa3scJDUgviwu",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    }
+    createObserver(loadValine, 'vcomments');
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://valine.js.org" target="_blank" rel="nofollow noopener noopener">comments
+      powered by Valine.</a></noscript>
+
 
               </div>
             
@@ -575,7 +608,7 @@ which(x) #将逻辑值转换为数值
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Subsetting &nbsp;",
+        "Vectors &nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,

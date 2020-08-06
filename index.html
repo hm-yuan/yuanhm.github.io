@@ -168,9 +168,107 @@
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/08/04/Advanced_R/Subsetting/">[Advanced R] 4. 切片</a>
+      <a class="index-header" href="/2020/08/06/Advanced_R/6.%20Functions/">[Advanced R] 6. 函数</a>
 
-      <a href="/2020/08/04/Advanced_R/Subsetting/" class="index-excerpt">
+      <a href="/2020/08/06/Advanced_R/6.%20Functions/" class="index-excerpt">
+        
+        
+          
+        
+        <div>Function
+  存在即对象，万物出自函数。
+
+函数基础函数构成三要素函数的拥有三个基本组成：参数（arguments）、主体（body）和环境（environment），分别使用formals()、body()和environment()来查看。
+fun0 &lt;- function(x, y) x+y
+formals(fun0)
+#&gt; $x
+
+#&gt; $y
+body(fun0)</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2020-08-06
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/R/">R</a>
+            
+              <a href="/tags/Programming/">Programming</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2020/08/05/Advanced_R/5.%20Control%20flow/">[Advanced R] 5. 控制流</a>
+
+      <a href="/2020/08/05/Advanced_R/5.%20Control%20flow/" class="index-excerpt">
+        
+        
+          
+        
+        <div>Control flow用if选择
+对于conditon长度为1的，使用if (condition) true_action else false_action形式来进行选择。其中，conditon可能出现以下情形：
+
+为逻辑值（logical）：按照TRUEorFALSE来进行选择。
+为整数值（integer）：如果&gt;0则为TRUE，&lt;0则为FALSE。
+为无效输入（NA, char</div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>&nbsp;2020-08-05
+          </div>
+        
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-category"></i>
+            
+              <a href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+            
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/R/">R</a>
+            
+              <a href="/tags/Programming/">Programming</a>
+            
+          </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <div class="col-12 col-md-12 mx-auto index-info">
+      <a class="index-header" href="/2020/08/04/Advanced_R/4.%20Subsetting/">[Advanced R] 4. 切片</a>
+
+      <a href="/2020/08/04/Advanced_R/4.%20Subsetting/" class="index-excerpt">
         
         
           
@@ -219,9 +317,9 @@ x[c(2.1, 2.2, 2.3, </div>
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/08/03/Advanced_R/Vectors/">[Advanced R] 3. 向量</a>
+      <a class="index-header" href="/2020/08/03/Advanced_R/3.%20Vectors/">[Advanced R] 3. 向量</a>
 
-      <a href="/2020/08/03/Advanced_R/Vectors/" class="index-excerpt">
+      <a href="/2020/08/03/Advanced_R/3.%20Vectors/" class="index-excerpt">
         
         
           
@@ -270,9 +368,9 @@ NA &gt; 5
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/08/02/Advanced_R/Names_and_Values/">[Advanced R] 2. 名称与对象</a>
+      <a class="index-header" href="/2020/08/02/Advanced_R/2.%20Names_and_Values/">[Advanced R] 2. 名称与对象</a>
 
-      <a href="/2020/08/02/Advanced_R/Names_and_Values/" class="index-excerpt">
+      <a href="/2020/08/02/Advanced_R/2.%20Names_and_Values/" class="index-excerpt">
         
         
           
@@ -280,7 +378,7 @@ NA &gt; 5
         <div>Names and Values
   对象（object）并没有名字（name），只是名字有了对象」
 
-名字与对象的链接名字和对象是独立的，二者通过“ &lt;- ”相连。
+名字与对象的链接名字和对象是独立的，二者通过&lt;-相连。
 
 每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。
 名字与对象直接相连，名字只是对象的查询编码（Reference）：
@@ -288,7 +386,8 @@ NA &gt; 5
 # 变量与对象的关系
 x &lt;- c(1, 2, 3)
 y &lt;- x
-</div>
+
+# x</div>
       </a>
 
       <div class="index-btm post-metas">
@@ -350,20 +449,31 @@ y &lt;- x
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/02/29/CFA/Portfolio_Management/">[CFA-1] 投资组合</a>
+      <a class="index-header" href="/2020/02/29/CFA/Equity_Investment/">[CFA-1] 权益投资</a>
 
-      <a href="/2020/02/29/CFA/Portfolio_Management/" class="index-excerpt">
+      <a href="/2020/02/29/CFA/Equity_Investment/" class="index-excerpt">
         
         
           
         
-        <div>Portfolio ManagementOverview「投资组合的好处：一定条件下，多元化有助于降低整体风险」
-基础
-组合视角（portfolio perspective）
-  组合视角：通过一只股票对整个组合收益、风险的影响来对其评估。
+        <div>Equity InvestmentMarket Organization and Structure金融市场基本概念
+金融市场的作用
+通过利率决定资金供给
+有效配置资源
 
-多元化的价值（risk-reduction benefits of diversification）
- 在资产不是绝对正相关的情况下，多元化有助于降低资产组</div>
+
+金融资产
+证券
+衍生品
+外汇
+
+
+市场
+
+现货市场（spot market）- 期货市场
+一级市场：IPO等新发证券 - 二级市场：股票市场
+货币市场：短期债券交易 - 资本市场：长期债券交易
+传统市场：债权与股权交易 - 替</div>
       </a>
 
       <div class="index-btm post-metas">
@@ -398,31 +508,20 @@ y &lt;- x
     
     
     <div class="col-12 col-md-12 mx-auto index-info">
-      <a class="index-header" href="/2020/02/29/CFA/Equity_Investment/">[CFA-1] 权益投资</a>
+      <a class="index-header" href="/2020/02/29/CFA/Portfolio_Management/">[CFA-1] 投资组合</a>
 
-      <a href="/2020/02/29/CFA/Equity_Investment/" class="index-excerpt">
+      <a href="/2020/02/29/CFA/Portfolio_Management/" class="index-excerpt">
         
         
           
         
-        <div>Equity InvestmentMarket Organization and Structure金融市场基本概念
-金融市场的作用
-通过利率决定资金供给
-有效配置资源
+        <div>Portfolio ManagementOverview「投资组合的好处：一定条件下，多元化有助于降低整体风险」
+基础
+组合视角（portfolio perspective）
+  组合视角：通过一只股票对整个组合收益、风险的影响来对其评估。
 
-
-金融资产
-证券
-衍生品
-外汇
-
-
-市场
-
-现货市场（spot market）- 期货市场
-一级市场：IPO等新发证券 - 二级市场：股票市场
-货币市场：短期债券交易 - 资本市场：长期债券交易
-传统市场：债权与股权交易 - 替</div>
+多元化的价值（risk-reduction benefits of diversification）
+ 在资产不是绝对正相关的情况下，多元化有助于降低资产组</div>
       </a>
 
       <div class="index-btm post-metas">

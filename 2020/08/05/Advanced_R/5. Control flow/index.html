@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] 2. 名称与对象 - Hexo</title>
+  <title>[Advanced R] 5. 控制流 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/binding-f1.png') no-repeat center center;
+         style="background: url('/img/cover.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-02 20:20">
-      2020年8月2日 晚上
+    <time datetime="2020-08-05 18:00">
+      2020年8月5日 晚上
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      740 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      10
        分钟
     </span>
   
@@ -212,173 +212,106 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
-<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
-</blockquote>
-<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
+              <h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
+<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
 <ul>
-<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
-<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
-</ul>
-<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
-x &lt;- c(1, 2, 3)
-y &lt;- x
-
-# x, y实际指向了同一个对象
-lobstr::obj_addr(x)
-# [1] &quot;0x1deba3bd8f8&quot;
-lobstr::obj_addr(y)
-# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
-<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
-<ul>
-<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
-tracemem(x)
-#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
-y[[3]] &lt;- 4L
-#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
-
-# 修改y并不会改变x的值
-x
-#&gt; [1] 1 2 3
-y
-#&gt; [1] 1 2 4
-
-# 修改y实际上新生成了一个变量
-lobstr::obj_addr(y)
-#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
-</li>
+<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
+<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
+<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
 </ul>
 </li>
-<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
-<ul>
-<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
-x &lt;- c(1, 2, 3)
-tracemem(x)
-z &lt;- f(x)
-# 没有复制发生！</code></pre>
+<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
+ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
+#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
+
+# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
+x &lt;- 1:50
+x[runif(10, max &#x3D; 50)] &lt;- NA
+case_when(
+	is.na(x) ~ &quot;nothing&quot;,
+    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
+    TRUE ~ as.character(x)
+)
+#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
+#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
+#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
+#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
+#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
+#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
 </li>
 </ul>
-</li>
-<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
-<ul>
-<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
-l2 &lt;- l1
-l2[[3]] &lt;- 4L
-lobstr:ref(l1, l2)
-#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
-#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
-#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
- 
-#&gt; o [5:0x1deba41de78] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] 
-#&gt; +-[3:0x1deba502778] 
-#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
-<ul>
-<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
-<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
-</ul>
-</li>
-<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
-y &lt;- x
-y[[1]] &lt;- &quot;c&quot;
-# 指向的对象不同了
-ref(x, y)
-#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
+<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
+<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
+    switch(
+    	x,
+        a &#x3D; &quot;option 1&quot;,
+        b &#x3D; &quot;option 2&quot;,
+        c &#x3D; &quot;option 3&quot;,
+        stop(&quot;Invalid &#96;x&#96; value&quot;)
+    )
+&#125;
 
-#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
+option(&quot;a&quot;)
+#&gt; [1] &quot;option 1&quot;
 
-# 实际是具体修改的字符串查询编码变化了
-ref(x, y, character &#x3D; T)
-#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
-#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
-#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
- 
-#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
-#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] 
-#&gt; \-[4:0x1deb150d048]</code></pre>
-</li>
-</ol>
-<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
-<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
-lobstr::obj_size(x)
-#&gt; 8,000,048 B
-y &lt;- list(x, x, x)
-lobstr::obj_size(y)
-#&gt; 8,000,128 B</code></pre>
-</li>
-<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
-obj_size(banana)
-#&gt; 136 B
-obj_size(rep(banana, 100))
-#&gt; 928 B</code></pre>
-</li>
-<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
-</li>
-</ol>
-<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
-<ol>
-<li><p>仅有单一链接（binding）的对象</p>
-<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
-<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
-medians &lt;- sapply(x, median, numeric(i))
-tracemem(x)
-#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
-
-# 直接使用循环，对象在每次迭代中被复制了两次
-for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
-#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
-#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
-#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
-#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
-#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
-
-# 将data.frame转换为list，仅有一次复制发生
-y &lt;- as.list(x)
-#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
-for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
-</li>
-</ol>
-<ol>
-<li><p>环境（environment）</p>
-<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
-<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-e2 &lt;- e1
-
-# 修改e1中的对象后，e2同步改变了
-e1$c &lt;- 4
-e2$c
+legs &lt;- function(x)&#123;
+    switch(
+    	x,
+        cow &#x3D; ,
+        dog &#x3D; 4,
+        human &#x3D; 2
+    )
+&#125;
+legs(&quot;cow&quot;)
 #&gt; [1] 4</code></pre>
-</li>
-</ol>
-<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
+<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
+<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
 <ul>
-<li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
-<li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
+<li><code>break</code>退出当前整个<code>for</code>循环。</li>
+<li><code>next</code>退出当前子循环。</li>
 </ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
+<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
+    if (i &lt; 3) &#123;
+        next
+    &#125;
+    print(i)
+    if (i &gt;&#x3D; 5) &#123;
+        break
+    &#125; 
+&#125;
+#&gt; [1] 3
+#&gt; [1] 4
+#&gt; [1] 5</code></pre>
+</li>
+</ul>
+<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
+<ul>
+<li><p>vector长度不能为0</p>
+</li>
+<li><p>循环可能剥离对象的属性</p>
+<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
+for (i in dates) print(i)
+#&gt; [1] 18262
+#&gt; [1] 18263
+
+for (i in seq_along(dates)) print(dates[[i]])
+#&gt; [1] &quot;2020-01-01&quot;
+#&gt; [1] &quot;2020-01-02&quot;</code></pre>
+</li>
+<li><p>使用<code>list()</code>来储存数据</p>
+<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
+out &lt;- vector(&quot;list&quot;, length(means))
+for (i in seq_along(means))&#123;
+    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
+&#125;</code></pre>
+</li>
+</ul>
+<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
+<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
+<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -411,9 +344,9 @@ e2$c
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/03/Advanced_R/Vectors/">
+                      <a href="/2020/08/06/Advanced_R/6.%20Functions/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] 3. 向量</span>
+                        <span class="hidden-mobile">[Advanced R] 6. 函数</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -421,8 +354,8 @@ e2$c
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/07/22/show-me-the-money/">
-                        <span class="hidden-mobile">show me the money</span>
+                      <a href="/2020/08/04/Advanced_R/4.%20Subsetting/">
+                        <span class="hidden-mobile">[Advanced R] 4. 切片</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -437,6 +370,31 @@ e2$c
               <div class="comments" id="comments">
                 
                 
+  <div id="vcomments"></div>
+  <script type="text/javascript">
+    function loadValine() {
+      addScript('https://cdn.staticfile.org/valine/1.4.14/Valine.min.js', function () {
+        new Valine({
+          el: "#vcomments",
+          app_id: "TIwGpobNKf5SGDuXSM37uWlL-gzGzoHsz",
+          app_key: "acevM8xtX5cGa3scJDUgviwu",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    }
+    createObserver(loadValine, 'vcomments');
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://valine.js.org" target="_blank" rel="nofollow noopener noopener">comments
+      powered by Valine.</a></noscript>
+
 
               </div>
             
@@ -570,7 +528,7 @@ e2$c
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Names and Values &nbsp;",
+        "Control flow &nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,

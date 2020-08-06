@@ -7,198 +7,8 @@
 ]]></content>
   </entry>
   <entry>
-    <title>[Advanced R] 4. 切片</title>
-    <url>/2020/08/04/Advanced_R/Subsetting/</url>
-    <content><![CDATA[<h2 id="Subsetting"><a href="#Subsetting" class="headerlink" title="Subsetting"></a>Subsetting</h2><blockquote>
-<p>  <strong>切片（Subsetting）是str( )的延续步骤。</strong></p>
-</blockquote>
-<h3 id="R中的六种切片方式"><a href="#R中的六种切片方式" class="headerlink" title="R中的六种切片方式"></a>R中的六种切片方式</h3><ul>
-<li><p>原子向量（atomic vector）中有六种切片方式，本质是通过逻辑值、序号、名字指定出特定元素。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(2, 1, 3, 4)
-# positive integers——保留选择
-x[order(x)]
-#&gt; [1] 1 2 3 4
-x[c(2.1, 2.2, 2.3, 2.6, 2.7, 2.8)] #R自动向下取整
-#&gt; [1] 1 1 1 1 1 1
-
-# negative integers——删去选择
-x[-c(3, 1)]
-#&gt; [1] 1 4
-
-# logical vectors
-x[c(T, T, F, T)]
-#&gt; [1] 2 1 4
-x[c(T, T, F)] #缺失的默认为TRUE
-#&gt; [1] 2 1 4
-x[c(T, F)] #长度不够自动循环
-#&gt; [1] 2 3
-
-# Nothing——返回原向量
-x[]
-#&gt; [1] 2 1 3 4
-
-# zero——返回长度为0的向量
-x[0]
-#&gt; numeric(0)
-
-# character vectors——如果原向量含有名字，那么通过选择名字来筛选</code></pre>
-</li>
-<li><p><strong>列表（list）</strong>的切片方式与原子向量相似，使用<strong>[ ]</strong>来返回list；使用<strong>[[ ]]</strong>和<strong>$</strong>来返回数值。</p>
-</li>
-<li><p>在处理多维结构的向量（如矩阵、数据框）时，可以选择三种方式来切片：</p>
-<ul>
-<li><p>多维向量：分别选定行、列</p>
-</li>
-<li><p>单一向量：由于多为结构本质上是向量，因而可以使用单一向量的方式来按顺序切片。</p>
-<pre><code class="hljs &#123;r&#125;">vals &lt;- outer(1:5, 1:5, FUN &#x3D; &quot;paste&quot;, sep &#x3D; &quot;,&quot;)
-vals
-#&gt;      [,1]  [,2]  [,3]  [,4]  [,5] 
-#&gt; [1,] &quot;1,1&quot; &quot;1,2&quot; &quot;1,3&quot; &quot;1,4&quot; &quot;1,5&quot;
-#&gt; [2,] &quot;2,1&quot; &quot;2,2&quot; &quot;2,3&quot; &quot;2,4&quot; &quot;2,5&quot;
-#&gt; [3,] &quot;3,1&quot; &quot;3,2&quot; &quot;3,3&quot; &quot;3,4&quot; &quot;3,5&quot;
-#&gt; [4,] &quot;4,1&quot; &quot;4,2&quot; &quot;4,3&quot; &quot;4,4&quot; &quot;4,5&quot;
-#&gt; [5,] &quot;5,1&quot; &quot;5,2&quot; &quot;5,3&quot; &quot;5,4&quot; &quot;5,5&quot;
-
-vals[c(1, 4, 15)] #从第一列开始顺序筛选
-[1] &quot;1,1&quot; &quot;4,1&quot; &quot;5,3&quot;</code></pre>
-</li>
-<li><p>矩阵（matrix）：使用<strong>2-column矩阵来筛选矩阵</strong>；使用<strong>3-column矩阵来筛选数组</strong>。</p>
-<pre><code class="hljs &#123;r&#125;">select &lt;- matrix(ncol &#x3D; 2, byrow &#x3D; TRUE, c(
-  1, 1,
-  3, 1,
-  2, 4
-))
-vals[select] #行、列分别用来指定特定位置
-#&gt; [1] &quot;1,1&quot; &quot;3,1&quot; &quot;2,4&quot;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Data.Frame</strong>同时具有list和matrix两方面特征</p>
-<ul>
-<li><p>输入单一参数时，<strong>Data.Frame</strong>表现得像lists，输入的参数<strong>对列进行切片</strong>。</p>
-</li>
-<li><p>输入两个参数时，<strong>Data.Frame</strong>表现得像matrices。但注意data.frame如下的细节，相对地，tibbles总是返回tibbles。<strong>这是因为在对data.frame或其它matrices进行切片时，R总是会返回降维后的值（除非使用drop = FALSE）</strong>。对此，tibbles默认了drop = FALSE。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
-df[&quot;x&quot;]
-#&gt;   x
-#&gt; 1 1
-#&gt; 2 2
-#&gt; 3 3
-df[,&quot;x&quot;]
-#&gt; [1] 1 2 3</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>因子向量（Factor）</strong>在进行切片时，如果不使用<strong>drop = FALSE</strong>，因子的level可能被遗弃。</p>
-<pre><code class="hljs &#123;r&#125;">z &lt;- factor(c(&quot;a&quot;, &quot;b&quot;))
-z[1]
-#&gt; [1] a
-#&gt; Levels: a b
-z[1, drop &#x3D; TRUE]
-#&gt; [1] a
-#&gt; Levels: a</code></pre>
-</li>
-</ul>
-<h3 id="选择特定变量"><a href="#选择特定变量" class="headerlink" title="选择特定变量"></a>选择特定变量</h3><p>使用<strong>[[ ]]</strong> 与 <strong>$</strong>来选择特定变量（$是[[ ]]的简写），效果相似，但存在如下区别：</p>
-<ul>
-<li><p><strong>$</strong>和<strong>[[</strong>在呼叫用另一个对象存储的变量时可能存在区别：x$y将被翻译为x[[“y”]]</p>
-<pre><code class="hljs &#123;r&#125;">var &lt;- &quot;cyl&quot;
-mtcars$var
-#&gt; NULL
-mtcars[[var]]
-#&gt; [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4</code></pre>
-</li>
-<li><p><strong>$</strong>可以适用于部分匹配，而<strong>[[</strong>不行。</p>
-</li>
-</ul>
-<h3 id="切片与赋值"><a href="#切片与赋值" class="headerlink" title="切片与赋值"></a>切片与赋值</h3><p><strong>x[i] &lt;- value</strong>是切片赋值的基本形式</p>
-<ul>
-<li><p>使用x[ ]空白切片来赋值具有一些特殊用法：</p>
-<pre><code class="hljs &#123;r&#125;">mtcars &lt;- lapply(mtcars, as.integer) # 按column对对象使用函数
-is.data.frame(mtcars)
-#&gt; [1] TRUE
-
-mtcars &lt;- lapply(mtcars, as.integer) # 相当于新赋予了一个变量
-is.data.frame(mtcars)
-#&gt; [1] FALSE</code></pre>
-</li>
-</ul>
-<h3 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h3><h4 id="查询表格"><a href="#查询表格" class="headerlink" title="查询表格"></a>查询表格</h4><p>通过「字符串匹配」的方式，制作索引向量来替换变量：①字符串匹配；②<strong>[ ]</strong>查询是无限次的。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;m&quot;, &quot;f&quot;, &quot;u&quot;, &quot;f&quot;, &quot;f&quot;, &quot;m&quot;, &quot;m&quot;)
-lookup &lt;- c(m &#x3D; &quot;Male&quot;, f &#x3D; &quot;Female&quot;, u &#x3D; NA)
-lookup
-#&gt;        m        f        u 
-#&gt;   &quot;Male&quot; &quot;Female&quot;       NA
-
-lookup[x]
-#&gt;        m        f        u        f        f        m        m 
-#&gt;   &quot;Male&quot; &quot;Female&quot;       NA &quot;Female&quot; &quot;Female&quot;   &quot;Male&quot;   &quot;Male&quot;</code></pre>
-<h4 id="通过匹配合并"><a href="#通过匹配合并" class="headerlink" title="通过匹配合并"></a>通过匹配合并</h4><p>制作信息表来方向匹配。</p>
-<pre><code class="hljs &#123;r&#125;"># 数据
-grades &lt;- c(1, 2, 2, 3, 2, 2, 1, 3, 1)
-
-info_table &lt;- data.frame(
-	grade &#x3D; 3:1,
-    desc &#x3D; c(&quot;Excellent&quot;, &quot;Good&quot;, &quot;Poor&quot;),
-    fail &#x3D; c(F, F, T)
-)
-
-# 匹配
-id &lt;- match(grades, info_table$grade)
-id 
-#&gt; [1] 3 2 2 1 2 2 3 1 3
-info_table[id,]
-#&gt;   grade desc      fail 
-#&gt;   &lt;int&gt; &lt;chr&gt;     &lt;lgl&gt;
-#&gt; 1     1 Poor      TRUE 
-#&gt; 2     2 Good      FALSE
-#&gt; 3     2 Good      FALSE
-#&gt; 4     3 Excellent FALSE
-#&gt; 5     2 Good      FALSE
-#&gt; 6     2 Good      FALSE
-#&gt; 7     1 Poor      TRUE 
-#&gt; 8     3 Excellent FALSE
-#&gt; 9     1 Poor      TRUE</code></pre>
-<h4 id="随机样本"><a href="#随机样本" class="headerlink" title="随机样本"></a>随机样本</h4><p>使用<strong>sample(n)</strong>来对矩阵、数据框随机切片（<strong>df[sample()]</strong>）。</p>
-<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>使用<strong>c(1, 2, 3, …)</strong>，通过<strong>[[ ]]</strong>来对数据框重新排序。</p>
-<h4 id="移除"><a href="#移除" class="headerlink" title="移除"></a>移除</h4><p>将选出的对象设置为NULL来移除特定变量，或者保留想要的。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
-df[setdiff(names(df), &quot;z&quot;)]
-#&gt;   x y
-#&gt; 1 1 3
-#&gt; 2 2 2
-#&gt; 3 3 1</code></pre>
-<h4 id="结合逻辑值"><a href="#结合逻辑值" class="headerlink" title="结合逻辑值"></a>结合逻辑值</h4><p>注意逻辑值和数值之间的转换，主要差别在于存在缺失值（<strong>NA</strong>）时：</p>
-<ul>
-<li><strong>c[which(x)]</strong>会在遇到NA时，直接遗弃对应值。</li>
-<li><strong>c[x]</strong>会在遇到NA时，返回NA。</li>
-</ul>
-<pre><code class="hljs &#123;r&#125;">c &lt;- c(1:10)
-
-# 设置切片条件
-(x &lt;- sample(10) &lt; 4)
-#&gt; [1] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE
-which(x) #将逻辑值转换为数值
-#&gt; [1]  6  9 10
-
-# 切片
-(c[which(x)])
-#&gt; [1] 3 6 9
-(c[x])
-#&gt; [1] 3 6 9</code></pre>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>[Advanced R] 3. 向量</title>
-    <url>/2020/08/03/Advanced_R/Vectors/</url>
+    <url>/2020/08/03/Advanced_R/3.%20Vectors/</url>
     <content><![CDATA[<h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
 <p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
 </blockquote>
@@ -206,7 +16,7 @@ which(x) #将逻辑值转换为数值
 <h3 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h3><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
 <p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 <ul>
-<li><p>绝大多数情况下与缺失值（NA）相关的表达式输出的都是NA。</p>
+<li><p>绝大多数情况下与缺失值（<code>NA</code>）相关的表达式输出的都是<code>NA</code>。</p>
 <pre><code class="hljs &#123;r&#125;">NA &gt; 5
 #&gt; [1] NA
 10 * NA
@@ -241,7 +51,7 @@ as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
 </ul>
 <h3 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h3><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
 <ul>
-<li><p>使用<strong>attr( )</strong>来获取和编辑单个属性，使用<strong>attributes( )</strong>来获取对象的所有属性信息。</p>
+<li><p>使用<code>attr( )</code>来获取和编辑单个属性，使用<code>attributes( )</code>来获取对象的所有属性信息。</p>
 </li>
 <li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
 <pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
@@ -264,12 +74,7 @@ x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
 # 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
 <ul>
 <li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
-<p>Vector|Matrix|Array<br> :—-: | :—-: | :—-: </p>
-<pre><code> names()     | rownames(), colnames() |   dimnames()   
-length()`     |     nrow(), ncol()     |     dim()      
-   c()       |    rbind(), cbind()    | abind::abind() 
-     —         |           t()            |    aperm()     
-</code></pre><p> is.null(dim(x)) |       is.matrix()        |   is.array()   </p>
+<p>|    Vector    |         Matrix         |     Array      |<br>| :—————: | :——————————: | :——————: |<br>|    ames()    | rownames(), colnames() |   dimnames()   |<br>|    gth()`    |     nrow(), ncol()     |     dim()      |<br>|     c()      |    rbind(), cbind()    | abind::abind() |<br>|      —       |          t()           |    aperm()     |<br>| null(dim(x)) |      is.matrix()       |   is.array()   |</p>
 </li>
 </ul>
 </li>
@@ -334,7 +139,7 @@ attributes(one_week_1)
 #&gt; [1] &quot;weeks&quot;</code></pre>
 </li>
 </ul>
-<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<strong>list( )</strong>来生成列表，使用<strong>as.list( )</strong>来将对象转换为列表。</p>
+<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<code>list( )</code>来生成列表，使用<code>as.list( )</code>来将对象转换为列表。</p>
 <h3 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h3><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
 <ul>
 <li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
@@ -357,7 +162,7 @@ attributes(one_week_1)
 </li>
 </ul>
 </li>
-<li><p>tibbles不支持rownames，相反，其提供<strong>rownames_to_column( )</strong>和<strong>rownames</strong>来将现有的行名称转换为变量。</p>
+<li><p>tibbles不支持行名称，相反，其提供<code>rownames_to_column( )</code>和<code>rownames</code>来将现有的行名称转换为变量。</p>
 </li>
 <li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
 <pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
@@ -394,12 +199,314 @@ is.null(c())
       </tags>
   </entry>
   <entry>
+    <title>[Advanced R] 5. 控制流</title>
+    <url>/2020/08/05/Advanced_R/5.%20Control%20flow/</url>
+    <content><![CDATA[<h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
+<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
+<ul>
+<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
+<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
+<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
+</ul>
+</li>
+<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
+ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
+#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
+
+# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
+x &lt;- 1:50
+x[runif(10, max &#x3D; 50)] &lt;- NA
+case_when(
+	is.na(x) ~ &quot;nothing&quot;,
+    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
+    TRUE ~ as.character(x)
+)
+#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
+#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
+#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
+#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
+#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
+#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
+</li>
+</ul>
+<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
+<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
+    switch(
+    	x,
+        a &#x3D; &quot;option 1&quot;,
+        b &#x3D; &quot;option 2&quot;,
+        c &#x3D; &quot;option 3&quot;,
+        stop(&quot;Invalid &#96;x&#96; value&quot;)
+    )
+&#125;
+
+option(&quot;a&quot;)
+#&gt; [1] &quot;option 1&quot;
+
+legs &lt;- function(x)&#123;
+    switch(
+    	x,
+        cow &#x3D; ,
+        dog &#x3D; 4,
+        human &#x3D; 2
+    )
+&#125;
+legs(&quot;cow&quot;)
+#&gt; [1] 4</code></pre>
+<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
+<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
+<ul>
+<li><code>break</code>退出当前整个<code>for</code>循环。</li>
+<li><code>next</code>退出当前子循环。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
+    if (i &lt; 3) &#123;
+        next
+    &#125;
+    print(i)
+    if (i &gt;&#x3D; 5) &#123;
+        break
+    &#125; 
+&#125;
+#&gt; [1] 3
+#&gt; [1] 4
+#&gt; [1] 5</code></pre>
+</li>
+</ul>
+<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
+<ul>
+<li><p>vector长度不能为0</p>
+</li>
+<li><p>循环可能剥离对象的属性</p>
+<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
+for (i in dates) print(i)
+#&gt; [1] 18262
+#&gt; [1] 18263
+
+for (i in seq_along(dates)) print(dates[[i]])
+#&gt; [1] &quot;2020-01-01&quot;
+#&gt; [1] &quot;2020-01-02&quot;</code></pre>
+</li>
+<li><p>使用<code>list()</code>来储存数据</p>
+<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
+out &lt;- vector(&quot;list&quot;, length(means))
+for (i in seq_along(means))&#123;
+    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
+&#125;</code></pre>
+</li>
+</ul>
+<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
+<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
+<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] 4. 切片</title>
+    <url>/2020/08/04/Advanced_R/4.%20Subsetting/</url>
+    <content><![CDATA[<h2 id="Subsetting"><a href="#Subsetting" class="headerlink" title="Subsetting"></a>Subsetting</h2><blockquote>
+<p>  <strong>切片（Subsetting）是str( )的延续步骤。</strong></p>
+</blockquote>
+<h3 id="R中的六种切片方式"><a href="#R中的六种切片方式" class="headerlink" title="R中的六种切片方式"></a>R中的六种切片方式</h3><ul>
+<li><p>原子向量（atomic vector）中有六种切片方式，本质是通过逻辑值、序号、名字指定出特定元素。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(2, 1, 3, 4)
+# positive integers——保留选择
+x[order(x)]
+#&gt; [1] 1 2 3 4
+x[c(2.1, 2.2, 2.3, 2.6, 2.7, 2.8)] #R自动向下取整
+#&gt; [1] 1 1 1 1 1 1
+
+# negative integers——删去选择
+x[-c(3, 1)]
+#&gt; [1] 1 4
+
+# logical vectors
+x[c(T, T, F, T)]
+#&gt; [1] 2 1 4
+x[c(T, T, F)] #缺失的默认为TRUE
+#&gt; [1] 2 1 4
+x[c(T, F)] #长度不够自动循环
+#&gt; [1] 2 3
+
+# Nothing——返回原向量
+x[]
+#&gt; [1] 2 1 3 4
+
+# zero——返回长度为0的向量
+x[0]
+#&gt; numeric(0)
+
+# character vectors——如果原向量含有名字，那么通过选择名字来筛选</code></pre>
+</li>
+<li><p><strong>列表（list）</strong>的切片方式与原子向量相似，使用<code>[ ]</code>来返回list；使用<code>[[ ]]</code>*和<code>$</code>来返回数值。</p>
+</li>
+<li><p>在处理多维结构的向量（如矩阵、数据框）时，可以选择三种方式来切片：</p>
+<ul>
+<li><p>多维向量：分别选定行、列</p>
+</li>
+<li><p>单一向量：由于多为结构本质上是向量，因而可以使用单一向量的方式来按顺序切片。</p>
+<pre><code class="hljs &#123;r&#125;">vals &lt;- outer(1:5, 1:5, FUN &#x3D; &quot;paste&quot;, sep &#x3D; &quot;,&quot;)
+vals
+#&gt;      [,1]  [,2]  [,3]  [,4]  [,5] 
+#&gt; [1,] &quot;1,1&quot; &quot;1,2&quot; &quot;1,3&quot; &quot;1,4&quot; &quot;1,5&quot;
+#&gt; [2,] &quot;2,1&quot; &quot;2,2&quot; &quot;2,3&quot; &quot;2,4&quot; &quot;2,5&quot;
+#&gt; [3,] &quot;3,1&quot; &quot;3,2&quot; &quot;3,3&quot; &quot;3,4&quot; &quot;3,5&quot;
+#&gt; [4,] &quot;4,1&quot; &quot;4,2&quot; &quot;4,3&quot; &quot;4,4&quot; &quot;4,5&quot;
+#&gt; [5,] &quot;5,1&quot; &quot;5,2&quot; &quot;5,3&quot; &quot;5,4&quot; &quot;5,5&quot;
+
+vals[c(1, 4, 15)] #从第一列开始顺序筛选
+[1] &quot;1,1&quot; &quot;4,1&quot; &quot;5,3&quot;</code></pre>
+</li>
+<li><p>矩阵（matrix）：使用<strong>2-column矩阵来筛选矩阵</strong>；使用<strong>3-column矩阵来筛选数组</strong>。</p>
+<pre><code class="hljs &#123;r&#125;">select &lt;- matrix(ncol &#x3D; 2, byrow &#x3D; TRUE, c(
+  1, 1,
+  3, 1,
+  2, 4
+))
+vals[select] #行、列分别用来指定特定位置
+#&gt; [1] &quot;1,1&quot; &quot;3,1&quot; &quot;2,4&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Data.Frame</strong>同时具有list和matrix两方面特征</p>
+<ul>
+<li><p>输入单一参数时，<strong>Data.Frame</strong>表现得像lists，输入的参数<strong>对列进行切片</strong>。</p>
+</li>
+<li><p>输入两个参数时，<strong>Data.Frame</strong>表现得像matrices。但注意data.frame如下的细节，相对地，tibbles总是返回tibbles。<strong>这是因为在对data.frame或其它matrices进行切片时，R总是会返回降维后的值（除非使用<code>drop = FALSE</code>）</strong>。对此，tibbles默认了<code>drop = FALSE</code>。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
+df[&quot;x&quot;]
+#&gt;   x
+#&gt; 1 1
+#&gt; 2 2
+#&gt; 3 3
+df[,&quot;x&quot;]
+#&gt; [1] 1 2 3</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>因子向量（Factor）</strong>在进行切片时，如果不使用<code>drop = FALSE</code>，因子的level可能被遗弃。</p>
+<pre><code class="hljs &#123;r&#125;">z &lt;- factor(c(&quot;a&quot;, &quot;b&quot;))
+z[1]
+#&gt; [1] a
+#&gt; Levels: a b
+z[1, drop &#x3D; TRUE]
+#&gt; [1] a
+#&gt; Levels: a</code></pre>
+</li>
+</ul>
+<h3 id="选择特定变量"><a href="#选择特定变量" class="headerlink" title="选择特定变量"></a>选择特定变量</h3><p>使用<code>[[ ]]</code> 与<script type="math/tex">`来选择特定变量（`</script>是<code>[[ ]]</code>的简写），效果相似，但存在如下区别：</p>
+<ul>
+<li><p><code>$</code>和<code>[[</code>在呼叫用另一个对象存储的变量时可能存在区别：<code>x$y</code>将被翻译为<code>x[[“y”]]</code></p>
+<pre><code class="hljs &#123;r&#125;">var &lt;- &quot;cyl&quot;
+mtcars$var
+#&gt; NULL
+mtcars[[var]]
+#&gt; [1] 6 6 4 6 8 6 8 4 4 6 6 8 8 8 8 8 8 4 4 4 4 8 8 8 8 4 4 4 8 6 8 4</code></pre>
+</li>
+<li><p><code>$</code>可以适用于部分匹配，而<code>[[</code>不行。</p>
+</li>
+</ul>
+<h3 id="切片与赋值"><a href="#切片与赋值" class="headerlink" title="切片与赋值"></a>切片与赋值</h3><p><code>x[i] &lt;- value</code>是切片赋值的基本形式</p>
+<ul>
+<li><p>使用<code>x[ ]</code>空白切片来赋值具有一些特殊用法：</p>
+<pre><code class="hljs &#123;r&#125;">mtcars &lt;- lapply(mtcars, as.integer) # 按column对对象使用函数
+is.data.frame(mtcars)
+#&gt; [1] TRUE
+
+mtcars &lt;- lapply(mtcars, as.integer) # 相当于新赋予了一个变量
+is.data.frame(mtcars)
+#&gt; [1] FALSE</code></pre>
+</li>
+</ul>
+<h3 id="应用示例"><a href="#应用示例" class="headerlink" title="应用示例"></a>应用示例</h3><h4 id="查询表格"><a href="#查询表格" class="headerlink" title="查询表格"></a>查询表格</h4><p>通过「字符串匹配」的方式，制作索引向量来替换变量：①字符串匹配；②<strong>[ ]</strong>查询是无限次的。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;m&quot;, &quot;f&quot;, &quot;u&quot;, &quot;f&quot;, &quot;f&quot;, &quot;m&quot;, &quot;m&quot;)
+lookup &lt;- c(m &#x3D; &quot;Male&quot;, f &#x3D; &quot;Female&quot;, u &#x3D; NA)
+lookup
+#&gt;        m        f        u 
+#&gt;   &quot;Male&quot; &quot;Female&quot;       NA
+
+lookup[x]
+#&gt;        m        f        u        f        f        m        m 
+#&gt;   &quot;Male&quot; &quot;Female&quot;       NA &quot;Female&quot; &quot;Female&quot;   &quot;Male&quot;   &quot;Male&quot;</code></pre>
+<h4 id="通过匹配合并"><a href="#通过匹配合并" class="headerlink" title="通过匹配合并"></a>通过匹配合并</h4><p>制作信息表来方向匹配。</p>
+<pre><code class="hljs &#123;r&#125;"># 数据
+grades &lt;- c(1, 2, 2, 3, 2, 2, 1, 3, 1)
+
+info_table &lt;- data.frame(
+	grade &#x3D; 3:1,
+    desc &#x3D; c(&quot;Excellent&quot;, &quot;Good&quot;, &quot;Poor&quot;),
+    fail &#x3D; c(F, F, T)
+)
+
+# 匹配
+id &lt;- match(grades, info_table$grade)
+id 
+#&gt; [1] 3 2 2 1 2 2 3 1 3
+info_table[id,]
+#&gt;   grade desc      fail 
+#&gt;   &lt;int&gt; &lt;chr&gt;     &lt;lgl&gt;
+#&gt; 1     1 Poor      TRUE 
+#&gt; 2     2 Good      FALSE
+#&gt; 3     2 Good      FALSE
+#&gt; 4     3 Excellent FALSE
+#&gt; 5     2 Good      FALSE
+#&gt; 6     2 Good      FALSE
+#&gt; 7     1 Poor      TRUE 
+#&gt; 8     3 Excellent FALSE
+#&gt; 9     1 Poor      TRUE</code></pre>
+<h4 id="随机样本"><a href="#随机样本" class="headerlink" title="随机样本"></a>随机样本</h4><p>使用<code>sample(n)</code>来对矩阵、数据框随机切片（<code>df[sample()]</code>）。</p>
+<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>使用<code>c(1, 2, 3, …)</code>，通过<code>[[ ]]</code>来对数据框重新排序。</p>
+<h4 id="移除"><a href="#移除" class="headerlink" title="移除"></a>移除</h4><p>将选出的对象设置为<code>NULL</code>来移除特定变量，或者保留想要的。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 3:1, z &#x3D; letters[1:3])
+df[setdiff(names(df), &quot;z&quot;)]
+#&gt;   x y
+#&gt; 1 1 3
+#&gt; 2 2 2
+#&gt; 3 3 1</code></pre>
+<h4 id="结合逻辑值"><a href="#结合逻辑值" class="headerlink" title="结合逻辑值"></a>结合逻辑值</h4><p>注意逻辑值和数值之间的转换，主要差别在于存在缺失值（<code>NA</code>）时：</p>
+<ul>
+<li><code>c[which(x)]</code>会在遇到<code>NA</code>时，直接遗弃对应值。</li>
+<li><code>c[x]</code>会在遇到<code>NA</code>时，返回<code>NA</code>。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">c &lt;- c(1:10)
+
+# 设置切片条件
+(x &lt;- sample(10) &lt; 4)
+#&gt; [1] FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE FALSE
+which(x) #将逻辑值转换为数值
+#&gt; [1]  6  9 10
+
+# 切片
+(c[which(x)])
+#&gt; [1] 3 6 9
+(c[x])
+#&gt; [1] 3 6 9</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>[Advanced R] 2. 名称与对象</title>
-    <url>/2020/08/02/Advanced_R/Names_and_Values/</url>
+    <url>/2020/08/02/Advanced_R/2.%20Names_and_Values/</url>
     <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
 <p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
 </blockquote>
-<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<strong>“ &lt;- ”</strong>相连。</p>
+<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<code>&lt;-</code>相连。</p>
 <ul>
 <li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
 <li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
@@ -557,10 +664,10 @@ e2$c
 #&gt; [1] 4</code></pre>
 </li>
 </ol>
-<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<strong>rm( )</strong>只能删去名称与对象的链接，并不能删去对象。</p>
+<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<code>rm( )</code>只能删去名称与对象的链接，并不能删去对象。</p>
 <ul>
-<li>使用<strong>gc( )</strong>来清理内存，<strong>gcinfo( TRUE )</strong>来显示每次计算机清理内存的操作。</li>
-<li>使用<strong>men_used( )</strong>来查看已消耗的内存。</li>
+<li>使用<code>gc( )</code>来清理内存，<code>gcinfo( TRUE )</code>来显示每次计算机清理内存的操作。</li>
+<li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
 </ul>
 <section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
@@ -573,470 +680,200 @@ e2$c
       </tags>
   </entry>
   <entry>
-    <title>[CFA-1] 投资组合</title>
-    <url>/2020/02/29/CFA/Portfolio_Management/</url>
-    <content><![CDATA[<h2 id="Portfolio-Management"><a href="#Portfolio-Management" class="headerlink" title="Portfolio Management"></a>Portfolio Management</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p><strong>「投资组合的好处：一定条件下，多元化有助于降低整体风险」</strong></p>
-<h5 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h5><ul>
-<li><p>组合视角（portfolio perspective）</p>
-<p>  组合视角：通过一只股票对整个组合<strong>收益</strong>、<strong>风险</strong>的影响来对其评估。</p>
-</li>
-<li><p>多元化的价值（risk-reduction benefits of diversification）</p>
-<p> <strong>在资产不是绝对正相关的情况下</strong>，多元化有助于降低资产组合的风险。<strong>随着相关性增加</strong>，多元化带来的收益将下降。</p>
-<blockquote>
-<p>  多元化比率（diversification ratio）：$R_{p}/R_i$</p>
-<ul>
-<li>度量多元化带来的风险减少收益。</li>
-</ul>
+    <title>[Advanced R] 6. 函数</title>
+    <url>/2020/08/06/Advanced_R/6.%20Functions/</url>
+    <content><![CDATA[<h2 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h2><blockquote>
+<p>  <strong>存在即对象，万物出自函数</strong>。</p>
 </blockquote>
-</li>
-<li><p>组合管理步骤（portfolio management process）</p>
-<ol>
-<li>计划阶段：设定各类参数<sup id="fnref:1" class="footnote-ref"><a href="#fn:1" rel="footnote"><span class="hint--top hint--rounded" aria-label="预期收益水平、风险承受能力、时间偏好、税率、流动性
-">[1]</span></a></sup>。形成<strong>investment policy statement (IPS)</strong>，包含盈利目标和条件。</li>
-<li>执行阶段：通过分析，决定资产组合方案。</li>
-<li>反馈阶段：评估风险、收益，并作出调整。</li>
-</ol>
-</li>
-</ul>
-<h5 id="投资者、基金类型"><a href="#投资者、基金类型" class="headerlink" title="投资者、基金类型"></a>投资者、基金类型</h5><ul>
-<li><p>固定缴存计划（defined contribution）、固定收益计划（defined benefit pension）</p>
-<ul>
-<li>固定缴存承诺过程，固定收益承诺回报。</li>
-</ul>
-</li>
-<li><p>资产管理行业</p>
-<ul>
-<li>passive management：较低管理费用，较低风险，较低但相对稳定的收益</li>
-<li>active management</li>
-</ul>
-</li>
-<li><p>:question:几种类型的混合基金 </p>
-<ul>
-<li><p>共同基金</p>
-<ul>
-<li><p>可分为：开放式和封闭式</p>
-<ul>
-<li>open-end：可赎回、可交易</li>
-</ul>
-<blockquote>
-<p>  投资者数量、基金池总额变动。</p>
-</blockquote>
-</li>
-<li><p>closed-end：不可赎回、可交易</p>
-<blockquote>
-<p>  大多为主动管理</p>
-<p>  直接与市场进行基金交易</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>其它几种类型</p>
-<pre><code>-   货币基金：购买货币
-</code></pre><ul>
-<li>债券基金<ul>
-<li>股票基金</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>exchange-traded fund（ETF）</p>
-<ul>
-<li><p>与closed-end基金比较：</p>
-<p>相似：可交易、不可赎回</p>
-<p>不同：大多为采用消极管理，紧跟指数收益。</p>
-</li>
-<li><p>与open-end基金比较：</p>
-<p>不同：经纪人佣金（brokerage cost）较高；open-end能够以资产净值（NAV）进行买卖，而ETF买卖价格由</p>
-</li>
-</ul>
-</li>
-<li><p>私募、风险投资、套利基金（hedge funds）</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="Portfolio-Risk-and-Return-Ⅰ"><a href="#Portfolio-Risk-and-Return-Ⅰ" class="headerlink" title="Portfolio Risk and Return Ⅰ"></a>Portfolio Risk and Return Ⅰ</h3><p><strong>「选取最优的投资组合：风险、收益以及投资者偏好」</strong></p>
-<h5 id="收益计算"><a href="#收益计算" class="headerlink" title="收益计算"></a>收益计算</h5><ul>
-<li><p>持有期收益(Holding period return)</p>
-<blockquote>
-<p>  $HPR = P_t-P_0+Div_t/P_0$</p>
-</blockquote>
-</li>
-<li><p>平均收益</p>
-<ul>
-<li>算术平均：</li>
-<li>几何平均：当各期收益率不同实，几何平均＜算术平均</li>
-</ul>
-</li>
-<li><p>真实收益：<strong>近似</strong>等于名义收益—通货膨胀率</p>
-</li>
-<li><p>货币加权收益（money-weighted return）：考虑所有资金流入、流出的收益</p>
-<ul>
-<li><p>$PV<em>{inflow} = PV</em>{outflow}$</p>
-</li>
-<li><p>由于越往后账户中的货币越多，所以越往后期间内的权重可能变大。</p>
-<blockquote>
-<p>  如果追加投入后，收益下降，那么货币加权收益也将偏低。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>时间加权收益（time-weighted return）</p>
-<ul>
-<li>单独计算每期收益，最终求各期算术平均。</li>
-</ul>
-</li>
-</ul>
-<h5 id="协方差和相关性"><a href="#协方差和相关性" class="headerlink" title="协方差和相关性"></a>协方差和相关性</h5><ul>
-<li><p>协方差：</p>
-<ul>
-<li>协方差的量级取决于：①单个对象收益标准差大小；②两个对象收益的同步变化程度</li>
-<li>使用算术平均计算单个对象的平均收益</li>
-</ul>
-</li>
-<li><p>相关性：对协方差剔除单个因子的影响（标准化后的协方差）</p>
-<p>$ρ_{1,2}=COV/δ_1δ_2$</p>
-<ul>
-<li>相关性系数值域在【0，1】</li>
-</ul>
-</li>
-</ul>
-<h5 id="效率前沿-star"><a href="#效率前沿-star" class="headerlink" title="效率前沿:star:"></a>效率前沿:star:</h5><ul>
-<li><p>组合方差、标准差的计算</p>
-<p>$Var_{portfolio}=w_1^2σ_1^2+w_2^2σ_2^2+2w_1w_2Cov_12$</p>
-<p>$σ<em>{portfolio}=Var</em>{portfolio}^{0.5}$</p>
-<blockquote>
-<p>  当两个对象呈正相关时，投资组合风险才等于各个资产的加权平均：</p>
-<p>  $σ_{portfolio}=w_1σ_1+w_2σ_2$</p>
-</blockquote>
-<ul>
-<li><p>相关系数越小时，组合方差越小。（多元化的优势）</p>
-<p>-1 &gt; 0 &gt; 1</p>
-</li>
-</ul>
-</li>
-<li><p>效率前沿概念</p>
-<ul>
-<li><p>最小方差效率前沿：<strong>给定收益</strong>的所有可能的最小方差组合（minimum-variance portfolios）构成最小方差的效率前沿。</p>
-</li>
-<li><p>效率前沿：<strong>给定风险水平</strong>的收益最高的投资组合的集合</p>
-<blockquote>
-<p>  风险厌恶者只会选择位于效率前沿上的投资组合。</p>
-</blockquote>
-</li>
-<li><p>全局最小方差组合：效率前沿上风险最低的投资组合</p>
-</li>
-</ul>
-</li>
-<li><p>资本分配曲线</p>
-<ul>
-<li>two-fund separation theorem：最优的投资者组合应<strong>优化的风险资产</strong>与<strong>无风险资产</strong>的组合</li>
-</ul>
-</li>
-</ul>
-<pre><code>-   资本分配线（capital allocation line，**CAL**）
+<h3 id="函数基础"><a href="#函数基础" class="headerlink" title="函数基础"></a>函数基础</h3><h4 id="函数构成三要素"><a href="#函数构成三要素" class="headerlink" title="函数构成三要素"></a>函数构成三要素</h4><p>函数的拥有三个基本组成：参数（arguments）、主体（body）和环境（environment），分别使用<code>formals()</code>、<code>body()</code>和<code>environment()</code>来查看。</p>
+<pre><code class="hljs &#123;r&#125;">fun0 &lt;- function(x, y) x+y
+formals(fun0)
+#&gt; $x
 
-    一条带有截距项的直线：
+#&gt; $y
+body(fun0)
+#&gt; x+y
 
-    $R=R_F+W_AR_A$
+environment(fun0)
+#&gt; &lt;environment: R_GlobalEnv&gt;</code></pre>
+<h4 id="初始函数的特殊性"><a href="#初始函数的特殊性" class="headerlink" title="初始函数的特殊性"></a>初始函数的特殊性</h4><p>R中包含了大量由C语言编写的初始函数（primitive functions），其在R中的属性要么为<code>builtin</code>和<code>special</code>，其不具备一般函数中的三大要素。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(sum)
+#&gt; [1] &quot;builtin&quot;
+typeof(&#96;[&#96;)
+#&gt; [1] &quot;special&quot;</code></pre>
+<h4 id="函数也是对象"><a href="#函数也是对象" class="headerlink" title="函数也是对象"></a>函数也是对象</h4><ul>
+<li><p>名称和函数对象（function object）也是链接（binding）的关系。同时，函数对象不一定需要名称，可以使用匿名函数（anonymous function）。例如在<code>lapply(X, FUN)</code>中编写的函数。</p>
+</li>
+<li><p>函数也可以像其它对象一样被放入list中。</p>
+<pre><code class="hljs &#123;r&#125;">funs &lt;- list(
+	half &#x3D; function(x) x&#x2F;2,
+    double &#x3D; function(x) x*2
+)
+funs$half(3)
+#&gt; [1] 1.5</code></pre>
+</li>
+</ul>
+<h4 id="使用do-call"><a href="#使用do-call" class="headerlink" title="使用do.call()"></a>使用<code>do.call()</code></h4><p>当函数名与参数分离时，使用<code>do.call（FUN，args）</code>来呼叫函数。</p>
+<pre><code class="hljs &#123;r&#125;">args &lt;- list(runif(100), na.rm &#x3D; TRUE)
+do.call(sum, args)
+#&gt; [1] 55.449</code></pre>
+<h3 id="词法范围（Lexical-Scoping）"><a href="#词法范围（Lexical-Scoping）" class="headerlink" title="词法范围（Lexical Scoping）"></a>词法范围（Lexical Scoping）</h3><p>词法范围解释了R中的函数如何识别对象值（value）和名称（name）间的链接，其遵从四个基本法则：</p>
+<ul>
+<li>Name masking：函数内<strong>定义的对象名</strong>将覆盖函数外定义的。</li>
+<li>Functions VS Variables：函数内<strong>定义的函数</strong>也将覆盖函数外定义的。</li>
+<li>A fresh start：函数内运行结果不会影响全局中的对象。</li>
+<li>Dynamic lookup：函数每次运行时即时查找所需对象。</li>
+</ul>
+<h3 id="惰性评估"><a href="#惰性评估" class="headerlink" title="惰性评估"></a>惰性评估</h3><h4 id="基本要素"><a href="#基本要素" class="headerlink" title="基本要素"></a>基本要素</h4><p>R只会在需要用到参数时，检测其是否为有效参数。由于惰性评估（lazy evaluation），R的函数需要以下要素：</p>
+<ul>
+<li><p>含有参数的表达式</p>
+</li>
+<li><p>用以评估（监测有效性）参数的的环境。</p>
+<ul>
+<li>在呼叫函数时定义的对象，将反映到全局环境中。注意：只对使用<code>&lt;-</code>方式定义的有效，<code>=</code>定义的不行。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 在呼叫函数时定义的对象，将反映到全局环境中
+fun1 &lt;- function(x) x+2
+fun1(x &lt;- 2)
+#&gt; [1] 4</code></pre>
+</li>
+<li><p>参数值</p>
+</li>
+</ul>
+<h4 id="默认参数"><a href="#默认参数" class="headerlink" title="默认参数"></a>默认参数</h4><ul>
+<li><p>默认参数可直接给出，或者由其它参数给出，乃至由函数中定义的对象给出。</p>
+</li>
+<li><p>默认参数存在与函数的评估环境（evaluation environment）中，而非全局环境（global environment）。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x &#x3D; ls()) &#123;
+    a &lt;- 1
+    x
+&#125;
+fun()
+#&gt; [1] &quot;a&quot; &quot;x&quot;
 
-    &gt;   **资产分配线**与投资者**无差异曲线**的**切点**即为最优投资组合
+fun(ls())
+#&gt; [1] &quot;fun&quot;</code></pre>
+</li>
+<li><p>使用<code>missing()</code>来判断参数值是否由默认给出。</p>
+</li>
+</ul>
+<h3 id="…（dot-dot-dot）"><a href="#…（dot-dot-dot）" class="headerlink" title="…（dot-dot-dot）"></a>…（dot-dot-dot）</h3><p>使用<code>...</code>来为函数添加更多的参数。</p>
+<ul>
+<li><p>使用<code>..n</code>来提取特定位置的参数</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(first &#x3D; ..1, third &#x3D; ..4)
+fun(1,2,3,4)
+#&gt; $first
+#&gt; [1] 1
 
--   与风险偏好相结合：
+#&gt; $third
+#&gt; [1] 4</code></pre>
+</li>
+<li><p>直接使用<code>list(...)</code>来将输入的参数储存为列表</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(...)
+fun(a &#x3D; 1, b &#x3D; 2)
+#&gt; $a
+#&gt; [1] 1
 
-    一个风险厌恶程度更低的人，将获得更高收益，但更高风险的最优投资组合。
-</code></pre><h3 id="Portfolio-Risk-and-Return-Ⅱ"><a href="#Portfolio-Risk-and-Return-Ⅱ" class="headerlink" title="Portfolio Risk and Return Ⅱ"></a>Portfolio Risk and Return Ⅱ</h3><p><strong>「风险与收益并不总是成正比：承担额外的非系统性风险并不会增加收益」</strong></p>
-<h5 id="系统性风险"><a href="#系统性风险" class="headerlink" title="系统性风险"></a>系统性风险</h5><ul>
-<li><p>将无风险资产加入投资组合：</p>
-<p>$σ_{portfolio}=W_Aσ_A$</p>
-<p>$E(R_p)=W_AE(R_A)+W_BE(R_B)$</p>
+#&gt; $b
+#&gt; [1] 2</code></pre>
 </li>
-<li><p>能增加收益的风险</p>
-<ol>
-<li><p><strong>确定最优的无风险资产和有风险资产比例</strong></p>
-<p>最优的CAL：与投资者无差别曲线相切的CAL</p>
-</li>
-<li><p><strong>确定CML和最优风险资产组合</strong></p>
-<p>最优风险资产组合：最优CAL与效率前沿的切点</p>
-<blockquote>
-<p>  :star: 确定最优的市场回报点（$E(R_M)$），以此为依据判断具体资产是否值得买入：</p>
+</ul>
+<h3 id="退出函数"><a href="#退出函数" class="headerlink" title="退出函数"></a>退出函数</h3><h4 id="函数返回值"><a href="#函数返回值" class="headerlink" title="函数返回值"></a>函数返回值</h4><ul>
+<li>隐性返回（implicit return）：最后被执行的表达式即为返回的值</li>
+<li>显性返回（explicit return）：使用<code>return()</code></li>
+</ul>
+<h4 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h4><p>使用<code>stop()</code>来立即停止当前函数。</p>
+<h4 id="隐藏返回值"><a href="#隐藏返回值" class="headerlink" title="隐藏返回值"></a>隐藏返回值</h4><p>使用<code>invisible()</code>来将返回值隐藏。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x) invisible(x)
+fun(232)</code></pre>
+<h4 id="退出窗口"><a href="#退出窗口" class="headerlink" title="退出窗口"></a>退出窗口</h4><p>使用<code>on.exit(, add = TRUE)</code>来作为函数的退出窗口（exit handler），用以确保不论函数如何退出，都不会改变全局环境。</p>
 <ul>
-<li><p>某项资产收益＞$E(R_M)$：买入</p>
-</li>
-<li><p>某项资产收益＜$E(R_M)$：卖出</p>
+<li><p><code>on.exit()</code>不论函数正常执行、报错都将执行。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x)&#123;
+    cat(&quot;Let&#39;s start.\n&quot;)
+    on.exit(cat(&quot;This is a exit handler.\n&quot;), add &#x3D; TRUE)
+    
+    if (x) &#123;
+        return(10)
+    &#125; else&#123;
+        stop(&quot;Error&quot;)
+    &#125;
+&#125;
+fun(TRUE)
+#&gt; Let&#39;s start
+#&gt; This is a exit handler
+#&gt; [1] 10
+
+fun(FALSE)</code></pre>
 </li>
 </ul>
-</blockquote>
-</li>
-</ol>
-<p>$E(R_p)=R_f+(E(R_M)-R_f)(σ_P/σ_M)$</p>
+<h3 id="函数形态"><a href="#函数形态" class="headerlink" title="函数形态"></a>函数形态</h3><h4 id="四种存在形态"><a href="#四种存在形态" class="headerlink" title="四种存在形态"></a>四种存在形态</h4><p>R中函数有四种不同的存在形态，各形态之间在一定程度上可相互转换：</p>
 <ul>
-<li>关于$σ_P$的函数</li>
-<li><p>市场风险回报（market risk premium）：$E(R_M)-R_f$</p>
-<blockquote>
-<p>  :star: 为额外承受的每一单位市场风险（$σ_M$）获取市场风险回报</p>
-<p>  承担额外的非系统性风险并不会增加收益</p>
-</blockquote>
+<li>prefix：普通函数，<code>FUN(x, y, z)</code></li>
+<li>infix：在参数中出现的函数，<code>+</code>、<code>%&gt;%</code></li>
+<li>replacement：通过赋值存在的函数，<code>&lt;-</code></li>
+<li>special：<code>[[]]</code>、<code>if</code>、<code>for</code></li>
+</ul>
+<h4 id="函数形态变换"><a href="#函数形态变换" class="headerlink" title="函数形态变换"></a>函数形态变换</h4><ul>
+<li><p>转换为前置形态</p>
+<pre><code class="hljs &#123;r&#125;">x + y
+&#96;+&#96;(x, y)
+
+names(df) &lt;- c(x, y, z)
+&#96;names&lt;-&#96;（df, c(x, y, z）)
+
+for (i in 1:10) print(i)
+&#96;for&#96;(i, 1:10, print(i))</code></pre>
+</li>
+<li><p>改写每个non-prefix形态的函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;+&#96; &lt;- function(e1, e2)&#123;
+    x &lt;- runif(1)
+    if (x &lt; 0.5)&#123;
+        e1 - e2
+    &#125; else&#123;
+        sum(e1, e2)
+    &#125;
+&#125;
+
+replicate(100, 1+2)
+#&gt; [1] -1  3 -1 -1 -1  3 -1 -1 -1  3 -1 -1 -1  3 -1  3  3  3  3 -1  3 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3
+#&gt; [35]  3  3  3  3  3  3 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1  3  3 -1  3 -1 -1 -1 -1 -1 -1  3  3 -1 -1 -1  3
+#&gt; [69] -1 -1 -1 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1 -1 -1 -1 -1  3 -1  3 -1  3 -1
+
+replicate(100, (1+2)) #添加括号后又回归原有的定义，&quot;(&quot;本身也是一个函数
+#&gt; [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+#&gt; [52] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3</code></pre>
 </li>
 </ul>
-</li>
-<li><p>系统系风险：不能被多元化所抵消的风险（risk of well-diversified portfolio）</p>
+<h4 id="自定义infix函数"><a href="#自定义infix函数" class="headerlink" title="自定义infix函数"></a>自定义infix函数</h4><p>使用<code>%</code>来自定义infix函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;%+%&#96; &lt;- function(a, b)&#123;
+    paste0(a, b)
+&#125;
+
+4 %+% 4
+#&gt; [1] &quot;44&quot;</code></pre>
+<h4 id="替换函数"><a href="#替换函数" class="headerlink" title="替换函数"></a>替换函数</h4><p>替换函数（replacement function）将右边的值输入左边函数中，需要有两个必要要素：</p>
 <ul>
-<li><p>系统性风险是相对的：由组合的具体情况决定。</p>
-<blockquote>
-<p>  一般弹性较大的资产组合具有较高的系统性风险。例如奢侈品具有较高的系统系风险。</p>
-</blockquote>
-</li>
-<li><p>高风险股票不意味着高<strong>预期收益</strong>：只有背负系统性风险才能获取更高的<strong>预期收益</strong>（equilibrium return）。</p>
-</li>
+<li>参数x用以储存值，参数value用以替换值。</li>
+<li>函数主体中需要返回替换后的值。</li>
 </ul>
-</li>
-</ul>
-<h5 id="β"><a href="#β" class="headerlink" title="β"></a>β</h5><ul>
-<li><p>计算单个资产的超额收益：超额收益是单个资产对多种因素敏感性的</p>
-<ol>
-<li><p>FAMA多因子模型：超额收益 = 敏感性1×因素1+敏感性2×因素2</p>
-</li>
-<li><p>单因子模型：资产的超额收益是β与市场超额收益的乘积</p>
-<p>$E(R_i)-R_f=β_i×[E(R_m)-R_f]$</p>
-</li>
-<li><p>市场模型（market model）：</p>
-<p>$R_i=α_i+β_iR_m+e_i$</p>
-<ul>
-<li><p>截距项$α_i=(1-β_i)$</p>
-</li>
-<li><p>预期收益$E(R_i)=α_i+β_iR_m$</p>
-</li>
-</ul>
-<blockquote>
-<p>  <strong>β表示一项资产对市场组合（market portfolio）的敏感性程度。</strong></p>
-</blockquote>
-</li>
-</ol>
-</li>
-<li><p>BETA（β）的计算</p>
-<p>:star: β是特殊标准化处理后的资产回报与市场回报的协方差: </p>
-<ol>
-<li>基本表达式：$β<em>i=COV</em>{im}/σ_M^2$</li>
-<li>用相关系数代表协方差：$β<em>i=ρ</em>{im}(σ_i/σ_M)$</li>
-</ol>
-</li>
-</ul>
-<h5 id="CAPM模型"><a href="#CAPM模型" class="headerlink" title="CAPM模型"></a>CAPM模型</h5><ul>
-<li><p>模型：描述预期资产回报与系统性风险的关系</p>
-<p>$E(R<em>i)=R_f+β_i[E(R</em>{mkt}-R_f)]$</p>
-<blockquote>
-<p>  <strong>关于β的另一种理解：β是标准化后的系统性风险</strong></p>
-<ul>
-<li><p>$β=COV<em>{i,mkt}/σ</em>{mkt}^2$</p>
-<p>:star:<strong>贝塔系数越高，投资该股的系统风险越高，投资者所要求的回报率也就越高</strong></p>
-</li>
-</ul>
-</blockquote>
-</li>
-<li><p>内涵：资产的预期收益率等于无风险收益率加上β调整后的市场风险回报（market risk premium，$E(R_M)-R_f$）</p>
-<ul>
-<li>当β＞1时，资产收益大于市场收益</li>
-<li>前提假设：①市场厌恶；②效用最大化；③无摩擦市场；④单期决定；⑤同质性假设；⑥所有资产可以随意拆分；⑦完全竞争市场</li>
-</ul>
-</li>
-<li><p>CML与SML的区别:question:</p>
-<ul>
-<li><p>CML（capital market line）考虑了所有风险因素（total risk），所有CML上的点都是各自风险水平下最有效的（<strong>well-diversified</strong>）投资组合</p>
-<blockquote>
-<p>  <strong>没有完全多元化的</strong>的出现在与CML相切的效率前沿内。</p>
-<p>  CML曲线上比切点高还是低来判断买入无风险资产来投资，或是投资无风险资产</p>
-</blockquote>
-</li>
-<li><p>SML（security market line）考虑系统性风险（systematic risk），只要是定价合理的投资组合都在SML上</p>
-<blockquote>
-<p>  所有没在SML上的点都是在相同市场风险水平下，被错误定价的：</p>
-<p>  SML下方：定价过高，卖出</p>
-<p>  SML上方：定价过低，买入</p>
-</blockquote>
-</li>
-</ul>
-</li>
-</ul>
-<h5 id="几种重要的比率"><a href="#几种重要的比率" class="headerlink" title="几种重要的比率"></a>几种重要的比率</h5><ul>
-<li><p>Sharp ratio：风险调整的收益</p>
-<p>Sharp ratio = $E(R<em>{portfolio}-R_f)/σ</em>{portfolio}$</p>
-<ul>
-<li>是CAL的斜率</li>
-<li>sharp ratio 越高，表现越好</li>
-<li>基于总风险，而非系统风险：适用于各类投资类型分析。</li>
-</ul>
-</li>
-<li><p>treynor ratio</p>
-</li>
-</ul>
-<ul>
-<li><p>$M^2$：承担每一份系统性风险的收益</p>
-<p>$M^2 = R_p-R_f/β_p$</p>
-</li>
-<li><p>Jensen‘s alpha</p>
-</li>
-</ul>
-<h3 id="Basic-of-Portfolio-Planning-and-Construction"><a href="#Basic-of-Portfolio-Planning-and-Construction" class="headerlink" title="Basic of Portfolio Planning and Construction"></a>Basic of Portfolio Planning and Construction</h3><h5 id="投资政策说明书（investment-policy-statement）"><a href="#投资政策说明书（investment-policy-statement）" class="headerlink" title="投资政策说明书（investment policy statement）"></a>投资政策说明书（investment policy statement）</h5><ul>
-<li><p>组成要素：</p>
-<ul>
-<li><p>投资者环境（circumstance）：风险承受水平、预期收益</p>
-<blockquote>
-<p>  objectives and constraints</p>
-</blockquote>
-</li>
-<li><p>投资策略（investment strategy）</p>
-</li>
-<li><p>对标（benchmark）：评估绩效</p>
-</li>
-</ul>
-</li>
-<li><p>投资者方面</p>
-<ul>
-<li>投资与风险目标（objectives）<ul>
-<li>绝对风险目标与相对风险目标：对标benchmark设置收益不足预期的范围</li>
-</ul>
-</li>
-<li>投资局限性（constraints）<ul>
-<li>流动性要求</li>
-<li>时间期限</li>
-<li>税务</li>
-<li>合规性</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>资产投资策略（strategic asset allocation）</p>
-<ol>
-<li><p>分清不同资产的收益与风险级别</p>
-<blockquote>
-<p>  包含：</p>
-<p>  growth assets：指数、股票等</p>
-<p>  downturn hedging assets：短期高质量信用贷款、固定收益（core）</p>
-<p>  inflation hedging assets：房地产（core）、基础设施、抗通胀债券</p>
-</blockquote>
-</li>
-<li><p>将投资策略与IPS相结合：选取最优投资组合</p>
-<ul>
-<li>主要根据objective（预期风险和收益目标）来选择</li>
-<li>主动投资管理：可能带来更高风险与收益<ul>
-<li>为获取短期收益进行技术性调整：tactical asset allocation</li>
-<li>risk budgeting：①设定总风险水平；②设定技术性操作的风险额度。<ul>
-<li>多个不同主动投资管理的风险可以对冲</li>
-<li>多个主动投资管理可能带来更高的税务问题</li>
-</ul>
-</li>
-<li>核卫星策略（core-statellite approach）：将核心资产（大部分资产）投资于被动管理的指数基金</li>
-</ul>
-</li>
-</ul>
-</li>
-</ol>
-</li>
-</ul>
-<h3 id="Introduction-to-Risk-Management"><a href="#Introduction-to-Risk-Management" class="headerlink" title="Introduction to Risk Management"></a>Introduction to Risk Management</h3><h5 id="关于风险管理"><a href="#关于风险管理" class="headerlink" title="关于风险管理"></a>关于风险管理</h5><ul>
-<li><p>目的：风险管理的目的并非要最小化风险，而是<strong>在一定的风险水平下获取最大的收益</strong>。</p>
-</li>
-<li><p>风险管控（risk governance）：明确各项风险管理政策。</p>
-</li>
-<li><p>风险承受水平（risk tolerance）：关于确定总风险水平，由企业的能力及环境决定。</p>
-</li>
-<li><p>风险预算（risk budgeting）：关于向各资产分配风险配额。</p>
-<blockquote>
-<p>  重点在于结合具体股票的风险特点和总的风险水平，来<strong>选择</strong>资产组合，从而通过风险对冲等方式找到最佳组合，</p>
-</blockquote>
-</li>
-</ul>
-<h5 id="关于风险"><a href="#关于风险" class="headerlink" title="关于风险"></a>关于风险</h5><ul>
-<li>财务风险：来源于金融市场的风险<ul>
-<li>信用风险：企业无法按时履约</li>
-<li>流动性风险：需要以低于真实价格来出售资产</li>
-<li>市场风险：利率及资本定价的调整</li>
-</ul>
-</li>
-<li><p>非财务风险</p>
-<ul>
-<li>经营风险</li>
-<li>偿债风险</li>
-<li>政策风险</li>
-<li>合规性风险</li>
-<li>会计风险</li>
-<li>模型风险：分析模型错误</li>
-<li>尾部风险：低估小概率时间的爆发</li>
-</ul>
-</li>
-<li><p>风险度量方式</p>
-<ul>
-<li><p>标准差：度量资产定价及收益（price &amp; interest rates）</p>
-<ul>
-<li>适用于独立的（stand-alone）资产</li>
-</ul>
-</li>
-<li><p>β：度量收益对市场风险（不稳定性/变化）的敏感性</p>
-<ul>
-<li>β的本质是资产收益与市场收益的协方差，现实中可以用个股对指数间的关系来计算。</li>
-</ul>
-</li>
-<li><p>久期：度量债券价格对利率变化的敏感性</p>
-<ul>
-<li><p>度量债券的利率风险</p>
-<blockquote>
-<p>  久期越短，债券价格的波动越小，风险越小；</p>
-<p>  久期越长，债券价格的波动越大，风险越大。</p>
-</blockquote>
-</li>
-</ul>
-</li>
-<li><p>Var：风险资产</p>
-<ul>
-<li>CVar：在最小损失已经确实后，预期的损失</li>
-<li>压力测试：设定关键变量，评估后果</li>
-<li>情景分析：改变多个输入变量，评估后果</li>
-</ul>
-</li>
-</ul>
-</li>
-<li><p>风险应对策略</p>
-<ul>
-<li>avoid：不参与</li>
-<li>prevent：补充监管，弥补数据漏洞</li>
-<li>management：多元化<ul>
-<li>risk transfer：保险、担保（surety bond）</li>
-<li>risk shifting：改变风险的结果（风险发生了，但结果不一样）。<strong>一般选择衍生品。</strong></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="技术性分析"><a href="#技术性分析" class="headerlink" title="技术性分析"></a>技术性分析</h3><h5 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h5><ul>
-<li>概念：结合市场情绪对买卖双方的行为进行预测<ul>
-<li>考虑市场理性和非理性因素，<strong>认为投资者的行为模式是可预测的</strong>（不基于市场有效性假说）</li>
-<li>与基本面分析的区别<ul>
-<li>基本面分析重在发现资产内在价值，技术性分析在于分析交易发生逻辑</li>
-<li>基本面分析依据公司财报等多方面信息，技术性分析只考虑股价及交易量。</li>
-<li>技术性分析不关注买卖双方的原因，仅关注已发生的交易。</li>
-</ul>
-</li>
-<li>技术分析的优缺点<ul>
-<li>优点：①基于客观且可观测数据；②可用于对未来不产生现金流的资产的定价，如原油。</li>
-<li>缺点：不能反映资产真正的供需关系</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>常见类型<ul>
-<li>反转形态（reversal patterns）</li>
-</ul>
-</li>
-</ul>
-<h3 id="Fintech-in-Investment-Management"><a href="#Fintech-in-Investment-Management" class="headerlink" title="Fintech in Investment Management"></a>Fintech in Investment Management</h3><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>预期收益水平、风险承受能力、时间偏好、税率、流动性
+<pre><code class="hljs &#123;r&#125;">&#96;replace_2nd&lt;-&#96; &lt;- function(x, value)&#123;
+    x[2] &lt;- value
+    x
+&#125; 
+
+c&lt;- 1:10
+replace_2nd(c) &lt;- 101L
+c
+#&gt; [1]   1 101   3   4   5   6   7   8   9  10</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
         <category>学习</category>
       </categories>
       <tags>
-        <tag>CFA</tag>
-        <tag>笔记</tag>
+        <tag>R</tag>
+        <tag>Programming</tag>
       </tags>
   </entry>
   <entry>
@@ -1641,6 +1478,473 @@ e2$c
 </li>
 </ul>
 ]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>CFA</tag>
+        <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[CFA-1] 投资组合</title>
+    <url>/2020/02/29/CFA/Portfolio_Management/</url>
+    <content><![CDATA[<h2 id="Portfolio-Management"><a href="#Portfolio-Management" class="headerlink" title="Portfolio Management"></a>Portfolio Management</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p><strong>「投资组合的好处：一定条件下，多元化有助于降低整体风险」</strong></p>
+<h5 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h5><ul>
+<li><p>组合视角（portfolio perspective）</p>
+<p>  组合视角：通过一只股票对整个组合<strong>收益</strong>、<strong>风险</strong>的影响来对其评估。</p>
+</li>
+<li><p>多元化的价值（risk-reduction benefits of diversification）</p>
+<p> <strong>在资产不是绝对正相关的情况下</strong>，多元化有助于降低资产组合的风险。<strong>随着相关性增加</strong>，多元化带来的收益将下降。</p>
+<blockquote>
+<p>  多元化比率（diversification ratio）：$R_{p}/R_i$</p>
+<ul>
+<li>度量多元化带来的风险减少收益。</li>
+</ul>
+</blockquote>
+</li>
+<li><p>组合管理步骤（portfolio management process）</p>
+<ol>
+<li>计划阶段：设定各类参数<sup id="fnref:1" class="footnote-ref"><a href="#fn:1" rel="footnote"><span class="hint--top hint--rounded" aria-label="预期收益水平、风险承受能力、时间偏好、税率、流动性
+">[1]</span></a></sup>。形成<strong>investment policy statement (IPS)</strong>，包含盈利目标和条件。</li>
+<li>执行阶段：通过分析，决定资产组合方案。</li>
+<li>反馈阶段：评估风险、收益，并作出调整。</li>
+</ol>
+</li>
+</ul>
+<h5 id="投资者、基金类型"><a href="#投资者、基金类型" class="headerlink" title="投资者、基金类型"></a>投资者、基金类型</h5><ul>
+<li><p>固定缴存计划（defined contribution）、固定收益计划（defined benefit pension）</p>
+<ul>
+<li>固定缴存承诺过程，固定收益承诺回报。</li>
+</ul>
+</li>
+<li><p>资产管理行业</p>
+<ul>
+<li>passive management：较低管理费用，较低风险，较低但相对稳定的收益</li>
+<li>active management</li>
+</ul>
+</li>
+<li><p>:question:几种类型的混合基金 </p>
+<ul>
+<li><p>共同基金</p>
+<ul>
+<li><p>可分为：开放式和封闭式</p>
+<ul>
+<li>open-end：可赎回、可交易</li>
+</ul>
+<blockquote>
+<p>  投资者数量、基金池总额变动。</p>
+</blockquote>
+</li>
+<li><p>closed-end：不可赎回、可交易</p>
+<blockquote>
+<p>  大多为主动管理</p>
+<p>  直接与市场进行基金交易</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>其它几种类型</p>
+<pre><code>-   货币基金：购买货币
+</code></pre><ul>
+<li>债券基金<ul>
+<li>股票基金</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>exchange-traded fund（ETF）</p>
+<ul>
+<li><p>与closed-end基金比较：</p>
+<p>相似：可交易、不可赎回</p>
+<p>不同：大多为采用消极管理，紧跟指数收益。</p>
+</li>
+<li><p>与open-end基金比较：</p>
+<p>不同：经纪人佣金（brokerage cost）较高；open-end能够以资产净值（NAV）进行买卖，而ETF买卖价格由</p>
+</li>
+</ul>
+</li>
+<li><p>私募、风险投资、套利基金（hedge funds）</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Portfolio-Risk-and-Return-Ⅰ"><a href="#Portfolio-Risk-and-Return-Ⅰ" class="headerlink" title="Portfolio Risk and Return Ⅰ"></a>Portfolio Risk and Return Ⅰ</h3><p><strong>「选取最优的投资组合：风险、收益以及投资者偏好」</strong></p>
+<h5 id="收益计算"><a href="#收益计算" class="headerlink" title="收益计算"></a>收益计算</h5><ul>
+<li><p>持有期收益(Holding period return)</p>
+<blockquote>
+<p>  $HPR = P_t-P_0+Div_t/P_0$</p>
+</blockquote>
+</li>
+<li><p>平均收益</p>
+<ul>
+<li>算术平均：</li>
+<li>几何平均：当各期收益率不同实，几何平均＜算术平均</li>
+</ul>
+</li>
+<li><p>真实收益：<strong>近似</strong>等于名义收益—通货膨胀率</p>
+</li>
+<li><p>货币加权收益（money-weighted return）：考虑所有资金流入、流出的收益</p>
+<ul>
+<li><p>$PV<em>{inflow} = PV</em>{outflow}$</p>
+</li>
+<li><p>由于越往后账户中的货币越多，所以越往后期间内的权重可能变大。</p>
+<blockquote>
+<p>  如果追加投入后，收益下降，那么货币加权收益也将偏低。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>时间加权收益（time-weighted return）</p>
+<ul>
+<li>单独计算每期收益，最终求各期算术平均。</li>
+</ul>
+</li>
+</ul>
+<h5 id="协方差和相关性"><a href="#协方差和相关性" class="headerlink" title="协方差和相关性"></a>协方差和相关性</h5><ul>
+<li><p>协方差：</p>
+<ul>
+<li>协方差的量级取决于：①单个对象收益标准差大小；②两个对象收益的同步变化程度</li>
+<li>使用算术平均计算单个对象的平均收益</li>
+</ul>
+</li>
+<li><p>相关性：对协方差剔除单个因子的影响（标准化后的协方差）</p>
+<p>$ρ_{1,2}=COV/δ_1δ_2$</p>
+<ul>
+<li>相关性系数值域在【0，1】</li>
+</ul>
+</li>
+</ul>
+<h5 id="效率前沿-star"><a href="#效率前沿-star" class="headerlink" title="效率前沿:star:"></a>效率前沿:star:</h5><ul>
+<li><p>组合方差、标准差的计算</p>
+<p>$Var_{portfolio}=w_1^2σ_1^2+w_2^2σ_2^2+2w_1w_2Cov_12$</p>
+<p>$σ<em>{portfolio}=Var</em>{portfolio}^{0.5}$</p>
+<blockquote>
+<p>  当两个对象呈正相关时，投资组合风险才等于各个资产的加权平均：</p>
+<p>  $σ_{portfolio}=w_1σ_1+w_2σ_2$</p>
+</blockquote>
+<ul>
+<li><p>相关系数越小时，组合方差越小。（多元化的优势）</p>
+<p>-1 &gt; 0 &gt; 1</p>
+</li>
+</ul>
+</li>
+<li><p>效率前沿概念</p>
+<ul>
+<li><p>最小方差效率前沿：<strong>给定收益</strong>的所有可能的最小方差组合（minimum-variance portfolios）构成最小方差的效率前沿。</p>
+</li>
+<li><p>效率前沿：<strong>给定风险水平</strong>的收益最高的投资组合的集合</p>
+<blockquote>
+<p>  风险厌恶者只会选择位于效率前沿上的投资组合。</p>
+</blockquote>
+</li>
+<li><p>全局最小方差组合：效率前沿上风险最低的投资组合</p>
+</li>
+</ul>
+</li>
+<li><p>资本分配曲线</p>
+<ul>
+<li>two-fund separation theorem：最优的投资者组合应<strong>优化的风险资产</strong>与<strong>无风险资产</strong>的组合</li>
+</ul>
+</li>
+</ul>
+<pre><code>-   资本分配线（capital allocation line，**CAL**）
+
+    一条带有截距项的直线：
+
+    $R=R_F+W_AR_A$
+
+    &gt;   **资产分配线**与投资者**无差异曲线**的**切点**即为最优投资组合
+
+-   与风险偏好相结合：
+
+    一个风险厌恶程度更低的人，将获得更高收益，但更高风险的最优投资组合。
+</code></pre><h3 id="Portfolio-Risk-and-Return-Ⅱ"><a href="#Portfolio-Risk-and-Return-Ⅱ" class="headerlink" title="Portfolio Risk and Return Ⅱ"></a>Portfolio Risk and Return Ⅱ</h3><p><strong>「风险与收益并不总是成正比：承担额外的非系统性风险并不会增加收益」</strong></p>
+<h5 id="系统性风险"><a href="#系统性风险" class="headerlink" title="系统性风险"></a>系统性风险</h5><ul>
+<li><p>将无风险资产加入投资组合：</p>
+<p>$σ_{portfolio}=W_Aσ_A$</p>
+<p>$E(R_p)=W_AE(R_A)+W_BE(R_B)$</p>
+</li>
+<li><p>能增加收益的风险</p>
+<ol>
+<li><p><strong>确定最优的无风险资产和有风险资产比例</strong></p>
+<p>最优的CAL：与投资者无差别曲线相切的CAL</p>
+</li>
+<li><p><strong>确定CML和最优风险资产组合</strong></p>
+<p>最优风险资产组合：最优CAL与效率前沿的切点</p>
+<blockquote>
+<p>  :star: 确定最优的市场回报点（$E(R_M)$），以此为依据判断具体资产是否值得买入：</p>
+<ul>
+<li><p>某项资产收益＞$E(R_M)$：买入</p>
+</li>
+<li><p>某项资产收益＜$E(R_M)$：卖出</p>
+</li>
+</ul>
+</blockquote>
+</li>
+</ol>
+<p>$E(R_p)=R_f+(E(R_M)-R_f)(σ_P/σ_M)$</p>
+<ul>
+<li>关于$σ_P$的函数</li>
+<li><p>市场风险回报（market risk premium）：$E(R_M)-R_f$</p>
+<blockquote>
+<p>  :star: 为额外承受的每一单位市场风险（$σ_M$）获取市场风险回报</p>
+<p>  承担额外的非系统性风险并不会增加收益</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>系统系风险：不能被多元化所抵消的风险（risk of well-diversified portfolio）</p>
+<ul>
+<li><p>系统性风险是相对的：由组合的具体情况决定。</p>
+<blockquote>
+<p>  一般弹性较大的资产组合具有较高的系统性风险。例如奢侈品具有较高的系统系风险。</p>
+</blockquote>
+</li>
+<li><p>高风险股票不意味着高<strong>预期收益</strong>：只有背负系统性风险才能获取更高的<strong>预期收益</strong>（equilibrium return）。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="β"><a href="#β" class="headerlink" title="β"></a>β</h5><ul>
+<li><p>计算单个资产的超额收益：超额收益是单个资产对多种因素敏感性的</p>
+<ol>
+<li><p>FAMA多因子模型：超额收益 = 敏感性1×因素1+敏感性2×因素2</p>
+</li>
+<li><p>单因子模型：资产的超额收益是β与市场超额收益的乘积</p>
+<p>$E(R_i)-R_f=β_i×[E(R_m)-R_f]$</p>
+</li>
+<li><p>市场模型（market model）：</p>
+<p>$R_i=α_i+β_iR_m+e_i$</p>
+<ul>
+<li><p>截距项$α_i=(1-β_i)$</p>
+</li>
+<li><p>预期收益$E(R_i)=α_i+β_iR_m$</p>
+</li>
+</ul>
+<blockquote>
+<p>  <strong>β表示一项资产对市场组合（market portfolio）的敏感性程度。</strong></p>
+</blockquote>
+</li>
+</ol>
+</li>
+<li><p>BETA（β）的计算</p>
+<p>:star: β是特殊标准化处理后的资产回报与市场回报的协方差: </p>
+<ol>
+<li>基本表达式：$β<em>i=COV</em>{im}/σ_M^2$</li>
+<li>用相关系数代表协方差：$β<em>i=ρ</em>{im}(σ_i/σ_M)$</li>
+</ol>
+</li>
+</ul>
+<h5 id="CAPM模型"><a href="#CAPM模型" class="headerlink" title="CAPM模型"></a>CAPM模型</h5><ul>
+<li><p>模型：描述预期资产回报与系统性风险的关系</p>
+<p>$E(R<em>i)=R_f+β_i[E(R</em>{mkt}-R_f)]$</p>
+<blockquote>
+<p>  <strong>关于β的另一种理解：β是标准化后的系统性风险</strong></p>
+<ul>
+<li><p>$β=COV<em>{i,mkt}/σ</em>{mkt}^2$</p>
+<p>:star:<strong>贝塔系数越高，投资该股的系统风险越高，投资者所要求的回报率也就越高</strong></p>
+</li>
+</ul>
+</blockquote>
+</li>
+<li><p>内涵：资产的预期收益率等于无风险收益率加上β调整后的市场风险回报（market risk premium，$E(R_M)-R_f$）</p>
+<ul>
+<li>当β＞1时，资产收益大于市场收益</li>
+<li>前提假设：①市场厌恶；②效用最大化；③无摩擦市场；④单期决定；⑤同质性假设；⑥所有资产可以随意拆分；⑦完全竞争市场</li>
+</ul>
+</li>
+<li><p>CML与SML的区别:question:</p>
+<ul>
+<li><p>CML（capital market line）考虑了所有风险因素（total risk），所有CML上的点都是各自风险水平下最有效的（<strong>well-diversified</strong>）投资组合</p>
+<blockquote>
+<p>  <strong>没有完全多元化的</strong>的出现在与CML相切的效率前沿内。</p>
+<p>  CML曲线上比切点高还是低来判断买入无风险资产来投资，或是投资无风险资产</p>
+</blockquote>
+</li>
+<li><p>SML（security market line）考虑系统性风险（systematic risk），只要是定价合理的投资组合都在SML上</p>
+<blockquote>
+<p>  所有没在SML上的点都是在相同市场风险水平下，被错误定价的：</p>
+<p>  SML下方：定价过高，卖出</p>
+<p>  SML上方：定价过低，买入</p>
+</blockquote>
+</li>
+</ul>
+</li>
+</ul>
+<h5 id="几种重要的比率"><a href="#几种重要的比率" class="headerlink" title="几种重要的比率"></a>几种重要的比率</h5><ul>
+<li><p>Sharp ratio：风险调整的收益</p>
+<p>Sharp ratio = $E(R<em>{portfolio}-R_f)/σ</em>{portfolio}$</p>
+<ul>
+<li>是CAL的斜率</li>
+<li>sharp ratio 越高，表现越好</li>
+<li>基于总风险，而非系统风险：适用于各类投资类型分析。</li>
+</ul>
+</li>
+<li><p>treynor ratio</p>
+</li>
+</ul>
+<ul>
+<li><p>$M^2$：承担每一份系统性风险的收益</p>
+<p>$M^2 = R_p-R_f/β_p$</p>
+</li>
+<li><p>Jensen‘s alpha</p>
+</li>
+</ul>
+<h3 id="Basic-of-Portfolio-Planning-and-Construction"><a href="#Basic-of-Portfolio-Planning-and-Construction" class="headerlink" title="Basic of Portfolio Planning and Construction"></a>Basic of Portfolio Planning and Construction</h3><h5 id="投资政策说明书（investment-policy-statement）"><a href="#投资政策说明书（investment-policy-statement）" class="headerlink" title="投资政策说明书（investment policy statement）"></a>投资政策说明书（investment policy statement）</h5><ul>
+<li><p>组成要素：</p>
+<ul>
+<li><p>投资者环境（circumstance）：风险承受水平、预期收益</p>
+<blockquote>
+<p>  objectives and constraints</p>
+</blockquote>
+</li>
+<li><p>投资策略（investment strategy）</p>
+</li>
+<li><p>对标（benchmark）：评估绩效</p>
+</li>
+</ul>
+</li>
+<li><p>投资者方面</p>
+<ul>
+<li>投资与风险目标（objectives）<ul>
+<li>绝对风险目标与相对风险目标：对标benchmark设置收益不足预期的范围</li>
+</ul>
+</li>
+<li>投资局限性（constraints）<ul>
+<li>流动性要求</li>
+<li>时间期限</li>
+<li>税务</li>
+<li>合规性</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>资产投资策略（strategic asset allocation）</p>
+<ol>
+<li><p>分清不同资产的收益与风险级别</p>
+<blockquote>
+<p>  包含：</p>
+<p>  growth assets：指数、股票等</p>
+<p>  downturn hedging assets：短期高质量信用贷款、固定收益（core）</p>
+<p>  inflation hedging assets：房地产（core）、基础设施、抗通胀债券</p>
+</blockquote>
+</li>
+<li><p>将投资策略与IPS相结合：选取最优投资组合</p>
+<ul>
+<li>主要根据objective（预期风险和收益目标）来选择</li>
+<li>主动投资管理：可能带来更高风险与收益<ul>
+<li>为获取短期收益进行技术性调整：tactical asset allocation</li>
+<li>risk budgeting：①设定总风险水平；②设定技术性操作的风险额度。<ul>
+<li>多个不同主动投资管理的风险可以对冲</li>
+<li>多个主动投资管理可能带来更高的税务问题</li>
+</ul>
+</li>
+<li>核卫星策略（core-statellite approach）：将核心资产（大部分资产）投资于被动管理的指数基金</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="Introduction-to-Risk-Management"><a href="#Introduction-to-Risk-Management" class="headerlink" title="Introduction to Risk Management"></a>Introduction to Risk Management</h3><h5 id="关于风险管理"><a href="#关于风险管理" class="headerlink" title="关于风险管理"></a>关于风险管理</h5><ul>
+<li><p>目的：风险管理的目的并非要最小化风险，而是<strong>在一定的风险水平下获取最大的收益</strong>。</p>
+</li>
+<li><p>风险管控（risk governance）：明确各项风险管理政策。</p>
+</li>
+<li><p>风险承受水平（risk tolerance）：关于确定总风险水平，由企业的能力及环境决定。</p>
+</li>
+<li><p>风险预算（risk budgeting）：关于向各资产分配风险配额。</p>
+<blockquote>
+<p>  重点在于结合具体股票的风险特点和总的风险水平，来<strong>选择</strong>资产组合，从而通过风险对冲等方式找到最佳组合，</p>
+</blockquote>
+</li>
+</ul>
+<h5 id="关于风险"><a href="#关于风险" class="headerlink" title="关于风险"></a>关于风险</h5><ul>
+<li>财务风险：来源于金融市场的风险<ul>
+<li>信用风险：企业无法按时履约</li>
+<li>流动性风险：需要以低于真实价格来出售资产</li>
+<li>市场风险：利率及资本定价的调整</li>
+</ul>
+</li>
+<li><p>非财务风险</p>
+<ul>
+<li>经营风险</li>
+<li>偿债风险</li>
+<li>政策风险</li>
+<li>合规性风险</li>
+<li>会计风险</li>
+<li>模型风险：分析模型错误</li>
+<li>尾部风险：低估小概率时间的爆发</li>
+</ul>
+</li>
+<li><p>风险度量方式</p>
+<ul>
+<li><p>标准差：度量资产定价及收益（price &amp; interest rates）</p>
+<ul>
+<li>适用于独立的（stand-alone）资产</li>
+</ul>
+</li>
+<li><p>β：度量收益对市场风险（不稳定性/变化）的敏感性</p>
+<ul>
+<li>β的本质是资产收益与市场收益的协方差，现实中可以用个股对指数间的关系来计算。</li>
+</ul>
+</li>
+<li><p>久期：度量债券价格对利率变化的敏感性</p>
+<ul>
+<li><p>度量债券的利率风险</p>
+<blockquote>
+<p>  久期越短，债券价格的波动越小，风险越小；</p>
+<p>  久期越长，债券价格的波动越大，风险越大。</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>Var：风险资产</p>
+<ul>
+<li>CVar：在最小损失已经确实后，预期的损失</li>
+<li>压力测试：设定关键变量，评估后果</li>
+<li>情景分析：改变多个输入变量，评估后果</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>风险应对策略</p>
+<ul>
+<li>avoid：不参与</li>
+<li>prevent：补充监管，弥补数据漏洞</li>
+<li>management：多元化<ul>
+<li>risk transfer：保险、担保（surety bond）</li>
+<li>risk shifting：改变风险的结果（风险发生了，但结果不一样）。<strong>一般选择衍生品。</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="技术性分析"><a href="#技术性分析" class="headerlink" title="技术性分析"></a>技术性分析</h3><h5 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h5><ul>
+<li>概念：结合市场情绪对买卖双方的行为进行预测<ul>
+<li>考虑市场理性和非理性因素，<strong>认为投资者的行为模式是可预测的</strong>（不基于市场有效性假说）</li>
+<li>与基本面分析的区别<ul>
+<li>基本面分析重在发现资产内在价值，技术性分析在于分析交易发生逻辑</li>
+<li>基本面分析依据公司财报等多方面信息，技术性分析只考虑股价及交易量。</li>
+<li>技术性分析不关注买卖双方的原因，仅关注已发生的交易。</li>
+</ul>
+</li>
+<li>技术分析的优缺点<ul>
+<li>优点：①基于客观且可观测数据；②可用于对未来不产生现金流的资产的定价，如原油。</li>
+<li>缺点：不能反映资产真正的供需关系</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>常见类型<ul>
+<li>反转形态（reversal patterns）</li>
+</ul>
+</li>
+</ul>
+<h3 id="Fintech-in-Investment-Management"><a href="#Fintech-in-Investment-Management" class="headerlink" title="Fintech in Investment Management"></a>Fintech in Investment Management</h3><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>预期收益水平、风险承受能力、时间偏好、税率、流动性
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
         <category>学习</category>
       </categories>

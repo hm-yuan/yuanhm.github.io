@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] 3. 向量 - Hexo</title>
+  <title>[Advanced R] 6. 函数 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/atomic.png') no-repeat center center;
+         style="background: url('/img/cover.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-03 17:00">
-      2020年8月3日 下午
+    <time datetime="2020-08-06 18:00">
+      2020年8月6日 晚上
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      1.5k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      12
+      17
        分钟
     </span>
   
@@ -212,191 +212,191 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
-<p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
+              <h2 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h2><blockquote>
+<p>  <strong>存在即对象，万物出自函数</strong>。</p>
 </blockquote>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/2ff3a6cebf1bb80abb2a814ae1cfc67b12817713/ae848/diagrams/vectors/summary-tree.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<h3 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h3><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<ul>
-<li><p>绝大多数情况下与缺失值（NA）相关的表达式输出的都是NA。</p>
-<pre><code class="hljs &#123;r&#125;">NA &gt; 5
-#&gt; [1] NA
-10 * NA
-#&gt; [1] NA
-!NA
-#&gt; [1] NA
+<h3 id="函数基础"><a href="#函数基础" class="headerlink" title="函数基础"></a>函数基础</h3><h4 id="函数构成三要素"><a href="#函数构成三要素" class="headerlink" title="函数构成三要素"></a>函数构成三要素</h4><p>函数的拥有三个基本组成：参数（arguments）、主体（body）和环境（environment），分别使用<code>formals()</code>、<code>body()</code>和<code>environment()</code>来查看。</p>
+<pre><code class="hljs &#123;r&#125;">fun0 &lt;- function(x, y) x+y
+formals(fun0)
+#&gt; $x
 
-# 以下为特殊情况
-NA ^ 0
-#&gt; [1] 1
-NA | TRUE
-#&gt; [1] TRUE
-NA &amp; FALSE
-#&gt; [1] FALSE</code></pre>
-</li>
-<li><p>由于原子向量中的所有元素具有相同的属性，当试图合并两个不同类别的向量时，<strong>R</strong>会自动按照一个固定的顺序来强行调整类别（coerce）：<strong>character → double → integer → logical</strong>。对于logical向量，在使用数学函数时，其会自动转换为numeric。当强行调整类别失败时，<strong>R</strong>会返回NA。</p>
-<pre><code class="hljs &#123;r&#125;">str(c(&quot;a&quot;, 1))
-#&gt;  chr [1:2] &quot;a&quot; &quot;1&quot;
+#&gt; $y
+body(fun0)
+#&gt; x+y
 
-# 对于logical向量，在使用数学函数时，其会自动转换为numeric
-x &lt;- c(FALSE, FALSE, TRUE)
-as.numeric(x)
-#&gt; [1] 0 0 1
-sum(x)
-#&gt; [1] 1
-
-# 当强行调整类别失败时，R会返回NA
-as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
-#&gt; Warning: NAs introduced by coercion
-#&gt; [1]  1  1 NA</code></pre>
+environment(fun0)
+#&gt; &lt;environment: R_GlobalEnv&gt;</code></pre>
+<h4 id="初始函数的特殊性"><a href="#初始函数的特殊性" class="headerlink" title="初始函数的特殊性"></a>初始函数的特殊性</h4><p>R中包含了大量由C语言编写的初始函数（primitive functions），其在R中的属性要么为<code>builtin</code>和<code>special</code>，其不具备一般函数中的三大要素。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(sum)
+#&gt; [1] &quot;builtin&quot;
+typeof(&#96;[&#96;)
+#&gt; [1] &quot;special&quot;</code></pre>
+<h4 id="函数也是对象"><a href="#函数也是对象" class="headerlink" title="函数也是对象"></a>函数也是对象</h4><ul>
+<li><p>名称和函数对象（function object）也是链接（binding）的关系。同时，函数对象不一定需要名称，可以使用匿名函数（anonymous function）。例如在<code>lapply(X, FUN)</code>中编写的函数。</p>
 </li>
-</ul>
-<h3 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h3><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
-<ul>
-<li><p>使用<strong>attr( )</strong>来获取和编辑单个属性，使用<strong>attributes( )</strong>来获取对象的所有属性信息。</p>
-</li>
-<li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
-<pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
-attr(a, &quot;x&quot;) &lt;- &quot;abc&quot;
-attr(a, &quot;x&quot;)
-#&gt; [1] &quot;abc&quot;
-
-# 丧失属性
-attributes(a[1])
-#&gt; NULL</code></pre>
-</li>
-<li><p>名字（name）和维度（dim）是仅有的两个会提前预设的属性。</p>
-<pre><code class="hljs &#123;r&#125;"># 三种命名方式
-x &lt;- c(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-
-x &lt;- 1:3
-names(x) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
-
-x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-# 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
-<ul>
-<li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
-<p>Vector|Matrix|Array<br> :—-: | :—-: | :—-: </p>
-<pre><code> names()     | rownames(), colnames() |   dimnames()   
-length()`     |     nrow(), ncol()     |     dim()      
-   c()       |    rbind(), cbind()    | abind::abind() 
-     —         |           t()            |    aperm()     
-</code></pre><p> is.null(dim(x)) |       is.matrix()        |   is.array()   </p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="S3原子向量"><a href="#S3原子向量" class="headerlink" title="S3原子向量"></a>S3原子向量</h3><p>拥有<strong>class</strong>的向量即转换成了<strong>S3对象（S3 object）</strong>，有四种重要的S3对象：</p>
-<ul>
-<li><p>类别变量（category data）：<strong>factor</strong>是基于integer的S3对象，内含提前预设的值。</p>
-<pre><code class="hljs &#123;r&#125;"># 基于integer的对象
-x &lt;- factor(c(&quot;a&quot;, &quot;b&quot;, &quot;b&quot;, &quot;a&quot;))
-typeof(x)
-#&gt; [1] &quot;integer&quot;
-class(x)
-#&gt; [1] &quot;factor&quot;
-
-attributes(x)
-#&gt; $levels
-#&gt; [1] &quot;a&quot; &quot;b&quot;
-
-#&gt; $class
-#&gt; [1] &quot;factor&quot;
-
-# factor中规定的level数量可多余实际对象中的元素类别数量
-x &lt;- factor(x, levels &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-table(x)
-#&gt; x
-#&gt; a b c 
-#&gt; 2 2 0</code></pre>
-</li>
-<li><p>日期（dates）：<strong>Date</strong>是基于double的S3对象，是距离1970-01-01的天数。</p>
-<pre><code class="hljs &#123;r&#125;">typeof(Sys.Date())
-#&gt; [1] &quot;double&quot;
-class(Sys.Date())
-#&gt; [1] &quot;Date&quot;
-unclass(Sys.Date())
-#&gt; [1] 18477</code></pre>
-</li>
-<li><p>时间（date-times）：<strong>POSIXct</strong>和<strong>POSIXlt</strong>是基于double构建的S3对象。</p>
-<pre><code class="hljs &#123;r&#125;">now_ct &lt;- as.POSIXct(&quot;2018-08-01 22:00&quot;, tz &#x3D; &quot;UTC&quot;)
-now_ct
-#&gt; [1] &quot;2018-08-01 22:00:00 UTC&quot;
-
-typeof(now_ct)
-#&gt; [1] &quot;double&quot;
-attributes(now_ct)
-#&gt; $class
-#&gt; [1] &quot;POSIXct&quot; &quot;POSIXt&quot; 
-#&gt; 
-#&gt; $tzone
-#&gt; [1] &quot;UTC&quot;</code></pre>
-</li>
-<li><p>区间（durations）：<strong>difftime</strong>是基于double构建的S3对象。</p>
-<pre><code class="hljs &#123;r&#125;">one_week_1 &lt;- as.difftime(1, units &#x3D; &quot;weeks&quot;)
-one_week_1
-#&gt; Time difference of 1 weeks
-typeof(one_week_1)
-#&gt; [1] &quot;double&quot;
-attributes(one_week_1)
-#&gt; $class
-#&gt; [1] &quot;difftime&quot;
-#&gt; 
-#&gt; $units
-#&gt; [1] &quot;weeks&quot;</code></pre>
-</li>
-</ul>
-<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<strong>list( )</strong>来生成列表，使用<strong>as.list( )</strong>来将对象转换为列表。</p>
-<h3 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h3><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
-<ul>
-<li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
-<ul>
-<li><p>Data Frame会自动修改无效变量名，tibbles不会修改。</p>
-</li>
-<li><p>Data Frame和tibble都会自动循环填充较短的变量，但是tibble只有在变量为1的时候才会循环填充。</p>
-</li>
-<li><p>tibble在创建变量时即可引用</p>
-<pre><code class="hljs &#123;r&#125;">tibble(
-  x &#x3D; 1:3,
-  y &#x3D; x * 2
+<li><p>函数也可以像其它对象一样被放入list中。</p>
+<pre><code class="hljs &#123;r&#125;">funs &lt;- list(
+	half &#x3D; function(x) x&#x2F;2,
+    double &#x3D; function(x) x*2
 )
-#&gt; # A tibble: 3 x 2
-#&gt;       x     y
-#&gt;   &lt;int&gt; &lt;dbl&gt;
-#&gt; 1     1     2
-#&gt; 2     2     4
-#&gt; 3     3     6</code></pre>
+funs$half(3)
+#&gt; [1] 1.5</code></pre>
 </li>
 </ul>
+<h4 id="使用do-call"><a href="#使用do-call" class="headerlink" title="使用do.call()"></a>使用<code>do.call()</code></h4><p>当函数名与参数分离时，使用<code>do.call（FUN，args）</code>来呼叫函数。</p>
+<pre><code class="hljs &#123;r&#125;">args &lt;- list(runif(100), na.rm &#x3D; TRUE)
+do.call(sum, args)
+#&gt; [1] 55.449</code></pre>
+<h3 id="词法范围（Lexical-Scoping）"><a href="#词法范围（Lexical-Scoping）" class="headerlink" title="词法范围（Lexical Scoping）"></a>词法范围（Lexical Scoping）</h3><p>词法范围解释了R中的函数如何识别对象值（value）和名称（name）间的链接，其遵从四个基本法则：</p>
+<ul>
+<li>Name masking：函数内<strong>定义的对象名</strong>将覆盖函数外定义的。</li>
+<li>Functions VS Variables：函数内<strong>定义的函数</strong>也将覆盖函数外定义的。</li>
+<li>A fresh start：函数内运行结果不会影响全局中的对象。</li>
+<li>Dynamic lookup：函数每次运行时即时查找所需对象。</li>
+</ul>
+<h3 id="惰性评估"><a href="#惰性评估" class="headerlink" title="惰性评估"></a>惰性评估</h3><h4 id="基本要素"><a href="#基本要素" class="headerlink" title="基本要素"></a>基本要素</h4><p>R只会在需要用到参数时，检测其是否为有效参数。由于惰性评估（lazy evaluation），R的函数需要以下要素：</p>
+<ul>
+<li><p>含有参数的表达式</p>
 </li>
-<li><p>tibbles不支持rownames，相反，其提供<strong>rownames_to_column( )</strong>和<strong>rownames</strong>来将现有的行名称转换为变量。</p>
+<li><p>用以评估（监测有效性）参数的的环境。</p>
+<ul>
+<li>在呼叫函数时定义的对象，将反映到全局环境中。注意：只对使用<code>&lt;-</code>方式定义的有效，<code>=</code>定义的不行。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 在呼叫函数时定义的对象，将反映到全局环境中
+fun1 &lt;- function(x) x+2
+fun1(x &lt;- 2)
+#&gt; [1] 4</code></pre>
 </li>
-<li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
-<pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
-dfm$y &lt;- matrix(1:9, nrow &#x3D; 3) #矩阵变量
-dfm$z &lt;- data.frame(a &#x3D; 3:1, b &#x3D; letters[1:3], stringsAsFactors &#x3D; FALSE) #data.frame变量
-
-str(dfm)
-#&gt; &#39;data.frame&#39;:	3 obs. of  3 variables:
-#&gt;  $ x: num  10 20 30
-#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9
-#&gt;  $ z:&#39;data.frame&#39;:	3 obs. of  2 variables:
-#&gt;   ..$ a: int  3 2 1
-#&gt;   ..$ b: chr  &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/38c47352b8062a6d59318b3bbd1f86b062419322/7780c/diagrams/vectors/data-frame-matrix.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<li><p>参数值</p>
 </li>
 </ul>
-<h3 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h3><p><strong>NULL</strong>是特殊的类型，长度（length）为0，不能有任何属性（attributes）</p>
-<pre><code><pre><code class="hljs &#123;r&#125;">typeof(NULL)
-#&gt; [1] &quot;NULL&quot;
+<h4 id="默认参数"><a href="#默认参数" class="headerlink" title="默认参数"></a>默认参数</h4><ul>
+<li><p>默认参数可直接给出，或者由其它参数给出，乃至由函数中定义的对象给出。</p>
+</li>
+<li><p>默认参数存在与函数的评估环境（evaluation environment）中，而非全局环境（global environment）。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x &#x3D; ls()) &#123;
+    a &lt;- 1
+    x
+&#125;
+fun()
+#&gt; [1] &quot;a&quot; &quot;x&quot;
 
-length(NULL)
-#&gt; [1] 0
+fun(ls())
+#&gt; [1] &quot;fun&quot;</code></pre>
+</li>
+<li><p>使用<code>missing()</code>来判断参数值是否由默认给出。</p>
+</li>
+</ul>
+<h3 id="…（dot-dot-dot）"><a href="#…（dot-dot-dot）" class="headerlink" title="…（dot-dot-dot）"></a>…（dot-dot-dot）</h3><p>使用<code>...</code>来为函数添加更多的参数。</p>
+<ul>
+<li><p>使用<code>..n</code>来提取特定位置的参数</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(first &#x3D; ..1, third &#x3D; ..4)
+fun(1,2,3,4)
+#&gt; $first
+#&gt; [1] 1
 
-is.null(c())
-#&gt; [1] TRUE</code></pre>
-</code></pre><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+#&gt; $third
+#&gt; [1] 4</code></pre>
+</li>
+<li><p>直接使用<code>list(...)</code>来将输入的参数储存为列表</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(...)
+fun(a &#x3D; 1, b &#x3D; 2)
+#&gt; $a
+#&gt; [1] 1
+
+#&gt; $b
+#&gt; [1] 2</code></pre>
+</li>
+</ul>
+<h3 id="退出函数"><a href="#退出函数" class="headerlink" title="退出函数"></a>退出函数</h3><h4 id="函数返回值"><a href="#函数返回值" class="headerlink" title="函数返回值"></a>函数返回值</h4><ul>
+<li>隐性返回（implicit return）：最后被执行的表达式即为返回的值</li>
+<li>显性返回（explicit return）：使用<code>return()</code></li>
+</ul>
+<h4 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h4><p>使用<code>stop()</code>来立即停止当前函数。</p>
+<h4 id="隐藏返回值"><a href="#隐藏返回值" class="headerlink" title="隐藏返回值"></a>隐藏返回值</h4><p>使用<code>invisible()</code>来将返回值隐藏。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x) invisible(x)
+fun(232)</code></pre>
+<h4 id="退出窗口"><a href="#退出窗口" class="headerlink" title="退出窗口"></a>退出窗口</h4><p>使用<code>on.exit(, add = TRUE)</code>来作为函数的退出窗口（exit handler），用以确保不论函数如何退出，都不会改变全局环境。</p>
+<ul>
+<li><p><code>on.exit()</code>不论函数正常执行、报错都将执行。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x)&#123;
+    cat(&quot;Let&#39;s start.\n&quot;)
+    on.exit(cat(&quot;This is a exit handler.\n&quot;), add &#x3D; TRUE)
+    
+    if (x) &#123;
+        return(10)
+    &#125; else&#123;
+        stop(&quot;Error&quot;)
+    &#125;
+&#125;
+fun(TRUE)
+#&gt; Let&#39;s start
+#&gt; This is a exit handler
+#&gt; [1] 10
+
+fun(FALSE)</code></pre>
+</li>
+</ul>
+<h3 id="函数形态"><a href="#函数形态" class="headerlink" title="函数形态"></a>函数形态</h3><h4 id="四种存在形态"><a href="#四种存在形态" class="headerlink" title="四种存在形态"></a>四种存在形态</h4><p>R中函数有四种不同的存在形态，各形态之间在一定程度上可相互转换：</p>
+<ul>
+<li>prefix：普通函数，<code>FUN(x, y, z)</code></li>
+<li>infix：在参数中出现的函数，<code>+</code>、<code>%&gt;%</code></li>
+<li>replacement：通过赋值存在的函数，<code>&lt;-</code></li>
+<li>special：<code>[[]]</code>、<code>if</code>、<code>for</code></li>
+</ul>
+<h4 id="函数形态变换"><a href="#函数形态变换" class="headerlink" title="函数形态变换"></a>函数形态变换</h4><ul>
+<li><p>转换为前置形态</p>
+<pre><code class="hljs &#123;r&#125;">x + y
+&#96;+&#96;(x, y)
+
+names(df) &lt;- c(x, y, z)
+&#96;names&lt;-&#96;（df, c(x, y, z）)
+
+for (i in 1:10) print(i)
+&#96;for&#96;(i, 1:10, print(i))</code></pre>
+</li>
+<li><p>改写每个non-prefix形态的函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;+&#96; &lt;- function(e1, e2)&#123;
+    x &lt;- runif(1)
+    if (x &lt; 0.5)&#123;
+        e1 - e2
+    &#125; else&#123;
+        sum(e1, e2)
+    &#125;
+&#125;
+
+replicate(100, 1+2)
+#&gt; [1] -1  3 -1 -1 -1  3 -1 -1 -1  3 -1 -1 -1  3 -1  3  3  3  3 -1  3 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3
+#&gt; [35]  3  3  3  3  3  3 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1  3  3 -1  3 -1 -1 -1 -1 -1 -1  3  3 -1 -1 -1  3
+#&gt; [69] -1 -1 -1 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1 -1 -1 -1 -1  3 -1  3 -1  3 -1
+
+replicate(100, (1+2)) #添加括号后又回归原有的定义，&quot;(&quot;本身也是一个函数
+#&gt; [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+#&gt; [52] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3</code></pre>
+</li>
+</ul>
+<h4 id="自定义infix函数"><a href="#自定义infix函数" class="headerlink" title="自定义infix函数"></a>自定义infix函数</h4><p>使用<code>%</code>来自定义infix函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;%+%&#96; &lt;- function(a, b)&#123;
+    paste0(a, b)
+&#125;
+
+4 %+% 4
+#&gt; [1] &quot;44&quot;</code></pre>
+<h4 id="替换函数"><a href="#替换函数" class="headerlink" title="替换函数"></a>替换函数</h4><p>替换函数（replacement function）将右边的值输入左边函数中，需要有两个必要要素：</p>
+<ul>
+<li>参数x用以储存值，参数value用以替换值。</li>
+<li>函数主体中需要返回替换后的值。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">&#96;replace_2nd&lt;-&#96; &lt;- function(x, value)&#123;
+    x[2] &lt;- value
+    x
+&#125; 
+
+c&lt;- 1:10
+replace_2nd(c) &lt;- 101L
+c
+#&gt; [1]   1 101   3   4   5   6   7   8   9  10</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -429,18 +429,12 @@ is.null(c())
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/04/Advanced_R/Subsetting/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] 4. 切片</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/08/02/Advanced_R/Names_and_Values/">
-                        <span class="hidden-mobile">[Advanced R] 2. 名称与对象</span>
+                      <a href="/2020/08/05/Advanced_R/5.%20Control%20flow/">
+                        <span class="hidden-mobile">[Advanced R] 5. 控制流</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -455,6 +449,31 @@ is.null(c())
               <div class="comments" id="comments">
                 
                 
+  <div id="vcomments"></div>
+  <script type="text/javascript">
+    function loadValine() {
+      addScript('https://cdn.staticfile.org/valine/1.4.14/Valine.min.js', function () {
+        new Valine({
+          el: "#vcomments",
+          app_id: "TIwGpobNKf5SGDuXSM37uWlL-gzGzoHsz",
+          app_key: "acevM8xtX5cGa3scJDUgviwu",
+          placeholder: "说点什么",
+          path: window.location.pathname,
+          avatar: "retro",
+          meta: ["nick","mail","link"],
+          pageSize: "10",
+          lang: "zh-CN",
+          highlight: false,
+          recordIP: false,
+          serverURLs: "",
+        });
+      });
+    }
+    createObserver(loadValine, 'vcomments');
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://valine.js.org" target="_blank" rel="nofollow noopener noopener">comments
+      powered by Valine.</a></noscript>
+
 
               </div>
             
@@ -588,7 +607,7 @@ is.null(c())
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Vectors &nbsp;",
+        "Functions &nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
