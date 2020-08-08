@@ -7,6 +7,198 @@
 ]]></content>
   </entry>
   <entry>
+    <title>[Advanced R] 3. 向量</title>
+    <url>/2020/08/03/Advanced_R/3.%20Vectors/</url>
+    <content><![CDATA[<h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
+<p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
+</blockquote>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/2ff3a6cebf1bb80abb2a814ae1cfc67b12817713/ae848/diagrams/vectors/summary-tree.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<h3 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h3><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<ul>
+<li><p>绝大多数情况下与缺失值（<code>NA</code>）相关的表达式输出的都是<code>NA</code>。</p>
+<pre><code class="hljs &#123;r&#125;">NA &gt; 5
+#&gt; [1] NA
+10 * NA
+#&gt; [1] NA
+!NA
+#&gt; [1] NA
+
+# 以下为特殊情况
+NA ^ 0
+#&gt; [1] 1
+NA | TRUE
+#&gt; [1] TRUE
+NA &amp; FALSE
+#&gt; [1] FALSE</code></pre>
+</li>
+<li><p>由于原子向量中的所有元素具有相同的属性，当试图合并两个不同类别的向量时，<strong>R</strong>会自动按照一个固定的顺序来强行调整类别（coerce）：<strong>character → double → integer → logical</strong>。对于logical向量，在使用数学函数时，其会自动转换为numeric。当强行调整类别失败时，<strong>R</strong>会返回NA。</p>
+<pre><code class="hljs &#123;r&#125;">str(c(&quot;a&quot;, 1))
+#&gt;  chr [1:2] &quot;a&quot; &quot;1&quot;
+
+# 对于logical向量，在使用数学函数时，其会自动转换为numeric
+x &lt;- c(FALSE, FALSE, TRUE)
+as.numeric(x)
+#&gt; [1] 0 0 1
+sum(x)
+#&gt; [1] 1
+
+# 当强行调整类别失败时，R会返回NA
+as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
+#&gt; Warning: NAs introduced by coercion
+#&gt; [1]  1  1 NA</code></pre>
+</li>
+</ul>
+<h3 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h3><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
+<ul>
+<li><p>使用<code>attr( )</code>来获取和编辑单个属性，使用<code>attributes( )</code>来获取对象的所有属性信息。</p>
+</li>
+<li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
+<pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
+attr(a, &quot;x&quot;) &lt;- &quot;abc&quot;
+attr(a, &quot;x&quot;)
+#&gt; [1] &quot;abc&quot;
+
+# 丧失属性
+attributes(a[1])
+#&gt; NULL</code></pre>
+</li>
+<li><p>名字（name）和维度（dim）是仅有的两个会提前预设的属性。</p>
+<pre><code class="hljs &#123;r&#125;"># 三种命名方式
+x &lt;- c(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+
+x &lt;- 1:3
+names(x) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
+
+x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+# 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
+<ul>
+<li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
+<p>|    Vector    |         Matrix         |     Array      |<br>| :—————: | :——————————: | :——————: |<br>|    ames()    | rownames(), colnames() |   dimnames()   |<br>|    gth()`    |     nrow(), ncol()     |     dim()      |<br>|     c()      |    rbind(), cbind()    | abind::abind() |<br>|      —       |          t()           |    aperm()     |<br>| null(dim(x)) |      is.matrix()       |   is.array()   |</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="S3原子向量"><a href="#S3原子向量" class="headerlink" title="S3原子向量"></a>S3原子向量</h3><p>拥有<strong>class</strong>的向量即转换成了<strong>S3对象（S3 object）</strong>，有四种重要的S3对象：</p>
+<ul>
+<li><p>类别变量（category data）：<strong>factor</strong>是基于integer的S3对象，内含提前预设的值。</p>
+<pre><code class="hljs &#123;r&#125;"># 基于integer的对象
+x &lt;- factor(c(&quot;a&quot;, &quot;b&quot;, &quot;b&quot;, &quot;a&quot;))
+typeof(x)
+#&gt; [1] &quot;integer&quot;
+class(x)
+#&gt; [1] &quot;factor&quot;
+
+attributes(x)
+#&gt; $levels
+#&gt; [1] &quot;a&quot; &quot;b&quot;
+
+#&gt; $class
+#&gt; [1] &quot;factor&quot;
+
+# factor中规定的level数量可多余实际对象中的元素类别数量
+x &lt;- factor(x, levels &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+table(x)
+#&gt; x
+#&gt; a b c 
+#&gt; 2 2 0</code></pre>
+</li>
+<li><p>日期（dates）：<strong>Date</strong>是基于double的S3对象，是距离1970-01-01的天数。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(Sys.Date())
+#&gt; [1] &quot;double&quot;
+class(Sys.Date())
+#&gt; [1] &quot;Date&quot;
+unclass(Sys.Date())
+#&gt; [1] 18477</code></pre>
+</li>
+<li><p>时间（date-times）：<strong>POSIXct</strong>和<strong>POSIXlt</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">now_ct &lt;- as.POSIXct(&quot;2018-08-01 22:00&quot;, tz &#x3D; &quot;UTC&quot;)
+now_ct
+#&gt; [1] &quot;2018-08-01 22:00:00 UTC&quot;
+
+typeof(now_ct)
+#&gt; [1] &quot;double&quot;
+attributes(now_ct)
+#&gt; $class
+#&gt; [1] &quot;POSIXct&quot; &quot;POSIXt&quot; 
+#&gt; 
+#&gt; $tzone
+#&gt; [1] &quot;UTC&quot;</code></pre>
+</li>
+<li><p>区间（durations）：<strong>difftime</strong>是基于double构建的S3对象。</p>
+<pre><code class="hljs &#123;r&#125;">one_week_1 &lt;- as.difftime(1, units &#x3D; &quot;weeks&quot;)
+one_week_1
+#&gt; Time difference of 1 weeks
+typeof(one_week_1)
+#&gt; [1] &quot;double&quot;
+attributes(one_week_1)
+#&gt; $class
+#&gt; [1] &quot;difftime&quot;
+#&gt; 
+#&gt; $units
+#&gt; [1] &quot;weeks&quot;</code></pre>
+</li>
+</ul>
+<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<code>list( )</code>来生成列表，使用<code>as.list( )</code>来将对象转换为列表。</p>
+<h3 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h3><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
+<ul>
+<li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
+<ul>
+<li><p>Data Frame会自动修改无效变量名，tibbles不会修改。</p>
+</li>
+<li><p>Data Frame和tibble都会自动循环填充较短的变量，但是tibble只有在变量为1的时候才会循环填充。</p>
+</li>
+<li><p>tibble在创建变量时即可引用</p>
+<pre><code class="hljs &#123;r&#125;">tibble(
+  x &#x3D; 1:3,
+  y &#x3D; x * 2
+)
+#&gt; # A tibble: 3 x 2
+#&gt;       x     y
+#&gt;   &lt;int&gt; &lt;dbl&gt;
+#&gt; 1     1     2
+#&gt; 2     2     4
+#&gt; 3     3     6</code></pre>
+</li>
+</ul>
+</li>
+<li><p>tibbles不支持行名称，相反，其提供<code>rownames_to_column( )</code>和<code>rownames</code>来将现有的行名称转换为变量。</p>
+</li>
+<li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
+<pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
+dfm$y &lt;- matrix(1:9, nrow &#x3D; 3) #矩阵变量
+dfm$z &lt;- data.frame(a &#x3D; 3:1, b &#x3D; letters[1:3], stringsAsFactors &#x3D; FALSE) #data.frame变量
+
+str(dfm)
+#&gt; &#39;data.frame&#39;:	3 obs. of  3 variables:
+#&gt;  $ x: num  10 20 30
+#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9
+#&gt;  $ z:&#39;data.frame&#39;:	3 obs. of  2 variables:
+#&gt;   ..$ a: int  3 2 1
+#&gt;   ..$ b: chr  &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/38c47352b8062a6d59318b3bbd1f86b062419322/7780c/diagrams/vectors/data-frame-matrix.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+</li>
+</ul>
+<h3 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h3><p><strong>NULL</strong>是特殊的类型，长度（length）为0，不能有任何属性（attributes）</p>
+<pre><code><pre><code class="hljs &#123;r&#125;">typeof(NULL)
+#&gt; [1] &quot;NULL&quot;
+
+length(NULL)
+#&gt; [1] 0
+
+is.null(c())
+#&gt; [1] TRUE</code></pre>
+</code></pre><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>[Advanced R] 2. 名称与对象</title>
     <url>/2020/08/02/Advanced_R/2.%20Names_and_Values/</url>
     <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
@@ -176,6 +368,118 @@ e2$c
 <li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
 </ul>
 <section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] 5. 控制流</title>
+    <url>/2020/08/05/Advanced_R/5.%20Control%20flow/</url>
+    <content><![CDATA[<h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
+<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
+<ul>
+<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
+<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
+<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
+</ul>
+</li>
+<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
+ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
+#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
+
+# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
+x &lt;- 1:50
+x[runif(10, max &#x3D; 50)] &lt;- NA
+case_when(
+	is.na(x) ~ &quot;nothing&quot;,
+    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
+    TRUE ~ as.character(x)
+)
+#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
+#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
+#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
+#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
+#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
+#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
+</li>
+</ul>
+<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
+<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
+    switch(
+    	x,
+        a &#x3D; &quot;option 1&quot;,
+        b &#x3D; &quot;option 2&quot;,
+        c &#x3D; &quot;option 3&quot;,
+        stop(&quot;Invalid &#96;x&#96; value&quot;)
+    )
+&#125;
+
+option(&quot;a&quot;)
+#&gt; [1] &quot;option 1&quot;
+
+legs &lt;- function(x)&#123;
+    switch(
+    	x,
+        cow &#x3D; ,
+        dog &#x3D; 4,
+        human &#x3D; 2
+    )
+&#125;
+legs(&quot;cow&quot;)
+#&gt; [1] 4</code></pre>
+<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
+<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
+<ul>
+<li><code>break</code>退出当前整个<code>for</code>循环。</li>
+<li><code>next</code>退出当前子循环。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
+    if (i &lt; 3) &#123;
+        next
+    &#125;
+    print(i)
+    if (i &gt;&#x3D; 5) &#123;
+        break
+    &#125; 
+&#125;
+#&gt; [1] 3
+#&gt; [1] 4
+#&gt; [1] 5</code></pre>
+</li>
+</ul>
+<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
+<ul>
+<li><p>vector长度不能为0</p>
+</li>
+<li><p>循环可能剥离对象的属性</p>
+<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
+for (i in dates) print(i)
+#&gt; [1] 18262
+#&gt; [1] 18263
+
+for (i in seq_along(dates)) print(dates[[i]])
+#&gt; [1] &quot;2020-01-01&quot;
+#&gt; [1] &quot;2020-01-02&quot;</code></pre>
+</li>
+<li><p>使用<code>list()</code>来储存数据</p>
+<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
+out &lt;- vector(&quot;list&quot;, length(means))
+for (i in seq_along(means))&#123;
+    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
+&#125;</code></pre>
+</li>
+</ul>
+<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
+<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
+<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
         <category>学习</category>
@@ -376,300 +680,53 @@ which(x) #将逻辑值转换为数值
       </tags>
   </entry>
   <entry>
-    <title>[Advanced R] 3. 向量</title>
-    <url>/2020/08/03/Advanced_R/3.%20Vectors/</url>
-    <content><![CDATA[<h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
-<p>  <strong>向量由</strong>原子向量（atomic vector）<strong>和</strong>列表（list）<strong>组成，二者的区别在于：原子向量中的每个元素具有相同的类别，而列表中元素的类别可以不同。</strong></p>
+    <title>[Advanced R] 6. 函数</title>
+    <url>/2020/08/07/Advanced_R/7.%20Environment/</url>
+    <content><![CDATA[<h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><blockquote>
+<p>  <strong>存在即对象，万物出自函数</strong>。</p>
 </blockquote>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/2ff3a6cebf1bb80abb2a814ae1cfc67b12817713/ae848/diagrams/vectors/summary-tree.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<h3 id="原子向量"><a href="#原子向量" class="headerlink" title="原子向量"></a>原子向量</h3><p>原子向量（atomic vector）有四种基础类别：logical，integer，double，character。</p>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/eb6730b841e32292d9ff36b33a590e24b6221f43/57192/diagrams/vectors/summary-tree-atomic.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<h3 id="基本定义"><a href="#基本定义" class="headerlink" title="基本定义"></a>基本定义</h3><p>环境中的变量需要有一下特征：</p>
 <ul>
-<li><p>绝大多数情况下与缺失值（<code>NA</code>）相关的表达式输出的都是<code>NA</code>。</p>
-<pre><code class="hljs &#123;r&#125;">NA &gt; 5
-#&gt; [1] NA
-10 * NA
-#&gt; [1] NA
-!NA
-#&gt; [1] NA
-
-# 以下为特殊情况
-NA ^ 0
-#&gt; [1] 1
-NA | TRUE
-#&gt; [1] TRUE
-NA &amp; FALSE
-#&gt; [1] FALSE</code></pre>
-</li>
-<li><p>由于原子向量中的所有元素具有相同的属性，当试图合并两个不同类别的向量时，<strong>R</strong>会自动按照一个固定的顺序来强行调整类别（coerce）：<strong>character → double → integer → logical</strong>。对于logical向量，在使用数学函数时，其会自动转换为numeric。当强行调整类别失败时，<strong>R</strong>会返回NA。</p>
-<pre><code class="hljs &#123;r&#125;">str(c(&quot;a&quot;, 1))
-#&gt;  chr [1:2] &quot;a&quot; &quot;1&quot;
-
-# 对于logical向量，在使用数学函数时，其会自动转换为numeric
-x &lt;- c(FALSE, FALSE, TRUE)
-as.numeric(x)
-#&gt; [1] 0 0 1
-sum(x)
-#&gt; [1] 1
-
-# 当强行调整类别失败时，R会返回NA
-as.integer(c(&quot;1&quot;, &quot;1.5&quot;, &quot;a&quot;))
-#&gt; Warning: NAs introduced by coercion
-#&gt; [1]  1  1 NA</code></pre>
-</li>
+<li>独立的名称</li>
+<li>环境中的变量名没有顺序：使用<code>env_names()</code>来获取变量名，<code>env_print()</code>来获取详细变量名。</li>
+<li>除空环境外（empty environment），所有环境都有父环境（parent）：使用<code>env_parent()</code>来获取父环境。当子环境没有所查找变量时，R便在父环境中寻找。</li>
+<li>环境在被修改时不会被复制，而是立即修改。</li>
 </ul>
-<h3 id="属性（Attributes）"><a href="#属性（Attributes）" class="headerlink" title="属性（Attributes）"></a>属性（Attributes）</h3><p>属性（Attributes）能够使原子向量变为更多的其它类型。</p>
-<ul>
-<li><p>使用<code>attr( )</code>来获取和编辑单个属性，使用<code>attributes( )</code>来获取对象的所有属性信息。</p>
-</li>
-<li><p>属性（Attributes）只是暂时的，绝大多数基本的操作都会使对象丧失属性。</p>
-<pre><code class="hljs &#123;r&#125;">a &lt;- 1:3
-attr(a, &quot;x&quot;) &lt;- &quot;abc&quot;
-attr(a, &quot;x&quot;)
-#&gt; [1] &quot;abc&quot;
+<p>使用<code>rlang::env()</code>来创造一个环境</p>
+<h3 id="在环境间循环"><a href="#在环境间循环" class="headerlink" title="在环境间循环"></a>在环境间循环</h3><p>由于每个环境都存在父环境，同时R中的函数词义范围允许lazy evaluation，可以编写函数来实现环境间的循环：</p>
+<pre><code class="hljs &#123;r&#125;">library(rlang)
 
-# 丧失属性
-attributes(a[1])
-#&gt; NULL</code></pre>
-</li>
-<li><p>名字（name）和维度（dim）是仅有的两个会提前预设的属性。</p>
-<pre><code class="hljs &#123;r&#125;"># 三种命名方式
-x &lt;- c(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-
-x &lt;- 1:3
-names(x) &lt;- c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;)
-
-x &lt;- setNames(1:3, c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-# 可使用unname(x)或names(x) &lt;- NULL 来去掉名称</code></pre>
-<ul>
-<li><p>增加维度（dim）使得向量升级为矩阵（matrix）或数组（array）。一般而言，适用于向量的函数，也有其在矩阵和数组中的形式</p>
-<p>|    Vector    |         Matrix         |     Array      |<br>| :—————: | :——————————: | :——————: |<br>|    ames()    | rownames(), colnames() |   dimnames()   |<br>|    gth()`    |     nrow(), ncol()     |     dim()      |<br>|     c()      |    rbind(), cbind()    | abind::abind() |<br>|      —       |          t()           |    aperm()     |<br>| null(dim(x)) |      is.matrix()       |   is.array()   |</p>
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="S3原子向量"><a href="#S3原子向量" class="headerlink" title="S3原子向量"></a>S3原子向量</h3><p>拥有<strong>class</strong>的向量即转换成了<strong>S3对象（S3 object）</strong>，有四种重要的S3对象：</p>
-<ul>
-<li><p>类别变量（category data）：<strong>factor</strong>是基于integer的S3对象，内含提前预设的值。</p>
-<pre><code class="hljs &#123;r&#125;"># 基于integer的对象
-x &lt;- factor(c(&quot;a&quot;, &quot;b&quot;, &quot;b&quot;, &quot;a&quot;))
-typeof(x)
-#&gt; [1] &quot;integer&quot;
-class(x)
-#&gt; [1] &quot;factor&quot;
-
-attributes(x)
-#&gt; $levels
-#&gt; [1] &quot;a&quot; &quot;b&quot;
-
-#&gt; $class
-#&gt; [1] &quot;factor&quot;
-
-# factor中规定的level数量可多余实际对象中的元素类别数量
-x &lt;- factor(x, levels &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-table(x)
-#&gt; x
-#&gt; a b c 
-#&gt; 2 2 0</code></pre>
-</li>
-<li><p>日期（dates）：<strong>Date</strong>是基于double的S3对象，是距离1970-01-01的天数。</p>
-<pre><code class="hljs &#123;r&#125;">typeof(Sys.Date())
-#&gt; [1] &quot;double&quot;
-class(Sys.Date())
-#&gt; [1] &quot;Date&quot;
-unclass(Sys.Date())
-#&gt; [1] 18477</code></pre>
-</li>
-<li><p>时间（date-times）：<strong>POSIXct</strong>和<strong>POSIXlt</strong>是基于double构建的S3对象。</p>
-<pre><code class="hljs &#123;r&#125;">now_ct &lt;- as.POSIXct(&quot;2018-08-01 22:00&quot;, tz &#x3D; &quot;UTC&quot;)
-now_ct
-#&gt; [1] &quot;2018-08-01 22:00:00 UTC&quot;
-
-typeof(now_ct)
-#&gt; [1] &quot;double&quot;
-attributes(now_ct)
-#&gt; $class
-#&gt; [1] &quot;POSIXct&quot; &quot;POSIXt&quot; 
-#&gt; 
-#&gt; $tzone
-#&gt; [1] &quot;UTC&quot;</code></pre>
-</li>
-<li><p>区间（durations）：<strong>difftime</strong>是基于double构建的S3对象。</p>
-<pre><code class="hljs &#123;r&#125;">one_week_1 &lt;- as.difftime(1, units &#x3D; &quot;weeks&quot;)
-one_week_1
-#&gt; Time difference of 1 weeks
-typeof(one_week_1)
-#&gt; [1] &quot;double&quot;
-attributes(one_week_1)
-#&gt; $class
-#&gt; [1] &quot;difftime&quot;
-#&gt; 
-#&gt; $units
-#&gt; [1] &quot;weeks&quot;</code></pre>
-</li>
-</ul>
-<h3 id="列表（List）"><a href="#列表（List）" class="headerlink" title="列表（List）"></a>列表（List）</h3><p>使用<code>list( )</code>来生成列表，使用<code>as.list( )</code>来将对象转换为列表。</p>
-<h3 id="Data-Frame-amp-Tibbles"><a href="#Data-Frame-amp-Tibbles" class="headerlink" title="Data Frame &amp; Tibbles"></a>Data Frame &amp; Tibbles</h3><p>Data Frame和Tibbles是构建在list基础上的两个重要S3对象。</p>
-<ul>
-<li><p>Data Frame和Tibbles的重要区别在于tibble从不强制修改其输入项。</p>
-<ul>
-<li><p>Data Frame会自动修改无效变量名，tibbles不会修改。</p>
-</li>
-<li><p>Data Frame和tibble都会自动循环填充较短的变量，但是tibble只有在变量为1的时候才会循环填充。</p>
-</li>
-<li><p>tibble在创建变量时即可引用</p>
-<pre><code class="hljs &#123;r&#125;">tibble(
-  x &#x3D; 1:3,
-  y &#x3D; x * 2
-)
-#&gt; # A tibble: 3 x 2
-#&gt;       x     y
-#&gt;   &lt;int&gt; &lt;dbl&gt;
-#&gt; 1     1     2
-#&gt; 2     2     4
-#&gt; 3     3     6</code></pre>
-</li>
-</ul>
-</li>
-<li><p>tibbles不支持行名称，相反，其提供<code>rownames_to_column( )</code>和<code>rownames</code>来将现有的行名称转换为变量。</p>
-</li>
-<li><p>只要确保行数相同，就可以添加matrix或array到原data.frame</p>
-<pre><code class="hljs &#123;r&#125;">dfm &lt;- data.frame(x &#x3D; 1:3 * 10)
-dfm$y &lt;- matrix(1:9, nrow &#x3D; 3) #矩阵变量
-dfm$z &lt;- data.frame(a &#x3D; 3:1, b &#x3D; letters[1:3], stringsAsFactors &#x3D; FALSE) #data.frame变量
-
-str(dfm)
-#&gt; &#39;data.frame&#39;:	3 obs. of  3 variables:
-#&gt;  $ x: num  10 20 30
-#&gt;  $ y: int [1:3, 1:3] 1 2 3 4 5 6 7 8 9
-#&gt;  $ z:&#39;data.frame&#39;:	3 obs. of  2 variables:
-#&gt;   ..$ a: int  3 2 1
-#&gt;   ..$ b: chr  &quot;a&quot; &quot;b&quot; &quot;c&quot;</code></pre>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/38c47352b8062a6d59318b3bbd1f86b062419322/7780c/diagrams/vectors/data-frame-matrix.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-</li>
-</ul>
-<h3 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h3><p><strong>NULL</strong>是特殊的类型，长度（length）为0，不能有任何属性（attributes）</p>
-<pre><code><pre><code class="hljs &#123;r&#125;">typeof(NULL)
-#&gt; [1] &quot;NULL&quot;
-
-length(NULL)
-#&gt; [1] 0
-
-is.null(c())
-#&gt; [1] TRUE</code></pre>
-</code></pre><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>[Advanced R] 5. 控制流</title>
-    <url>/2020/08/05/Advanced_R/5.%20Control%20flow/</url>
-    <content><![CDATA[<h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
-<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
-<ul>
-<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
-<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
-<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
-</ul>
-</li>
-<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
-ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
-#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
-
-# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
-x &lt;- 1:50
-x[runif(10, max &#x3D; 50)] &lt;- NA
-case_when(
-	is.na(x) ~ &quot;nothing&quot;,
-    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
-    TRUE ~ as.character(x)
-)
-#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
-#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
-#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
-#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
-#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
-#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
-</li>
-</ul>
-<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
-<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
-    switch(
-    	x,
-        a &#x3D; &quot;option 1&quot;,
-        b &#x3D; &quot;option 2&quot;,
-        c &#x3D; &quot;option 3&quot;,
-        stop(&quot;Invalid &#96;x&#96; value&quot;)
-    )
-&#125;
-
-option(&quot;a&quot;)
-#&gt; [1] &quot;option 1&quot;
-
-legs &lt;- function(x)&#123;
-    switch(
-    	x,
-        cow &#x3D; ,
-        dog &#x3D; 4,
-        human &#x3D; 2
-    )
-&#125;
-legs(&quot;cow&quot;)
-#&gt; [1] 4</code></pre>
-<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
-<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
-<ul>
-<li><code>break</code>退出当前整个<code>for</code>循环。</li>
-<li><code>next</code>退出当前子循环。</li>
-</ul>
-<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
-    if (i &lt; 3) &#123;
-        next
+where &lt;- function(name, env &#x3D; caller_env())&#123;
+    if (identical(env, empty_env()))&#123;
+        stop(&quot;Can&#39;t find &quot;, name, call. &#x3D; FALSE)
+    &#125; else if (env_has(env, name)) &#123;
+        env
+    &#125; else &#123;
+        where(name, env_parent(env))
     &#125;
-    print(i)
-    if (i &gt;&#x3D; 5) &#123;
-        break
-    &#125; 
 &#125;
-#&gt; [1] 3
-#&gt; [1] 4
-#&gt; [1] 5</code></pre>
-</li>
-</ul>
-<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
-<ul>
-<li><p>vector长度不能为0</p>
-</li>
-<li><p>循环可能剥离对象的属性</p>
-<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
-for (i in dates) print(i)
-#&gt; [1] 18262
-#&gt; [1] 18263
 
-for (i in seq_along(dates)) print(dates[[i]])
-#&gt; [1] &quot;2020-01-01&quot;
-#&gt; [1] &quot;2020-01-02&quot;</code></pre>
-</li>
-<li><p>使用<code>list()</code>来储存数据</p>
-<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
-out &lt;- vector(&quot;list&quot;, length(means))
-for (i in seq_along(means))&#123;
-    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
-&#125;</code></pre>
-</li>
-</ul>
-<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
-<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
-<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
-</ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+where(&quot;a&quot;)
+#&gt; &lt;environment: R_GlobalEnv&gt;
+where(&quot;sum&quot;)
+#&gt; &lt;environment: base&gt;
+where(&quot;+&quot;)
+#&gt; &lt;environment: base&gt;</code></pre>
+<h3 id="特殊环境"><a href="#特殊环境" class="headerlink" title="特殊环境"></a>特殊环境</h3><h4 id="Package环境"><a href="#Package环境" class="headerlink" title="Package环境."></a>Package环境.</h4><p>每个新被加载的包都成为<code>R_GlobalEnv</code>的父环境，可以使用<code>search()</code>来查看被加载的环境名，使用<code>search_envs()</code>来查看被加载的环境。</p>
+<p><img src="https://d33wubrfki0l68.cloudfront.net/038b2da4f5db1d2a8acaf4ee1e7d08d04ab36ebc/ac22a/diagrams/environments/search-path.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">search_envs()
+#&gt; [[1]] $ &lt;env: global&gt;
+#&gt; [[2]] $ &lt;env: package:rlang&gt;
+#&gt; [[3]] $ &lt;env: tools:rstudio&gt;
+#&gt; [[4]] $ &lt;env: package:stats&gt;
+#&gt; [[5]] $ &lt;env: package:graphics&gt;
+#&gt; [[6]] $ &lt;env: package:grDevices&gt;
+#&gt; [[7]] $ &lt;env: package:utils&gt;
+#&gt; [[8]] $ &lt;env: package:datasets&gt;
+#&gt; [[9]] $ &lt;env: package:methods&gt;
+#&gt; [[10]] $ &lt;env: Autoloads&gt;
+#&gt; [[11]] $ &lt;env: package:base&gt;</code></pre>
+<h4 id="函数环境"><a href="#函数环境" class="headerlink" title="函数环境"></a>函数环境</h4><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
         <category>学习</category>
