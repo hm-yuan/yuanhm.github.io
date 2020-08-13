@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] Ⅰ. 名称与对象 - Hexo</title>
+  <title>[Advanced R] Ⅱ.泛函数（1） - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/binding-f1.png') no-repeat center center;
+         style="background: url('/img/path.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-02 20:20">
-      2020年8月2日 晚上
+    <time datetime="2020-08-13 18:00">
+      2020年8月13日 晚上
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      1.1k 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      15
+      13
        分钟
     </span>
   
@@ -212,173 +212,189 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
-<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
+              <h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><blockquote>
+<p>  泛函数以函数为输入，返回向量作为输出。</p>
 </blockquote>
-<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<code>&lt;-</code>相连。</p>
+<h3 id="purrr-map-函数"><a href="#purrr-map-函数" class="headerlink" title="purrr::map()函数"></a><code>purrr::map()</code>函数</h3><h4 id="基本形式"><a href="#基本形式" class="headerlink" title="基本形式"></a>基本形式</h4><p><code>map(.x, .f, ...)</code></p>
 <ul>
-<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
-<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
+<li><code>.x</code>为输入的向量，<strong>是输入函数的第一个参数</strong>；<code>.f</code>为应用函数，<code>...</code>输入函数的参数。</li>
+<li>通过<code>map_*()</code>来控制输出结果表现形式。</li>
 </ul>
-<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
-x &lt;- c(1, 2, 3)
-y &lt;- x
-
-# x, y实际指向了同一个对象
-lobstr::obj_addr(x)
-# [1] &quot;0x1deba3bd8f8&quot;
-lobstr::obj_addr(y)
-# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
-<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
+<h4 id="匿名函数与快捷方式"><a href="#匿名函数与快捷方式" class="headerlink" title="匿名函数与快捷方式"></a>匿名函数与快捷方式</h4><p><code>purrr</code>为匿名函数提供了多种快捷方式</p>
 <ul>
-<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
-tracemem(x)
-#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
-y[[3]] &lt;- 4L
-#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
+<li><p>标准形式</p>
+<pre><code class="hljs &#123;r&#125;">map_dbl(mtcars, function(x) length(unique(x)))</code></pre>
+</li>
+<li><p>快捷方式：<code>purrr</code>将由<code>~</code>开头的表达式转换为函数，<strong>并允许</strong>将<code>.</code>开头的字符理解为参数。其中，<code>.x</code>和<code>.y</code>分别表示第一、第二个参数，或者使用<code>..1</code>、<code>..2</code>、<code>..3</code>来表示序号不同的参数。</p>
+<pre><code class="hljs &#123;r&#125;">map_dbl(mtcars, ~length(unique(.x)))
 
-# 修改y并不会改变x的值
-x
-#&gt; [1] 1 2 3
-y
-#&gt; [1] 1 2 4
-
-# 修改y实际上新生成了一个变量
-lobstr::obj_addr(y)
-#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
+# 不需要参数的匿名函数
+map_dbl(1:3, ~sample(1:10, 1))
+#&gt; [1] 5 2 1</code></pre>
 </li>
 </ul>
+<h4 id="提取元素"><a href="#提取元素" class="headerlink" title="提取元素"></a>提取元素</h4><p>使用<code>map()</code>函数提取特定元素，如果不满足要求，则将返回错误（可使用<code>.default = NA</code>避免）。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- list(
+  list(-1, x &#x3D; 1, y &#x3D; c(2), z &#x3D; &quot;a&quot;),
+  list(-2, x &#x3D; 4, y &#x3D; c(5, 6), z &#x3D; &quot;b&quot;),
+  list(-3, x &#x3D; 8, y &#x3D; c(9, 10, 11))
+)
+
+# 使用名称提取
+map_dbl(x, &quot;x&quot;)
+#&gt; [1] 1 4 8
+
+# 使用序号提取
+map_dbl(x, 1)
+#&gt; [1] -1 -2 -3
+
+# 同时使用二者
+map_dbl(x, list(&quot;y&quot;, 1))
+#&gt; [1] 2 5 9</code></pre>
+<h4 id="使用-向函数传递参数"><a href="#使用-向函数传递参数" class="headerlink" title="使用...向函数传递参数"></a>使用<code>...</code>向函数传递参数</h4><ul>
+<li><p><code>...</code>内的参数将以向量形式在各个细分类别中循环：<img src="https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 </li>
-<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
-<ul>
-<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
-x &lt;- c(1, 2, 3)
-tracemem(x)
-z &lt;- f(x)
-# 没有复制发生！</code></pre>
+<li><p><code>...</code>内的参数在每次执行<code>map()</code>时即确定</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(0, 0, 0, 0)
+map_dbl(x, ~.x + .y, runif(1))
+#&gt; [1] 0.4003342 0.4003342 0.4003342 0.4003342
+plus &lt;- function(x, y) x+y
+map_dbl(x, ~plus(.x, y &#x3D; runif(1)))
+#&gt; [1] 0.47520775 0.01718815 0.37455781 0.44909849</code></pre>
 </li>
 </ul>
-</li>
-<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
+<h4 id="可变参数"><a href="#可变参数" class="headerlink" title="可变参数"></a>可变参数</h4><p>为函数应用可变的参数（使蓝色的框变动不同）<img src="https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 <ul>
-<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
-l2 &lt;- l1
-l2[[3]] &lt;- 4L
-lobstr:ref(l1, l2)
-#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
-#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
-#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
- 
-#&gt; o [5:0x1deba41de78] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] 
-#&gt; +-[3:0x1deba502778] 
-#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
+<li><p>将可变参数作为第一个参数（<code>.x</code>）输入。</p>
+</li>
+<li><p>使用R函数的灵活匹配。</p>
+<pre><code class="hljs &#123;r&#125;">trims &lt;- c(0, 0.1, 0.2, 0.5)
+x &lt;- runif(100)
+map_dbl(trims, ~mean(x, trim &#x3D; .x))
+#&gt; [1] 0.4776990 0.4710686 0.4596495 0.4486498
+map_dbl(trims, mean, x &#x3D; x)
+#&gt; [1] 0.4776990 0.4710686 0.4596495 0.4486498</code></pre>
 </li>
 </ul>
-</li>
-<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
+<h3 id="purrr工作流程"><a href="#purrr工作流程" class="headerlink" title="purrr工作流程"></a><code>purrr</code>工作流程</h3><p>对处理对象进行分组，并使用<code>map()</code>配合函数进行每一步处理。</p>
+<pre><code class="hljs &#123;r&#125;">by_cyl &lt;- split(mtcars, mtcars$cyl)
+
+by_cyl %&gt;% 
+  map(~ lm(mpg ~ wt, data &#x3D; .x)) %&gt;% 
+  map(coef) %&gt;% 
+  map_dbl(2)
+#&gt;     4     6     8 
+#&gt; -5.65 -2.78 -2.19</code></pre>
+<h3 id="map族函数"><a href="#map族函数" class="headerlink" title="map族函数"></a>map族函数</h3><p>除基础的<code>map()</code>外，map族函数还包含以下几类：</p>
 <ul>
-<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
-<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
+<li>输入与输出相同格式：<code>modify()</code></li>
+<li>对两个输入参数循环：<code>map2()</code></li>
+<li>对输入参数及其序号循环：<code>imap()</code></li>
+<li>不输出结果：<code>walk()</code></li>
+<li>对任意数量输入参数循环：<code>pmap()</code></li>
 </ul>
-</li>
-<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
-y &lt;- x
-y[[1]] &lt;- &quot;c&quot;
-# 指向的对象不同了
-ref(x, y)
-#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
+<p>针对不同的输入、输出情况，以上的map族函数也有其对应的形式：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">List</th>
+<th style="text-align:center">Atomic</th>
+<th style="text-align:center">Same type</th>
+<th style="text-align:center">Nothing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">One argument</td>
+<td style="text-align:center"><code>map()</code></td>
+<td style="text-align:center"><code>map_lgl()</code>, …</td>
+<td style="text-align:center"><code>modify()</code></td>
+<td style="text-align:center"><code>walk()</code></td>
+</tr>
+<tr>
+<td style="text-align:center">Two arguments</td>
+<td style="text-align:center"><code>map2()</code></td>
+<td style="text-align:center"><code>map2_lgl()</code>, …</td>
+<td style="text-align:center"><code>modify2()</code></td>
+<td style="text-align:center"><code>walk2()</code></td>
+</tr>
+<tr>
+<td style="text-align:center">One argument + index</td>
+<td style="text-align:center"><code>imap()</code></td>
+<td style="text-align:center"><code>imap_lgl()</code>, …</td>
+<td style="text-align:center"><code>imodify()</code></td>
+<td style="text-align:center"><code>iwalk()</code></td>
+</tr>
+<tr>
+<td style="text-align:center">N arguments</td>
+<td style="text-align:center"><code>pmap()</code></td>
+<td style="text-align:center"><code>pmap_lgl()</code>, …</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center"><code>pwalk()</code></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h4 id="modify"><a href="#modify" class="headerlink" title="modify()"></a><code>modify()</code></h4><p><code>modify()</code>可以输出与输入相同格式的对象，但其并不是「立即修改」的。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 6:4)
 
-#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
+map(df, ~.x * 2)
+#&gt; $x
+#&gt; [1] 2 4 6
 
-# 实际是具体修改的字符串查询编码变化了
-ref(x, y, character &#x3D; T)
-#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
-#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
-#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
- 
-#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
-#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] 
-#&gt; \-[4:0x1deb150d048]</code></pre>
+#&gt; $y
+#&gt; [1] 12 10  8
+modify(df, ~.x * 2)
+#&gt;   x  y
+#&gt; 1 2 12
+#&gt; 2 4 10
+#&gt; 3 6  8</code></pre>
+<h4 id="map2"><a href="#map2" class="headerlink" title="map2()"></a><code>map2()</code></h4><ul>
+<li><p>使用<code>map()</code>来输入两个参数无法处理第二个参数为向量的情况：<img src="https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 </li>
-</ol>
-<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
-<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
-lobstr::obj_size(x)
-#&gt; 8,000,048 B
-y &lt;- list(x, x, x)
-lobstr::obj_size(y)
-#&gt; 8,000,128 B</code></pre>
-</li>
-<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
-obj_size(banana)
-#&gt; 136 B
-obj_size(rep(banana, 100))
-#&gt; 928 B</code></pre>
-</li>
-<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
-</li>
-</ol>
-<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
-<ol>
-<li><p>仅有单一链接（binding）的对象</p>
-<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
-<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
-medians &lt;- sapply(x, median, numeric(i))
-tracemem(x)
-#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
+<li><p>使用<code>map2()</code>来提供两个次序不同，但相同地位的输入：<img src="https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">value &lt;- map(1:5, ~runif(10))
+value[[1]][[1]] &lt;- NA
 
-# 直接使用循环，对象在每次迭代中被复制了两次
-for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
-#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
-#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
-#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
-#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
-#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
+weight &lt;- map(1:5, ~runif(10))
 
-# 将data.frame转换为list，仅有一次复制发生
-y &lt;- as.list(x)
-#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
-for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
+map2_dbl(value, weight, weighted.mean)
+#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378
+map2_dbl(value, weight, weighted.mean, na.rm &#x3D; T)
+#&gt; [1] 0.6927842 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
 </li>
-</ol>
-<ol>
-<li><p>环境（environment）</p>
-<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
-<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-e2 &lt;- e1
-
-# 修改e1中的对象后，e2同步改变了
-e1$c &lt;- 4
-e2$c
-#&gt; [1] 4</code></pre>
+<li><p><code>map2()</code>函数的会自动循环长度较短的输入以确保两个输入具有相同的长度，即将<code>map2(x, y, f)</code>转换为<code>map(x, f, y)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/55032525ec77409e381dcd200a47e1787e65b964/dcaef/diagrams/functionals/map2-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
 </li>
-</ol>
-<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<code>rm( )</code>只能删去名称与对象的链接，并不能删去对象。</p>
-<ul>
-<li>使用<code>gc( )</code>来清理内存，<code>gcinfo( TRUE )</code>来显示每次计算机清理内存的操作。</li>
-<li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
 </ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
+<h4 id="walk"><a href="#walk" class="headerlink" title="walk()"></a><code>walk()</code></h4><p>使用<code>walk()</code>来实现一些循环的副作用，但不输出特定结果。</p>
+<pre><code class="hljs &#123;r&#125;">temp &lt;- tempfile()
+dir.create(temp)
+
+cyls &lt;- split(mtcars, mtcars$cyl)
+paths &lt;- file.path(temp, paste0(&quot;cyl-&quot;, names(cyls), &quot;.csv&quot;))
+walk2(cyls, paths, write.csv)
+
+dir(temp)
+#&gt; [1] &quot;cyl-4.csv&quot; &quot;cyl-6.csv&quot; &quot;cyl-8.csv&quot;</code></pre>
+<h4 id="imap"><a href="#imap" class="headerlink" title="imap()"></a><code>imap()</code></h4><p>在读取输入的参数时，同时读取参数的名称及序号。<code>imap(x, f)</code>等价于<code>map2(x, names(x), f)</code>或<code>map2(x, seq_along(x), f)</code></p>
+<h4 id="pmap"><a href="#pmap" class="headerlink" title="pmap()"></a><code>pmap()</code></h4><ul>
+<li><p>通过输入一个带有多个参数的<strong>list</strong>来进行输入：<img src="https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">pmap_dbl(list(value, weight), weighted.mean)
+#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
+</li>
+<li><p><code>pmap()</code>能够对参数名称进行定义</p>
+<pre><code class="hljs &#123;r&#125;">trims &lt;- c(0, 0.1, 0.2, 0.5)
+x &lt;- runif(100)
+
+pmap_dbl(list(trim &#x3D; trims), mean, x &#x3D; x)
+#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
+</li>
+<li><p><code>pmap()</code>在数据框中的应用，把每行作为单独的函数进行循环：<img src="https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -398,8 +414,6 @@ e2$c
                     
                       <a class="hover-with-bg" href="/tags/R/">R</a>
                     
-                      <a class="hover-with-bg" href="/tags/Programming/">Programming</a>
-                    
                   </div>
                 
               </div>
@@ -411,18 +425,12 @@ e2$c
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/03/Advanced_R/3.%20Vectors/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] Ⅰ. 向量</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/07/22/show-me-the-money/">
-                        <span class="hidden-mobile">show me the money</span>
+                      <a href="/2020/08/07/Advanced_R/7.%20Environment/">
+                        <span class="hidden-mobile">[Advanced R] Ⅰ.环境</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -595,7 +603,7 @@ e2$c
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Names and Values &nbsp;",
+        "Functionals&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
