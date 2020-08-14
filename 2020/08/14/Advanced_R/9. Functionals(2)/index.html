@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] Ⅰ.环境 - Hexo</title>
+  <title>[Advanced R] Ⅱ.泛函数（2） - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/old_town.png') no-repeat center center;
+         style="background: url('/img/path.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-07 18:00">
-      2020年8月7日 晚上
+    <time datetime="2020-08-14 15:00">
+      2020年8月14日 下午
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      391 字
+      444 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      4
+      5
        分钟
     </span>
   
@@ -212,51 +212,66 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><blockquote>
-<p>  <strong>存在即对象，万物出自函数</strong>。</p>
-</blockquote>
-<h3 id="基本定义"><a href="#基本定义" class="headerlink" title="基本定义"></a>基本定义</h3><p>环境中的变量需要有一下特征：</p>
+              <h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><h3 id="reduce族函数"><a href="#reduce族函数" class="headerlink" title="reduce族函数"></a>reduce族函数</h3><h4 id="reduce-函数"><a href="#reduce-函数" class="headerlink" title="reduce()函数"></a><code>reduce()</code>函数</h4><p><code>reduce()</code>函数对输入的向量滚动操作，<code>reduce(1:4, f)</code> 等价于 <code>f(f(f(1, 2), 3), 4)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">(list &lt;- map(1:4, ~sample(1:10, 10, replace &#x3D; T)))
+#&gt; [[1]]
+#&gt;  [1]  2  1  9  1  5  1 10  3  6  9
+#&gt; 
+#&gt; [[2]]
+#&gt;  [1]  7  8 10  1  6  6 10  1  2  8
+#&gt; 
+#&gt; [[3]]
+#&gt;  [1] 10  5  6  1  1  9  6 10  8  8
+#&gt; 
+#&gt; [[4]]
+#&gt;  [1]  5  2 10  1  5  2  9  9  4  8
+
+reduce(list, intersect)
+#&gt; [1]  1 10</code></pre>
+<h4 id="accumulate-函数"><a href="#accumulate-函数" class="headerlink" title="accumulate()函数"></a><code>accumulate()</code>函数</h4><p><code>accumulate()</code>在对输入向量滚动操作的基础上同步输出结果。</p>
+<pre><code class="hljs &#123;r&#125;">accumulate(1:4, &#96;+&#96;)
+#&gt; [1]  1  3  6 10
+
+reduce(1:4, &#96;+&#96;)
+#&gt; [1] 10</code></pre>
+<h3 id="预测函数"><a href="#预测函数" class="headerlink" title="预测函数"></a>预测函数</h3><h4 id="六类基础函数"><a href="#六类基础函数" class="headerlink" title="六类基础函数"></a>六类基础函数</h4><p><code>purrr</code>包提供6类预测函数，即对成功匹配的结果输出<code>TRUE</code>或其它特定值。</p>
 <ul>
-<li>独立的名称</li>
-<li>环境中的变量名没有顺序：使用<code>env_names()</code>来获取变量名，<code>env_print()</code>来获取详细变量名。</li>
-<li>除空环境外（empty environment），所有环境都有父环境（parent）：使用<code>env_parent()</code>来获取父环境。当子环境没有所查找变量时，R便在父环境中寻找。</li>
-<li>环境在被修改时不会被复制，而是立即修改。</li>
+<li><p><code>some(.x, .p)</code>在有任意元素成功匹配时返回真；<code>every(.x, .p)</code>在所有元素匹配时返回真。</p>
+</li>
+<li><p><code>detect(.x, .p)</code>返回第一个成功匹配的值；<code>detect_index(.x, .p)</code>返回第一个成功匹配的值的序号。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+detect(df, is.character)
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+detect_index(df, is.character)
+#&gt; [1] 2</code></pre>
+</li>
+<li><p><code>keep()</code>保留满足条件的向量；<code>discard()</code>舍弃满足条件的向量。</p>
+</li>
 </ul>
-<p>使用<code>rlang::env()</code>来创造一个环境</p>
-<h3 id="在环境间循环"><a href="#在环境间循环" class="headerlink" title="在环境间循环"></a>在环境间循环</h3><p>由于每个环境都存在父环境，同时R中的函数词义范围允许lazy evaluation，可以编写函数来实现环境间的循环：</p>
-<pre><code class="hljs &#123;r&#125;">library(rlang)
+<h4 id="map族函数的其它变种"><a href="#map族函数的其它变种" class="headerlink" title="map族函数的其它变种"></a>map族函数的其它变种</h4><p><code>map()</code>和<code>modify()</code>函数同样能够变换为预测函数，即只对满足条件的对象进行操作。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(
+  num1 &#x3D; c(0, 10, 20),
+  num2 &#x3D; c(5, 6, 7),
+  chr1 &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;),
+  stringsAsFactors &#x3D; FALSE
+)
 
-where &lt;- function(name, env &#x3D; caller_env())&#123;
-    if (identical(env, empty_env()))&#123;
-        stop(&quot;Can&#39;t find &quot;, name, call. &#x3D; FALSE)
-    &#125; else if (env_has(env, name)) &#123;
-        env
-    &#125; else &#123;
-        where(name, env_parent(env))
-    &#125;
-&#125;
+map_if(df, is.numeric, mean)
+#&gt; $num1
+#&gt; [1] 10
+#&gt; 
+#&gt; $num2
+#&gt; [1] 6
+#&gt; 
+#&gt; $chr1
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
 
-where(&quot;a&quot;)
-#&gt; &lt;environment: R_GlobalEnv&gt;
-where(&quot;sum&quot;)
-#&gt; &lt;environment: base&gt;
-where(&quot;+&quot;)
-#&gt; &lt;environment: base&gt;</code></pre>
-<h3 id="特殊环境"><a href="#特殊环境" class="headerlink" title="特殊环境"></a>特殊环境</h3><h4 id="Package环境"><a href="#Package环境" class="headerlink" title="Package环境."></a>Package环境.</h4><p>每个新被加载的包都成为<code>R_GlobalEnv</code>的父环境，可以使用<code>search()</code>来查看被加载的环境名，使用<code>search_envs()</code>来查看被加载的环境。</p>
-<p><img src="https://d33wubrfki0l68.cloudfront.net/038b2da4f5db1d2a8acaf4ee1e7d08d04ab36ebc/ac22a/diagrams/environments/search-path.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">search_envs()
-#&gt; [[1]] $ &lt;env: global&gt;
-#&gt; [[2]] $ &lt;env: package:rlang&gt;
-#&gt; [[3]] $ &lt;env: tools:rstudio&gt;
-#&gt; [[4]] $ &lt;env: package:stats&gt;
-#&gt; [[5]] $ &lt;env: package:graphics&gt;
-#&gt; [[6]] $ &lt;env: package:grDevices&gt;
-#&gt; [[7]] $ &lt;env: package:utils&gt;
-#&gt; [[8]] $ &lt;env: package:datasets&gt;
-#&gt; [[9]] $ &lt;env: package:methods&gt;
-#&gt; [[10]] $ &lt;env: Autoloads&gt;
-#&gt; [[11]] $ &lt;env: package:base&gt;</code></pre>
-<h4 id="函数环境"><a href="#函数环境" class="headerlink" title="函数环境"></a>函数环境</h4><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+modify_if(df, is.numeric, mean)
+#&gt;   num1 num2 chr1
+#&gt; 1   10    6    a
+#&gt; 2   10    6    b
+#&gt; 3   10    6    c</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -276,8 +291,6 @@ where(&quot;+&quot;)
                     
                       <a class="hover-with-bg" href="/tags/R/">R</a>
                     
-                      <a class="hover-with-bg" href="/tags/Programming/">Programming</a>
-                    
                   </div>
                 
               </div>
@@ -289,9 +302,9 @@ where(&quot;+&quot;)
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/13/Advanced_R/9.%20Functionals(1)/">
+                      <a href="/2020/08/14/Advanced_R/10.%20Function%20factories/">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] Ⅱ.泛函数（1）</span>
+                        <span class="hidden-mobile">[Advanced R] Ⅱ.泛函数（2）</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -299,8 +312,8 @@ where(&quot;+&quot;)
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/08/06/Advanced_R/6.%20Functions/">
-                        <span class="hidden-mobile">[Advanced R] Ⅰ. 函数</span>
+                      <a href="/2020/08/13/Advanced_R/9.%20Functionals(1)/">
+                        <span class="hidden-mobile">[Advanced R] Ⅱ.泛函数（1）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -473,7 +486,7 @@ where(&quot;+&quot;)
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Environment&nbsp;",
+        "Functionals&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,

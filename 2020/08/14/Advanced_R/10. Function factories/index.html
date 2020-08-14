@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] Ⅱ.泛函数（1） - Hexo</title>
+  <title>[Advanced R] Ⅱ.泛函数（2） - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-13 18:00">
-      2020年8月13日 晚上
+    <time datetime="2020-08-14 15:00">
+      2020年8月14日 下午
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.1k 字
+      444 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      13
+      5
        分钟
     </span>
   
@@ -212,188 +212,65 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><blockquote>
-<p>  泛函数以函数为输入，返回向量作为输出。</p>
-</blockquote>
-<h3 id="purrr-map-函数"><a href="#purrr-map-函数" class="headerlink" title="purrr::map()函数"></a><code>purrr::map()</code>函数</h3><h4 id="基本形式"><a href="#基本形式" class="headerlink" title="基本形式"></a>基本形式</h4><p><code>map(.x, .f, ...)</code></p>
-<ul>
-<li><code>.x</code>为输入的向量，<strong>是输入函数的第一个参数</strong>；<code>.f</code>为应用函数，<code>...</code>输入函数的参数。</li>
-<li>通过<code>map_*()</code>来控制输出结果表现形式。</li>
-</ul>
-<h4 id="匿名函数与快捷方式"><a href="#匿名函数与快捷方式" class="headerlink" title="匿名函数与快捷方式"></a>匿名函数与快捷方式</h4><p><code>purrr</code>为匿名函数提供了多种快捷方式</p>
-<ul>
-<li><p>标准形式</p>
-<pre><code class="hljs &#123;r&#125;">map_dbl(mtcars, function(x) length(unique(x)))</code></pre>
-</li>
-<li><p>快捷方式：<code>purrr</code>将由<code>~</code>开头的表达式转换为函数，<strong>并允许</strong>将<code>.</code>开头的字符理解为参数。其中，<code>.x</code>和<code>.y</code>分别表示第一、第二个参数，或者使用<code>..1</code>、<code>..2</code>、<code>..3</code>来表示序号不同的参数。</p>
-<pre><code class="hljs &#123;r&#125;">map_dbl(mtcars, ~length(unique(.x)))
+              <h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><h3 id="reduce族函数"><a href="#reduce族函数" class="headerlink" title="reduce族函数"></a>reduce族函数</h3><h4 id="reduce-函数"><a href="#reduce-函数" class="headerlink" title="reduce()函数"></a><code>reduce()</code>函数</h4><p><code>reduce()</code>函数对输入的向量滚动操作，<code>reduce(1:4, f)</code> 等价于 <code>f(f(f(1, 2), 3), 4)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">(list &lt;- map(1:4, ~sample(1:10, 10, replace &#x3D; T)))
+#&gt; [[1]]
+#&gt;  [1]  2  1  9  1  5  1 10  3  6  9
+#&gt; 
+#&gt; [[2]]
+#&gt;  [1]  7  8 10  1  6  6 10  1  2  8
+#&gt; 
+#&gt; [[3]]
+#&gt;  [1] 10  5  6  1  1  9  6 10  8  8
+#&gt; 
+#&gt; [[4]]
+#&gt;  [1]  5  2 10  1  5  2  9  9  4  8
 
-# 不需要参数的匿名函数
-map_dbl(1:3, ~sample(1:10, 1))
-#&gt; [1] 5 2 1</code></pre>
+reduce(list, intersect)
+#&gt; [1]  1 10</code></pre>
+<h4 id="accumulate-函数"><a href="#accumulate-函数" class="headerlink" title="accumulate()函数"></a><code>accumulate()</code>函数</h4><p><code>accumulate()</code>在对输入向量滚动操作的基础上同步输出结果。</p>
+<pre><code class="hljs &#123;r&#125;">accumulate(1:4, &#96;+&#96;)
+#&gt; [1]  1  3  6 10
+
+reduce(1:4, &#96;+&#96;)
+#&gt; [1] 10</code></pre>
+<h3 id="预测函数"><a href="#预测函数" class="headerlink" title="预测函数"></a>预测函数</h3><h4 id="六类基础函数"><a href="#六类基础函数" class="headerlink" title="六类基础函数"></a>六类基础函数</h4><p><code>purrr</code>包提供6类预测函数，即对成功匹配的结果输出<code>TRUE</code>或其它特定值。</p>
+<ul>
+<li><p><code>some(.x, .p)</code>在有任意元素成功匹配时返回真；<code>every(.x, .p)</code>在所有元素匹配时返回真。</p>
+</li>
+<li><p><code>detect(.x, .p)</code>返回第一个成功匹配的值；<code>detect_index(.x, .p)</code>返回第一个成功匹配的值的序号。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+detect(df, is.character)
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+detect_index(df, is.character)
+#&gt; [1] 2</code></pre>
+</li>
+<li><p><code>keep()</code>保留满足条件的向量；<code>discard()</code>舍弃满足条件的向量。</p>
 </li>
 </ul>
-<h4 id="提取元素"><a href="#提取元素" class="headerlink" title="提取元素"></a>提取元素</h4><p>使用<code>map()</code>函数提取特定元素，如果不满足要求，则将返回错误（可使用<code>.default = NA</code>避免）。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- list(
-  list(-1, x &#x3D; 1, y &#x3D; c(2), z &#x3D; &quot;a&quot;),
-  list(-2, x &#x3D; 4, y &#x3D; c(5, 6), z &#x3D; &quot;b&quot;),
-  list(-3, x &#x3D; 8, y &#x3D; c(9, 10, 11))
+<h4 id="map族函数的其它变种"><a href="#map族函数的其它变种" class="headerlink" title="map族函数的其它变种"></a>map族函数的其它变种</h4><p><code>map()</code>和<code>modify()</code>函数同样能够变换为预测函数，即只对满足条件的对象进行操作。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(
+  num1 &#x3D; c(0, 10, 20),
+  num2 &#x3D; c(5, 6, 7),
+  chr1 &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;),
+  stringsAsFactors &#x3D; FALSE
 )
 
-# 使用名称提取
-map_dbl(x, &quot;x&quot;)
-#&gt; [1] 1 4 8
+map_if(df, is.numeric, mean)
+#&gt; $num1
+#&gt; [1] 10
+#&gt; 
+#&gt; $num2
+#&gt; [1] 6
+#&gt; 
+#&gt; $chr1
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
 
-# 使用序号提取
-map_dbl(x, 1)
-#&gt; [1] -1 -2 -3
-
-# 同时使用二者
-map_dbl(x, list(&quot;y&quot;, 1))
-#&gt; [1] 2 5 9</code></pre>
-<h4 id="使用-向函数传递参数"><a href="#使用-向函数传递参数" class="headerlink" title="使用...向函数传递参数"></a>使用<code>...</code>向函数传递参数</h4><ul>
-<li><p><code>...</code>内的参数将以向量形式在各个细分类别中循环：<img src="https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-</li>
-<li><p><code>...</code>内的参数在每次执行<code>map()</code>时即确定</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(0, 0, 0, 0)
-map_dbl(x, ~.x + .y, runif(1))
-#&gt; [1] 0.4003342 0.4003342 0.4003342 0.4003342
-plus &lt;- function(x, y) x+y
-map_dbl(x, ~plus(.x, y &#x3D; runif(1)))
-#&gt; [1] 0.47520775 0.01718815 0.37455781 0.44909849</code></pre>
-</li>
-</ul>
-<h4 id="可变参数"><a href="#可变参数" class="headerlink" title="可变参数"></a>可变参数</h4><p>为函数应用可变的参数（使蓝色的框变动不同）<img src="https://d33wubrfki0l68.cloudfront.net/6d0b927ba5266f886cc721ae090afcc5e872a748/f8636/diagrams/functionals/map-arg-flipped.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<ul>
-<li><p>将可变参数作为第一个参数（<code>.x</code>）输入。</p>
-</li>
-<li><p>使用R函数的灵活匹配。</p>
-<pre><code class="hljs &#123;r&#125;">trims &lt;- c(0, 0.1, 0.2, 0.5)
-x &lt;- runif(100)
-map_dbl(trims, ~mean(x, trim &#x3D; .x))
-#&gt; [1] 0.4776990 0.4710686 0.4596495 0.4486498
-map_dbl(trims, mean, x &#x3D; x)
-#&gt; [1] 0.4776990 0.4710686 0.4596495 0.4486498</code></pre>
-</li>
-</ul>
-<h3 id="purrr工作流程"><a href="#purrr工作流程" class="headerlink" title="purrr工作流程"></a><code>purrr</code>工作流程</h3><p>对处理对象进行分组，并使用<code>map()</code>配合函数进行每一步处理。</p>
-<pre><code class="hljs &#123;r&#125;">by_cyl &lt;- split(mtcars, mtcars$cyl)
-
-by_cyl %&gt;% 
-  map(~ lm(mpg ~ wt, data &#x3D; .x)) %&gt;% 
-  map(coef) %&gt;% 
-  map_dbl(2)
-#&gt;     4     6     8 
-#&gt; -5.65 -2.78 -2.19</code></pre>
-<h3 id="map族函数"><a href="#map族函数" class="headerlink" title="map族函数"></a>map族函数</h3><p>除基础的<code>map()</code>外，map族函数还包含以下几类：</p>
-<ul>
-<li>输入与输出相同格式：<code>modify()</code></li>
-<li>对两个输入参数循环：<code>map2()</code></li>
-<li>对输入参数及其序号循环：<code>imap()</code></li>
-<li>不输出结果：<code>walk()</code></li>
-<li>对任意数量输入参数循环：<code>pmap()</code></li>
-</ul>
-<p>针对不同的输入、输出情况，以上的map族函数也有其对应的形式：</p>
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th style="text-align:center"></th>
-<th style="text-align:center">List</th>
-<th style="text-align:center">Atomic</th>
-<th style="text-align:center">Same type</th>
-<th style="text-align:center">Nothing</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">One argument</td>
-<td style="text-align:center"><code>map()</code></td>
-<td style="text-align:center"><code>map_lgl()</code>, …</td>
-<td style="text-align:center"><code>modify()</code></td>
-<td style="text-align:center"><code>walk()</code></td>
-</tr>
-<tr>
-<td style="text-align:center">Two arguments</td>
-<td style="text-align:center"><code>map2()</code></td>
-<td style="text-align:center"><code>map2_lgl()</code>, …</td>
-<td style="text-align:center"><code>modify2()</code></td>
-<td style="text-align:center"><code>walk2()</code></td>
-</tr>
-<tr>
-<td style="text-align:center">One argument + index</td>
-<td style="text-align:center"><code>imap()</code></td>
-<td style="text-align:center"><code>imap_lgl()</code>, …</td>
-<td style="text-align:center"><code>imodify()</code></td>
-<td style="text-align:center"><code>iwalk()</code></td>
-</tr>
-<tr>
-<td style="text-align:center">N arguments</td>
-<td style="text-align:center"><code>pmap()</code></td>
-<td style="text-align:center"><code>pmap_lgl()</code>, …</td>
-<td style="text-align:center">-</td>
-<td style="text-align:center"><code>pwalk()</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-<h4 id="modify"><a href="#modify" class="headerlink" title="modify()"></a><code>modify()</code></h4><p><code>modify()</code>可以输出与输入相同格式的对象，但其并不是「立即修改」的。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 6:4)
-
-map(df, ~.x * 2)
-#&gt; $x
-#&gt; [1] 2 4 6
-
-#&gt; $y
-#&gt; [1] 12 10  8
-modify(df, ~.x * 2)
-#&gt;   x  y
-#&gt; 1 2 12
-#&gt; 2 4 10
-#&gt; 3 6  8</code></pre>
-<h4 id="map2"><a href="#map2" class="headerlink" title="map2()"></a><code>map2()</code></h4><ul>
-<li><p>使用<code>map()</code>来输入两个参数无法处理第二个参数为向量的情况：<img src="https://d33wubrfki0l68.cloudfront.net/a468c847ea8aca9a6131492e1e7431f418259eaf/ce4e0/diagrams/functionals/map-arg-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-</li>
-<li><p>使用<code>map2()</code>来提供两个次序不同，但相同地位的输入：<img src="https://d33wubrfki0l68.cloudfront.net/f5cddf51ec9c243a7c13732b0ce46b0868bf8a31/501a8/diagrams/functionals/map2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">value &lt;- map(1:5, ~runif(10))
-value[[1]][[1]] &lt;- NA
-
-weight &lt;- map(1:5, ~runif(10))
-
-map2_dbl(value, weight, weighted.mean)
-#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378
-map2_dbl(value, weight, weighted.mean, na.rm &#x3D; T)
-#&gt; [1] 0.6927842 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
-</li>
-<li><p><code>map2()</code>函数的会自动循环长度较短的输入以确保两个输入具有相同的长度，即将<code>map2(x, y, f)</code>转换为<code>map(x, f, y)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/55032525ec77409e381dcd200a47e1787e65b964/dcaef/diagrams/functionals/map2-recycle.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-</li>
-</ul>
-<h4 id="walk"><a href="#walk" class="headerlink" title="walk()"></a><code>walk()</code></h4><p>使用<code>walk()</code>来实现一些循环的副作用，但不输出特定结果。</p>
-<pre><code class="hljs &#123;r&#125;">temp &lt;- tempfile()
-dir.create(temp)
-
-cyls &lt;- split(mtcars, mtcars$cyl)
-paths &lt;- file.path(temp, paste0(&quot;cyl-&quot;, names(cyls), &quot;.csv&quot;))
-walk2(cyls, paths, write.csv)
-
-dir(temp)
-#&gt; [1] &quot;cyl-4.csv&quot; &quot;cyl-6.csv&quot; &quot;cyl-8.csv&quot;</code></pre>
-<h4 id="imap"><a href="#imap" class="headerlink" title="imap()"></a><code>imap()</code></h4><p>在读取输入的参数时，同时读取参数的名称及序号。<code>imap(x, f)</code>等价于<code>map2(x, names(x), f)</code>或<code>map2(x, seq_along(x), f)</code></p>
-<h4 id="pmap"><a href="#pmap" class="headerlink" title="pmap()"></a><code>pmap()</code></h4><ul>
-<li><p>通过输入一个带有多个参数的<strong>list</strong>来进行输入：<img src="https://d33wubrfki0l68.cloudfront.net/e426c5755e2e65bdcc073d387775db79791f32fd/92902/diagrams/functionals/pmap.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">pmap_dbl(list(value, weight), weighted.mean)
-#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
-</li>
-<li><p><code>pmap()</code>能够对参数名称进行定义</p>
-<pre><code class="hljs &#123;r&#125;">trims &lt;- c(0, 0.1, 0.2, 0.5)
-x &lt;- runif(100)
-
-pmap_dbl(list(trim &#x3D; trims), mean, x &#x3D; x)
-#&gt; [1]        NA 0.4119934 0.4984402 0.3880366 0.5391378</code></pre>
-</li>
-<li><p><code>pmap()</code>在数据框中的应用，把每行作为单独的函数进行循环：<img src="https://d33wubrfki0l68.cloudfront.net/e698354d802ce16f83546db63c45a19b8d51f45e/43de7/diagrams/functionals/pmap-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-</li>
-</ul>
+modify_if(df, is.numeric, mean)
+#&gt;   num1 num2 chr1
+#&gt; 1   10    6    a
+#&gt; 2   10    6    b
+#&gt; 3   10    6    c</code></pre>
 <section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
@@ -429,8 +306,8 @@ pmap_dbl(list(trim &#x3D; trims), mean, x &#x3D; x)
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/08/07/Advanced_R/7.%20Environment/">
-                        <span class="hidden-mobile">[Advanced R] Ⅰ.环境</span>
+                      <a href="/2020/08/14/Advanced_R/9.%20Functionals(2)/">
+                        <span class="hidden-mobile">[Advanced R] Ⅱ.泛函数（2）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
