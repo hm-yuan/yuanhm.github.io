@@ -1,203 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>show me the money</title>
-    <url>/2020/07/22/show-me-the-money/</url>
-    <content><![CDATA[<p>show me the money</p>
-]]></content>
-  </entry>
-  <entry>
-    <title>[Advanced R] Ⅰ. 名称与对象</title>
-    <url>/2020/08/02/Advanced_R/2.%20Names_and_Values/</url>
-    <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
-<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
-</blockquote>
-<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<code>&lt;-</code>相连。</p>
-<ul>
-<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
-<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
-</ul>
-<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
-x &lt;- c(1, 2, 3)
-y &lt;- x
-
-# x, y实际指向了同一个对象
-lobstr::obj_addr(x)
-# [1] &quot;0x1deba3bd8f8&quot;
-lobstr::obj_addr(y)
-# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
-<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
-<ul>
-<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
-tracemem(x)
-#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
-y[[3]] &lt;- 4L
-#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
-
-# 修改y并不会改变x的值
-x
-#&gt; [1] 1 2 3
-y
-#&gt; [1] 1 2 4
-
-# 修改y实际上新生成了一个变量
-lobstr::obj_addr(y)
-#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
-<ul>
-<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
-x &lt;- c(1, 2, 3)
-tracemem(x)
-z &lt;- f(x)
-# 没有复制发生！</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
-<ul>
-<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
-l2 &lt;- l1
-l2[[3]] &lt;- 4L
-lobstr:ref(l1, l2)
-#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
-#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
-#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
- 
-#&gt; o [5:0x1deba41de78] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] 
-#&gt; +-[3:0x1deba502778] 
-#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
-<ul>
-<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
-<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
-</ul>
-</li>
-<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
-y &lt;- x
-y[[1]] &lt;- &quot;c&quot;
-# 指向的对象不同了
-ref(x, y)
-#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
-
-#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
-
-# 实际是具体修改的字符串查询编码变化了
-ref(x, y, character &#x3D; T)
-#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
-#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
-#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
- 
-#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
-#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] 
-#&gt; \-[4:0x1deb150d048]</code></pre>
-</li>
-</ol>
-<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
-<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
-lobstr::obj_size(x)
-#&gt; 8,000,048 B
-y &lt;- list(x, x, x)
-lobstr::obj_size(y)
-#&gt; 8,000,128 B</code></pre>
-</li>
-<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
-obj_size(banana)
-#&gt; 136 B
-obj_size(rep(banana, 100))
-#&gt; 928 B</code></pre>
-</li>
-<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
-</li>
-</ol>
-<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
-<ol>
-<li><p>仅有单一链接（binding）的对象</p>
-<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
-<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
-medians &lt;- sapply(x, median, numeric(i))
-tracemem(x)
-#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
-
-# 直接使用循环，对象在每次迭代中被复制了两次
-for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
-#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
-#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
-#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
-#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
-#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
-
-# 将data.frame转换为list，仅有一次复制发生
-y &lt;- as.list(x)
-#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
-for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
-</li>
-</ol>
-<ol>
-<li><p>环境（environment）</p>
-<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
-<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-e2 &lt;- e1
-
-# 修改e1中的对象后，e2同步改变了
-e1$c &lt;- 4
-e2$c
-#&gt; [1] 4</code></pre>
-</li>
-</ol>
-<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<code>rm( )</code>只能删去名称与对象的链接，并不能删去对象。</p>
-<ul>
-<li>使用<code>gc( )</code>来清理内存，<code>gcinfo( TRUE )</code>来显示每次计算机清理内存的操作。</li>
-<li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
-</ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>[Advanced R] Ⅱ.函数工厂</title>
-    <url>/2020/08/15/Advanced_R/10.%20Function%20factories/</url>
-    <content><![CDATA[<h2 id="函数工厂"><a href="#函数工厂" class="headerlink" title="函数工厂"></a>函数工厂</h2><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>[Advanced R] Ⅰ. 向量</title>
     <url>/2020/08/03/Advanced_R/3.%20Vectors/</url>
     <content><![CDATA[<h2 id="Vectors"><a href="#Vectors" class="headerlink" title="Vectors"></a>Vectors</h2><blockquote>
@@ -390,6 +193,309 @@ is.null(c())
       </tags>
   </entry>
   <entry>
+    <title>[Advanced R] Ⅱ.函数工厂</title>
+    <url>/2020/08/15/Advanced_R/10.%20Function%20factories/</url>
+    <content><![CDATA[<h2 id="函数工厂"><a href="#函数工厂" class="headerlink" title="函数工厂"></a>函数工厂</h2><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] Ⅰ. 控制流</title>
+    <url>/2020/08/05/Advanced_R/5.%20Control%20flow/</url>
+    <content><![CDATA[<h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
+<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
+<ul>
+<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
+<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
+<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
+</ul>
+</li>
+<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
+ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
+#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
+
+# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
+x &lt;- 1:50
+x[runif(10, max &#x3D; 50)] &lt;- NA
+case_when(
+	is.na(x) ~ &quot;nothing&quot;,
+    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
+    TRUE ~ as.character(x)
+)
+#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
+#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
+#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
+#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
+#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
+#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
+</li>
+</ul>
+<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
+<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
+    switch(
+    	x,
+        a &#x3D; &quot;option 1&quot;,
+        b &#x3D; &quot;option 2&quot;,
+        c &#x3D; &quot;option 3&quot;,
+        stop(&quot;Invalid &#96;x&#96; value&quot;)
+    )
+&#125;
+
+option(&quot;a&quot;)
+#&gt; [1] &quot;option 1&quot;
+
+legs &lt;- function(x)&#123;
+    switch(
+    	x,
+        cow &#x3D; ,
+        dog &#x3D; 4,
+        human &#x3D; 2
+    )
+&#125;
+legs(&quot;cow&quot;)
+#&gt; [1] 4</code></pre>
+<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
+<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
+<ul>
+<li><code>break</code>退出当前整个<code>for</code>循环。</li>
+<li><code>next</code>退出当前子循环。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
+    if (i &lt; 3) &#123;
+        next
+    &#125;
+    print(i)
+    if (i &gt;&#x3D; 5) &#123;
+        break
+    &#125; 
+&#125;
+#&gt; [1] 3
+#&gt; [1] 4
+#&gt; [1] 5</code></pre>
+</li>
+</ul>
+<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
+<ul>
+<li><p>vector长度不能为0</p>
+</li>
+<li><p>循环可能剥离对象的属性</p>
+<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
+for (i in dates) print(i)
+#&gt; [1] 18262
+#&gt; [1] 18263
+
+for (i in seq_along(dates)) print(dates[[i]])
+#&gt; [1] &quot;2020-01-01&quot;
+#&gt; [1] &quot;2020-01-02&quot;</code></pre>
+</li>
+<li><p>使用<code>list()</code>来储存数据</p>
+<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
+out &lt;- vector(&quot;list&quot;, length(means))
+for (i in seq_along(means))&#123;
+    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
+&#125;</code></pre>
+</li>
+</ul>
+<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
+<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
+<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] Ⅰ. 名称与对象</title>
+    <url>/2020/08/02/Advanced_R/2.%20Names_and_Values/</url>
+    <content><![CDATA[<h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
+<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
+</blockquote>
+<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<code>&lt;-</code>相连。</p>
+<ul>
+<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
+<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
+x &lt;- c(1, 2, 3)
+y &lt;- x
+
+# x, y实际指向了同一个对象
+lobstr::obj_addr(x)
+# [1] &quot;0x1deba3bd8f8&quot;
+lobstr::obj_addr(y)
+# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
+<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
+<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
+<ul>
+<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
+tracemem(x)
+#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
+y[[3]] &lt;- 4L
+#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
+
+# 修改y并不会改变x的值
+x
+#&gt; [1] 1 2 3
+y
+#&gt; [1] 1 2 4
+
+# 修改y实际上新生成了一个变量
+lobstr::obj_addr(y)
+#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
+<ul>
+<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
+x &lt;- c(1, 2, 3)
+tracemem(x)
+z &lt;- f(x)
+# 没有复制发生！</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
+<ul>
+<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
+l2 &lt;- l1
+l2[[3]] &lt;- 4L
+lobstr:ref(l1, l2)
+#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
+#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
+#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
+ 
+#&gt; o [5:0x1deba41de78] &lt;list&gt; 
+#&gt; +-[2:0x1deba502740] 
+#&gt; +-[3:0x1deba502778] 
+#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
+</li>
+</ul>
+</li>
+<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
+<ul>
+<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
+<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
+</ul>
+</li>
+<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
+y &lt;- x
+y[[1]] &lt;- &quot;c&quot;
+# 指向的对象不同了
+ref(x, y)
+#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
+
+#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
+
+# 实际是具体修改的字符串查询编码变化了
+ref(x, y, character &#x3D; T)
+#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
+#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
+#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
+ 
+#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
+#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
+#&gt; +-[2:0x1deb133d720] 
+#&gt; +-[3:0x1deb550c728] 
+#&gt; \-[4:0x1deb150d048]</code></pre>
+</li>
+</ol>
+<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
+<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
+lobstr::obj_size(x)
+#&gt; 8,000,048 B
+y &lt;- list(x, x, x)
+lobstr::obj_size(y)
+#&gt; 8,000,128 B</code></pre>
+</li>
+<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
+<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
+obj_size(banana)
+#&gt; 136 B
+obj_size(rep(banana, 100))
+#&gt; 928 B</code></pre>
+</li>
+<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
+</li>
+</ol>
+<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
+<ol>
+<li><p>仅有单一链接（binding）的对象</p>
+<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
+<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
+<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
+medians &lt;- sapply(x, median, numeric(i))
+tracemem(x)
+#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
+
+# 直接使用循环，对象在每次迭代中被复制了两次
+for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
+#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
+#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
+#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
+#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
+#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
+#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
+#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
+
+# 将data.frame转换为list，仅有一次复制发生
+y &lt;- as.list(x)
+#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
+for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
+#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
+</li>
+</ol>
+<ol>
+<li><p>环境（environment）</p>
+<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
+<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
+e2 &lt;- e1
+
+# 修改e1中的对象后，e2同步改变了
+e1$c &lt;- 4
+e2$c
+#&gt; [1] 4</code></pre>
+</li>
+</ol>
+<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<code>rm( )</code>只能删去名称与对象的链接，并不能删去对象。</p>
+<ul>
+<li>使用<code>gc( )</code>来清理内存，<code>gcinfo( TRUE )</code>来显示每次计算机清理内存的操作。</li>
+<li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
+</ul>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>[Advanced R] Ⅰ. 切片</title>
     <url>/2020/08/04/Advanced_R/4.%20Subsetting/</url>
     <content><![CDATA[<h2 id="Subsetting"><a href="#Subsetting" class="headerlink" title="Subsetting"></a>Subsetting</h2><blockquote>
@@ -569,315 +675,6 @@ which(x) #将逻辑值转换为数值
 #&gt; [1] 3 6 9
 (c[x])
 #&gt; [1] 3 6 9</code></pre>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>[Advanced R] Ⅰ. 控制流</title>
-    <url>/2020/08/05/Advanced_R/5.%20Control%20flow/</url>
-    <content><![CDATA[<h2 id="Control-flow"><a href="#Control-flow" class="headerlink" title="Control flow"></a>Control flow</h2><h3 id="用if选择"><a href="#用if选择" class="headerlink" title="用if选择"></a>用<code>if</code>选择</h3><ul>
-<li><p>对于<code>conditon</code>长度为1的，使用<code>if (condition) true_action else false_action</code>形式来进行选择。其中，<code>conditon</code>可能出现以下情形：</p>
-<ul>
-<li>为逻辑值（<strong>logical</strong>）：按照<code>TRUE</code>or<code>FALSE</code>来进行选择。</li>
-<li>为整数值（<strong>integer</strong>）：如果&gt;0则为<code>TRUE</code>，&lt;0则为<code>FALSE</code>。</li>
-<li>为无效输入（<strong>NA</strong>, <strong>character</strong>, …）：返回NA。</li>
-</ul>
-</li>
-<li><p>对于<code>condition</code>为向量的，使用<code>ifelse()</code>来进行选择。当存在多个条件时使用<code>case_when（）</code>进行选择。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- 1:10
-ifelse(x %% 2 &#x3D;&#x3D; 0, &quot;even&quot;, &quot;odd&quot;)
-#&gt; [1] &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot; &quot;odd&quot;  &quot;even&quot;
-
-# 当存在多个条件时,case_when()按顺序进行选择。如果都不匹配，则返回NA。
-x &lt;- 1:50
-x[runif(10, max &#x3D; 50)] &lt;- NA
-case_when(
-	is.na(x) ~ &quot;nothing&quot;,
-    x %% 7 &#x3D;&#x3D; 0 ~ &quot;Oh yeah!&quot;,
-    TRUE ~ as.character(x)
-)
-#&gt; [1] &quot;1&quot;        &quot;nothing&quot;  &quot;3&quot;        &quot;4&quot;        &quot;5&quot;        &quot;6&quot;        &quot;Oh yeah!&quot; &quot;8&quot;        &quot;nothing&quot; 
-#&gt; [10] &quot;10&quot;       &quot;11&quot;       &quot;12&quot;       &quot;13&quot;       &quot;Oh yeah!&quot; &quot;15&quot;       &quot;16&quot;       &quot;17&quot;       &quot;18&quot;      
-#&gt; [19] &quot;19&quot;       &quot;20&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot;  &quot;23&quot;       &quot;24&quot;       &quot;25&quot;       &quot;nothing&quot;  &quot;27&quot;      
-#&gt; [28] &quot;Oh yeah!&quot; &quot;29&quot;       &quot;nothing&quot;  &quot;31&quot;       &quot;32&quot;       &quot;33&quot;       &quot;34&quot;       &quot;Oh yeah!&quot; &quot;nothing&quot; 
-#&gt; [37] &quot;37&quot;       &quot;nothing&quot;  &quot;39&quot;       &quot;40&quot;       &quot;41&quot;       &quot;Oh yeah!&quot; &quot;43&quot;       &quot;44&quot;       &quot;45&quot;      
-#&gt; [46] &quot;46&quot;       &quot;nothing&quot;  &quot;48&quot;       &quot;nothing&quot;  &quot;50&quot;</code></pre>
-</li>
-</ul>
-<h3 id="用switch-选择"><a href="#用switch-选择" class="headerlink" title="用switch()选择"></a>用<code>switch()</code>选择</h3><p>使用<code>switch()</code>时需注意在最后包含报错选项，否则未能成果匹配的结果将在不通知的情况下返回<code>NULL</code>。此外，如果<code>switch()</code>中<code>=</code>右方的值为空，那么会自动采用下一个<code>=</code>右方的值</p>
-<pre><code class="hljs &#123;r&#125;">option &lt;- function(x)&#123;
-    switch(
-    	x,
-        a &#x3D; &quot;option 1&quot;,
-        b &#x3D; &quot;option 2&quot;,
-        c &#x3D; &quot;option 3&quot;,
-        stop(&quot;Invalid &#96;x&#96; value&quot;)
-    )
-&#125;
-
-option(&quot;a&quot;)
-#&gt; [1] &quot;option 1&quot;
-
-legs &lt;- function(x)&#123;
-    switch(
-    	x,
-        cow &#x3D; ,
-        dog &#x3D; 4,
-        human &#x3D; 2
-    )
-&#125;
-legs(&quot;cow&quot;)
-#&gt; [1] 4</code></pre>
-<h3 id="使用循环迭代"><a href="#使用循环迭代" class="headerlink" title="使用循环迭代"></a>使用循环迭代</h3><h4 id="for循环"><a href="#for循环" class="headerlink" title="for循环"></a><code>for</code>循环</h4><ul>
-<li><p><code>break</code>和<code>next</code>是控制循环的两个重要方式：</p>
-<ul>
-<li><code>break</code>退出当前整个<code>for</code>循环。</li>
-<li><code>next</code>退出当前子循环。</li>
-</ul>
-<pre><code class="hljs &#123;r&#125;">for (i in 1:10)&#123;
-    if (i &lt; 3) &#123;
-        next
-    &#125;
-    print(i)
-    if (i &gt;&#x3D; 5) &#123;
-        break
-    &#125; 
-&#125;
-#&gt; [1] 3
-#&gt; [1] 4
-#&gt; [1] 5</code></pre>
-</li>
-</ul>
-<h4 id="for循环常见问题"><a href="#for循环常见问题" class="headerlink" title="for循环常见问题"></a><code>for</code>循环常见问题</h4><p><code>for (item in vector) perform_action</code></p>
-<ul>
-<li><p>vector长度不能为0</p>
-</li>
-<li><p>循环可能剥离对象的属性</p>
-<pre><code class="hljs &#123;r&#125;">dates &lt;- as.Date(c(&quot;2020-01-01&quot;, &quot;2020-01-02&quot;))
-for (i in dates) print(i)
-#&gt; [1] 18262
-#&gt; [1] 18263
-
-for (i in seq_along(dates)) print(dates[[i]])
-#&gt; [1] &quot;2020-01-01&quot;
-#&gt; [1] &quot;2020-01-02&quot;</code></pre>
-</li>
-<li><p>使用<code>list()</code>来储存数据</p>
-<pre><code class="hljs &#123;r&#125;">means &lt;- c(1, 10, 20)
-out &lt;- vector(&quot;list&quot;, length(means))
-for (i in seq_along(means))&#123;
-    out[[i]] &lt;- rnorm(10, mean &#x3D; means[[i]])
-&#125;</code></pre>
-</li>
-</ul>
-<h4 id="while与repeat循环"><a href="#while与repeat循环" class="headerlink" title="while与repeat循环"></a><code>while</code>与<code>repeat</code>循环</h4><ul>
-<li><code>while(condition) action</code>：但<code>condition</code>为真时，执行命令。</li>
-<li><code>repeat(action)</code>：不断重复执行命令，知道出现<code>break</code>。</li>
-</ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
-      <categories>
-        <category>学习</category>
-      </categories>
-      <tags>
-        <tag>R</tag>
-        <tag>Programming</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>[Advanced R] Ⅰ. 函数</title>
-    <url>/2020/08/06/Advanced_R/6.%20Functions/</url>
-    <content><![CDATA[<h2 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h2><blockquote>
-<p>  <strong>存在即对象，万物出自函数</strong>。</p>
-</blockquote>
-<h3 id="函数基础"><a href="#函数基础" class="headerlink" title="函数基础"></a>函数基础</h3><h4 id="函数构成三要素"><a href="#函数构成三要素" class="headerlink" title="函数构成三要素"></a>函数构成三要素</h4><p>函数的拥有三个基本组成：参数（arguments）、主体（body）和环境（environment），分别使用<code>formals()</code>、<code>body()</code>和<code>environment()</code>来查看。</p>
-<pre><code class="hljs &#123;r&#125;">fun0 &lt;- function(x, y) x+y
-formals(fun0)
-#&gt; $x
-
-#&gt; $y
-body(fun0)
-#&gt; x+y
-
-environment(fun0)
-#&gt; &lt;environment: R_GlobalEnv&gt;</code></pre>
-<h4 id="初始函数的特殊性"><a href="#初始函数的特殊性" class="headerlink" title="初始函数的特殊性"></a>初始函数的特殊性</h4><p>R中包含了大量由C语言编写的初始函数（primitive functions），其在R中的属性要么为<code>builtin</code>和<code>special</code>，其不具备一般函数中的三大要素。</p>
-<pre><code class="hljs &#123;r&#125;">typeof(sum)
-#&gt; [1] &quot;builtin&quot;
-typeof(&#96;[&#96;)
-#&gt; [1] &quot;special&quot;</code></pre>
-<h4 id="函数也是对象"><a href="#函数也是对象" class="headerlink" title="函数也是对象"></a>函数也是对象</h4><ul>
-<li><p>名称和函数对象（function object）也是链接（binding）的关系。同时，函数对象不一定需要名称，可以使用匿名函数（anonymous function）。例如在<code>lapply(X, FUN)</code>中编写的函数。</p>
-</li>
-<li><p>函数也可以像其它对象一样被放入list中。</p>
-<pre><code class="hljs &#123;r&#125;">funs &lt;- list(
-	half &#x3D; function(x) x&#x2F;2,
-    double &#x3D; function(x) x*2
-)
-funs$half(3)
-#&gt; [1] 1.5</code></pre>
-</li>
-</ul>
-<h4 id="使用do-call"><a href="#使用do-call" class="headerlink" title="使用do.call()"></a>使用<code>do.call()</code></h4><p>当函数名与参数分离时，使用<code>do.call（FUN，args）</code>来呼叫函数。</p>
-<pre><code class="hljs &#123;r&#125;">args &lt;- list(runif(100), na.rm &#x3D; TRUE)
-do.call(sum, args)
-#&gt; [1] 55.449</code></pre>
-<h3 id="词法范围（Lexical-Scoping）"><a href="#词法范围（Lexical-Scoping）" class="headerlink" title="词法范围（Lexical Scoping）"></a>词法范围（Lexical Scoping）</h3><p>词法范围解释了R中的函数如何识别对象值（value）和名称（name）间的链接，其遵从四个基本法则：</p>
-<ul>
-<li>Name masking：函数内<strong>定义的对象名</strong>将覆盖函数外定义的。</li>
-<li>Functions VS Variables：函数内<strong>定义的函数</strong>也将覆盖函数外定义的。</li>
-<li>A fresh start：函数内运行结果不会影响全局中的对象。</li>
-<li>Dynamic lookup：函数每次运行时即时查找所需对象。</li>
-</ul>
-<h3 id="惰性评估"><a href="#惰性评估" class="headerlink" title="惰性评估"></a>惰性评估</h3><h4 id="基本要素"><a href="#基本要素" class="headerlink" title="基本要素"></a>基本要素</h4><p>R只会在需要用到参数时，检测其是否为有效参数。由于惰性评估（lazy evaluation），R的函数需要以下要素：</p>
-<ul>
-<li><p>含有参数的表达式</p>
-</li>
-<li><p>用以评估（监测有效性）参数的的环境。</p>
-<ul>
-<li>在呼叫函数时定义的对象，将反映到全局环境中。注意：只对使用<code>&lt;-</code>方式定义的有效，<code>=</code>定义的不行。</li>
-</ul>
-<pre><code class="hljs &#123;r&#125;"># 在呼叫函数时定义的对象，将反映到全局环境中
-fun1 &lt;- function(x) x+2
-fun1(x &lt;- 2)
-#&gt; [1] 4</code></pre>
-</li>
-<li><p>参数值</p>
-</li>
-</ul>
-<h4 id="默认参数"><a href="#默认参数" class="headerlink" title="默认参数"></a>默认参数</h4><ul>
-<li><p>默认参数可直接给出，或者由其它参数给出，乃至由函数中定义的对象给出。</p>
-</li>
-<li><p>默认参数存在与函数的评估环境（evaluation environment）中，而非全局环境（global environment）。</p>
-<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x &#x3D; ls()) &#123;
-    a &lt;- 1
-    x
-&#125;
-fun()
-#&gt; [1] &quot;a&quot; &quot;x&quot;
-
-fun(ls())
-#&gt; [1] &quot;fun&quot;</code></pre>
-</li>
-<li><p>使用<code>missing()</code>来判断参数值是否由默认给出。</p>
-</li>
-</ul>
-<h3 id="…（dot-dot-dot）"><a href="#…（dot-dot-dot）" class="headerlink" title="…（dot-dot-dot）"></a>…（dot-dot-dot）</h3><p>使用<code>...</code>来为函数添加更多的参数。</p>
-<ul>
-<li><p>使用<code>..n</code>来提取特定位置的参数</p>
-<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(first &#x3D; ..1, third &#x3D; ..4)
-fun(1,2,3,4)
-#&gt; $first
-#&gt; [1] 1
-
-#&gt; $third
-#&gt; [1] 4</code></pre>
-</li>
-<li><p>直接使用<code>list(...)</code>来将输入的参数储存为列表</p>
-<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(...)
-fun(a &#x3D; 1, b &#x3D; 2)
-#&gt; $a
-#&gt; [1] 1
-
-#&gt; $b
-#&gt; [1] 2</code></pre>
-</li>
-</ul>
-<h3 id="退出函数"><a href="#退出函数" class="headerlink" title="退出函数"></a>退出函数</h3><h4 id="函数返回值"><a href="#函数返回值" class="headerlink" title="函数返回值"></a>函数返回值</h4><ul>
-<li>隐性返回（implicit return）：最后被执行的表达式即为返回的值</li>
-<li>显性返回（explicit return）：使用<code>return()</code></li>
-</ul>
-<h4 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h4><p>使用<code>stop()</code>来立即停止当前函数。</p>
-<h4 id="隐藏返回值"><a href="#隐藏返回值" class="headerlink" title="隐藏返回值"></a>隐藏返回值</h4><p>使用<code>invisible()</code>来将返回值隐藏。</p>
-<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x) invisible(x)
-fun(232)</code></pre>
-<h4 id="退出窗口"><a href="#退出窗口" class="headerlink" title="退出窗口"></a>退出窗口</h4><p>使用<code>on.exit(, add = TRUE)</code>来作为函数的退出窗口（exit handler），用以确保不论函数如何退出，都不会改变全局环境。</p>
-<ul>
-<li><p><code>on.exit()</code>不论函数正常执行、报错都将执行。</p>
-<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x)&#123;
-    cat(&quot;Let&#39;s start.\n&quot;)
-    on.exit(cat(&quot;This is a exit handler.\n&quot;), add &#x3D; TRUE)
-    
-    if (x) &#123;
-        return(10)
-    &#125; else&#123;
-        stop(&quot;Error&quot;)
-    &#125;
-&#125;
-fun(TRUE)
-#&gt; Let&#39;s start
-#&gt; This is a exit handler
-#&gt; [1] 10
-
-fun(FALSE)</code></pre>
-</li>
-</ul>
-<h3 id="函数形态"><a href="#函数形态" class="headerlink" title="函数形态"></a>函数形态</h3><h4 id="四种存在形态"><a href="#四种存在形态" class="headerlink" title="四种存在形态"></a>四种存在形态</h4><p>R中函数有四种不同的存在形态，各形态之间在一定程度上可相互转换：</p>
-<ul>
-<li>prefix：普通函数，<code>FUN(x, y, z)</code></li>
-<li>infix：在参数中出现的函数，<code>+</code>、<code>%&gt;%</code></li>
-<li>replacement：通过赋值存在的函数，<code>&lt;-</code></li>
-<li>special：<code>[[]]</code>、<code>if</code>、<code>for</code></li>
-</ul>
-<h4 id="函数形态变换"><a href="#函数形态变换" class="headerlink" title="函数形态变换"></a>函数形态变换</h4><ul>
-<li><p>转换为前置形态</p>
-<pre><code class="hljs &#123;r&#125;">x + y
-&#96;+&#96;(x, y)
-
-names(df) &lt;- c(x, y, z)
-&#96;names&lt;-&#96;（df, c(x, y, z）)
-
-for (i in 1:10) print(i)
-&#96;for&#96;(i, 1:10, print(i))</code></pre>
-</li>
-<li><p>改写每个non-prefix形态的函数</p>
-<pre><code class="hljs &#123;r&#125;">&#96;+&#96; &lt;- function(e1, e2)&#123;
-    x &lt;- runif(1)
-    if (x &lt; 0.5)&#123;
-        e1 - e2
-    &#125; else&#123;
-        sum(e1, e2)
-    &#125;
-&#125;
-
-replicate(100, 1+2)
-#&gt; [1] -1  3 -1 -1 -1  3 -1 -1 -1  3 -1 -1 -1  3 -1  3  3  3  3 -1  3 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3
-#&gt; [35]  3  3  3  3  3  3 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1  3  3 -1  3 -1 -1 -1 -1 -1 -1  3  3 -1 -1 -1  3
-#&gt; [69] -1 -1 -1 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1 -1 -1 -1 -1  3 -1  3 -1  3 -1
-
-replicate(100, (1+2)) #添加括号后又回归原有的定义，&quot;(&quot;本身也是一个函数
-#&gt; [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
-#&gt; [52] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3</code></pre>
-</li>
-</ul>
-<h4 id="自定义infix函数"><a href="#自定义infix函数" class="headerlink" title="自定义infix函数"></a>自定义infix函数</h4><p>使用<code>%</code>来自定义infix函数</p>
-<pre><code class="hljs &#123;r&#125;">&#96;%+%&#96; &lt;- function(a, b)&#123;
-    paste0(a, b)
-&#125;
-
-4 %+% 4
-#&gt; [1] &quot;44&quot;</code></pre>
-<h4 id="替换函数"><a href="#替换函数" class="headerlink" title="替换函数"></a>替换函数</h4><p>替换函数（replacement function）将右边的值输入左边函数中，需要有两个必要要素：</p>
-<ul>
-<li>参数x用以储存值，参数value用以替换值。</li>
-<li>函数主体中需要返回替换后的值。</li>
-</ul>
-<pre><code class="hljs &#123;r&#125;">&#96;replace_2nd&lt;-&#96; &lt;- function(x, value)&#123;
-    x[2] &lt;- value
-    x
-&#125; 
-
-c&lt;- 1:10
-replace_2nd(c) &lt;- 101L
-c
-#&gt; [1]   1 101   3   4   5   6   7   8   9  10</code></pre>
 <section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
@@ -1140,67 +937,192 @@ pmap_dbl(list(trim &#x3D; trims), mean, x &#x3D; x)
       </tags>
   </entry>
   <entry>
-    <title>[Advanced R] Ⅱ.泛函数（2）</title>
-    <url>/2020/08/14/Advanced_R/9.%20Functionals(2)/</url>
-    <content><![CDATA[<h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><h3 id="reduce族函数"><a href="#reduce族函数" class="headerlink" title="reduce族函数"></a>reduce族函数</h3><h4 id="reduce-函数"><a href="#reduce-函数" class="headerlink" title="reduce()函数"></a><code>reduce()</code>函数</h4><p><code>reduce()</code>函数对输入的向量滚动操作，<code>reduce(1:4, f)</code> 等价于 <code>f(f(f(1, 2), 3), 4)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">(list &lt;- map(1:4, ~sample(1:10, 10, replace &#x3D; T)))
-#&gt; [[1]]
-#&gt;  [1]  2  1  9  1  5  1 10  3  6  9
-#&gt; 
-#&gt; [[2]]
-#&gt;  [1]  7  8 10  1  6  6 10  1  2  8
-#&gt; 
-#&gt; [[3]]
-#&gt;  [1] 10  5  6  1  1  9  6 10  8  8
-#&gt; 
-#&gt; [[4]]
-#&gt;  [1]  5  2 10  1  5  2  9  9  4  8
+    <title>[Advanced R] Ⅰ. 函数</title>
+    <url>/2020/08/06/Advanced_R/6.%20Functions/</url>
+    <content><![CDATA[<h2 id="Function"><a href="#Function" class="headerlink" title="Function"></a>Function</h2><blockquote>
+<p>  <strong>存在即对象，万物出自函数</strong>。</p>
+</blockquote>
+<h3 id="函数基础"><a href="#函数基础" class="headerlink" title="函数基础"></a>函数基础</h3><h4 id="函数构成三要素"><a href="#函数构成三要素" class="headerlink" title="函数构成三要素"></a>函数构成三要素</h4><p>函数的拥有三个基本组成：参数（arguments）、主体（body）和环境（environment），分别使用<code>formals()</code>、<code>body()</code>和<code>environment()</code>来查看。</p>
+<pre><code class="hljs &#123;r&#125;">fun0 &lt;- function(x, y) x+y
+formals(fun0)
+#&gt; $x
 
-reduce(list, intersect)
-#&gt; [1]  1 10</code></pre>
-<h4 id="accumulate-函数"><a href="#accumulate-函数" class="headerlink" title="accumulate()函数"></a><code>accumulate()</code>函数</h4><p><code>accumulate()</code>在对输入向量滚动操作的基础上同步输出结果。</p>
-<pre><code class="hljs &#123;r&#125;">accumulate(1:4, &#96;+&#96;)
-#&gt; [1]  1  3  6 10
+#&gt; $y
+body(fun0)
+#&gt; x+y
 
-reduce(1:4, &#96;+&#96;)
-#&gt; [1] 10</code></pre>
-<h3 id="预测函数"><a href="#预测函数" class="headerlink" title="预测函数"></a>预测函数</h3><h4 id="六类基础函数"><a href="#六类基础函数" class="headerlink" title="六类基础函数"></a>六类基础函数</h4><p><code>purrr</code>包提供6类预测函数，即对成功匹配的结果输出<code>TRUE</code>或其它特定值。</p>
-<ul>
-<li><p><code>some(.x, .p)</code>在有任意元素成功匹配时返回真；<code>every(.x, .p)</code>在所有元素匹配时返回真。</p>
+environment(fun0)
+#&gt; &lt;environment: R_GlobalEnv&gt;</code></pre>
+<h4 id="初始函数的特殊性"><a href="#初始函数的特殊性" class="headerlink" title="初始函数的特殊性"></a>初始函数的特殊性</h4><p>R中包含了大量由C语言编写的初始函数（primitive functions），其在R中的属性要么为<code>builtin</code>和<code>special</code>，其不具备一般函数中的三大要素。</p>
+<pre><code class="hljs &#123;r&#125;">typeof(sum)
+#&gt; [1] &quot;builtin&quot;
+typeof(&#96;[&#96;)
+#&gt; [1] &quot;special&quot;</code></pre>
+<h4 id="函数也是对象"><a href="#函数也是对象" class="headerlink" title="函数也是对象"></a>函数也是对象</h4><ul>
+<li><p>名称和函数对象（function object）也是链接（binding）的关系。同时，函数对象不一定需要名称，可以使用匿名函数（anonymous function）。例如在<code>lapply(X, FUN)</code>中编写的函数。</p>
 </li>
-<li><p><code>detect(.x, .p)</code>返回第一个成功匹配的值；<code>detect_index(.x, .p)</code>返回第一个成功匹配的值的序号。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
-detect(df, is.character)
-#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
-detect_index(df, is.character)
-#&gt; [1] 2</code></pre>
-</li>
-<li><p><code>keep()</code>保留满足条件的向量；<code>discard()</code>舍弃满足条件的向量。</p>
+<li><p>函数也可以像其它对象一样被放入list中。</p>
+<pre><code class="hljs &#123;r&#125;">funs &lt;- list(
+	half &#x3D; function(x) x&#x2F;2,
+    double &#x3D; function(x) x*2
+)
+funs$half(3)
+#&gt; [1] 1.5</code></pre>
 </li>
 </ul>
-<h4 id="map族函数的其它变种"><a href="#map族函数的其它变种" class="headerlink" title="map族函数的其它变种"></a>map族函数的其它变种</h4><p><code>map()</code>和<code>modify()</code>函数同样能够变换为预测函数，即只对满足条件的对象进行操作。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(
-  num1 &#x3D; c(0, 10, 20),
-  num2 &#x3D; c(5, 6, 7),
-  chr1 &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;),
-  stringsAsFactors &#x3D; FALSE
-)
+<h4 id="使用do-call"><a href="#使用do-call" class="headerlink" title="使用do.call()"></a>使用<code>do.call()</code></h4><p>当函数名与参数分离时，使用<code>do.call（FUN，args）</code>来呼叫函数。</p>
+<pre><code class="hljs &#123;r&#125;">args &lt;- list(runif(100), na.rm &#x3D; TRUE)
+do.call(sum, args)
+#&gt; [1] 55.449</code></pre>
+<h3 id="词法范围（Lexical-Scoping）"><a href="#词法范围（Lexical-Scoping）" class="headerlink" title="词法范围（Lexical Scoping）"></a>词法范围（Lexical Scoping）</h3><p>词法范围解释了R中的函数如何识别对象值（value）和名称（name）间的链接，其遵从四个基本法则：</p>
+<ul>
+<li>Name masking：函数内<strong>定义的对象名</strong>将覆盖函数外定义的。</li>
+<li>Functions VS Variables：函数内<strong>定义的函数</strong>也将覆盖函数外定义的。</li>
+<li>A fresh start：函数内运行结果不会影响全局中的对象。</li>
+<li>Dynamic lookup：函数每次运行时即时查找所需对象。</li>
+</ul>
+<h3 id="惰性评估"><a href="#惰性评估" class="headerlink" title="惰性评估"></a>惰性评估</h3><h4 id="基本要素"><a href="#基本要素" class="headerlink" title="基本要素"></a>基本要素</h4><p>R只会在需要用到参数时，检测其是否为有效参数。由于惰性评估（lazy evaluation），R的函数需要以下要素：</p>
+<ul>
+<li><p>含有参数的表达式</p>
+</li>
+<li><p>用以评估（监测有效性）参数的的环境。</p>
+<ul>
+<li>在呼叫函数时定义的对象，将反映到全局环境中。注意：只对使用<code>&lt;-</code>方式定义的有效，<code>=</code>定义的不行。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;"># 在呼叫函数时定义的对象，将反映到全局环境中
+fun1 &lt;- function(x) x+2
+fun1(x &lt;- 2)
+#&gt; [1] 4</code></pre>
+</li>
+<li><p>参数值</p>
+</li>
+</ul>
+<h4 id="默认参数"><a href="#默认参数" class="headerlink" title="默认参数"></a>默认参数</h4><ul>
+<li><p>默认参数可直接给出，或者由其它参数给出，乃至由函数中定义的对象给出。</p>
+</li>
+<li><p>默认参数存在与函数的评估环境（evaluation environment）中，而非全局环境（global environment）。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x &#x3D; ls()) &#123;
+    a &lt;- 1
+    x
+&#125;
+fun()
+#&gt; [1] &quot;a&quot; &quot;x&quot;
 
-map_if(df, is.numeric, mean)
-#&gt; $num1
+fun(ls())
+#&gt; [1] &quot;fun&quot;</code></pre>
+</li>
+<li><p>使用<code>missing()</code>来判断参数值是否由默认给出。</p>
+</li>
+</ul>
+<h3 id="…（dot-dot-dot）"><a href="#…（dot-dot-dot）" class="headerlink" title="…（dot-dot-dot）"></a>…（dot-dot-dot）</h3><p>使用<code>...</code>来为函数添加更多的参数。</p>
+<ul>
+<li><p>使用<code>..n</code>来提取特定位置的参数</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(first &#x3D; ..1, third &#x3D; ..4)
+fun(1,2,3,4)
+#&gt; $first
+#&gt; [1] 1
+
+#&gt; $third
+#&gt; [1] 4</code></pre>
+</li>
+<li><p>直接使用<code>list(...)</code>来将输入的参数储存为列表</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(...) list(...)
+fun(a &#x3D; 1, b &#x3D; 2)
+#&gt; $a
+#&gt; [1] 1
+
+#&gt; $b
+#&gt; [1] 2</code></pre>
+</li>
+</ul>
+<h3 id="退出函数"><a href="#退出函数" class="headerlink" title="退出函数"></a>退出函数</h3><h4 id="函数返回值"><a href="#函数返回值" class="headerlink" title="函数返回值"></a>函数返回值</h4><ul>
+<li>隐性返回（implicit return）：最后被执行的表达式即为返回的值</li>
+<li>显性返回（explicit return）：使用<code>return()</code></li>
+</ul>
+<h4 id="错误"><a href="#错误" class="headerlink" title="错误"></a>错误</h4><p>使用<code>stop()</code>来立即停止当前函数。</p>
+<h4 id="隐藏返回值"><a href="#隐藏返回值" class="headerlink" title="隐藏返回值"></a>隐藏返回值</h4><p>使用<code>invisible()</code>来将返回值隐藏。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x) invisible(x)
+fun(232)</code></pre>
+<h4 id="退出窗口"><a href="#退出窗口" class="headerlink" title="退出窗口"></a>退出窗口</h4><p>使用<code>on.exit(, add = TRUE)</code>来作为函数的退出窗口（exit handler），用以确保不论函数如何退出，都不会改变全局环境。</p>
+<ul>
+<li><p><code>on.exit()</code>不论函数正常执行、报错都将执行。</p>
+<pre><code class="hljs &#123;r&#125;">fun &lt;- function(x)&#123;
+    cat(&quot;Let&#39;s start.\n&quot;)
+    on.exit(cat(&quot;This is a exit handler.\n&quot;), add &#x3D; TRUE)
+    
+    if (x) &#123;
+        return(10)
+    &#125; else&#123;
+        stop(&quot;Error&quot;)
+    &#125;
+&#125;
+fun(TRUE)
+#&gt; Let&#39;s start
+#&gt; This is a exit handler
 #&gt; [1] 10
-#&gt; 
-#&gt; $num2
-#&gt; [1] 6
-#&gt; 
-#&gt; $chr1
-#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
 
-modify_if(df, is.numeric, mean)
-#&gt;   num1 num2 chr1
-#&gt; 1   10    6    a
-#&gt; 2   10    6    b
-#&gt; 3   10    6    c</code></pre>
+fun(FALSE)</code></pre>
+</li>
+</ul>
+<h3 id="函数形态"><a href="#函数形态" class="headerlink" title="函数形态"></a>函数形态</h3><h4 id="四种存在形态"><a href="#四种存在形态" class="headerlink" title="四种存在形态"></a>四种存在形态</h4><p>R中函数有四种不同的存在形态，各形态之间在一定程度上可相互转换：</p>
+<ul>
+<li>prefix：普通函数，<code>FUN(x, y, z)</code></li>
+<li>infix：在参数中出现的函数，<code>+</code>、<code>%&gt;%</code></li>
+<li>replacement：通过赋值存在的函数，<code>&lt;-</code></li>
+<li>special：<code>[[]]</code>、<code>if</code>、<code>for</code></li>
+</ul>
+<h4 id="函数形态变换"><a href="#函数形态变换" class="headerlink" title="函数形态变换"></a>函数形态变换</h4><ul>
+<li><p>转换为前置形态</p>
+<pre><code class="hljs &#123;r&#125;">x + y
+&#96;+&#96;(x, y)
+
+names(df) &lt;- c(x, y, z)
+&#96;names&lt;-&#96;（df, c(x, y, z）)
+
+for (i in 1:10) print(i)
+&#96;for&#96;(i, 1:10, print(i))</code></pre>
+</li>
+<li><p>改写每个non-prefix形态的函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;+&#96; &lt;- function(e1, e2)&#123;
+    x &lt;- runif(1)
+    if (x &lt; 0.5)&#123;
+        e1 - e2
+    &#125; else&#123;
+        sum(e1, e2)
+    &#125;
+&#125;
+
+replicate(100, 1+2)
+#&gt; [1] -1  3 -1 -1 -1  3 -1 -1 -1  3 -1 -1 -1  3 -1  3  3  3  3 -1  3 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3
+#&gt; [35]  3  3  3  3  3  3 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1  3  3 -1  3 -1 -1 -1 -1 -1 -1  3  3 -1 -1 -1  3
+#&gt; [69] -1 -1 -1 -1  3  3  3  3 -1 -1 -1  3 -1 -1  3  3  3 -1  3 -1 -1 -1 -1 -1 -1 -1  3 -1  3 -1  3 -1
+
+replicate(100, (1+2)) #添加括号后又回归原有的定义，&quot;(&quot;本身也是一个函数
+#&gt; [1] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+#&gt; [52] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3</code></pre>
+</li>
+</ul>
+<h4 id="自定义infix函数"><a href="#自定义infix函数" class="headerlink" title="自定义infix函数"></a>自定义infix函数</h4><p>使用<code>%</code>来自定义infix函数</p>
+<pre><code class="hljs &#123;r&#125;">&#96;%+%&#96; &lt;- function(a, b)&#123;
+    paste0(a, b)
+&#125;
+
+4 %+% 4
+#&gt; [1] &quot;44&quot;</code></pre>
+<h4 id="替换函数"><a href="#替换函数" class="headerlink" title="替换函数"></a>替换函数</h4><p>替换函数（replacement function）将右边的值输入左边函数中，需要有两个必要要素：</p>
+<ul>
+<li>参数x用以储存值，参数value用以替换值。</li>
+<li>函数主体中需要返回替换后的值。</li>
+</ul>
+<pre><code class="hljs &#123;r&#125;">&#96;replace_2nd&lt;-&#96; &lt;- function(x, value)&#123;
+    x[2] &lt;- value
+    x
+&#125; 
+
+c&lt;- 1:10
+replace_2nd(c) &lt;- 101L
+c
+#&gt; [1]   1 101   3   4   5   6   7   8   9  10</code></pre>
 <section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
       <categories>
@@ -1208,6 +1130,20 @@ modify_if(df, is.numeric, mean)
       </categories>
       <tags>
         <tag>R</tag>
+        <tag>Programming</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>[Advanced R] 元编程.基本理念</title>
+    <url>/2020/08/17/Advanced_R/%E5%85%83%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[<h2 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h2><h3 id="三大基本理念"><a href="#三大基本理念" class="headerlink" title="三大基本理念"></a>三大基本理念</h3><h4 id="Code-is-data"><a href="#Code-is-data" class="headerlink" title="Code is data"></a>Code is data</h4><h4 id="Code-is-tree"><a href="#Code-is-tree" class="headerlink" title="Code is tree"></a>Code is tree</h4><h4 id="Code-can-generate-code"><a href="#Code-can-generate-code" class="headerlink" title="Code can generate code"></a>Code can generate code</h4><section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
       </tags>
   </entry>
   <entry>
@@ -1821,6 +1757,77 @@ modify_if(df, is.numeric, mean)
       </tags>
   </entry>
   <entry>
+    <title>[Advanced R] Ⅱ.泛函数（2）</title>
+    <url>/2020/08/14/Advanced_R/9.%20Functionals(2)/</url>
+    <content><![CDATA[<h2 id="Functionals"><a href="#Functionals" class="headerlink" title="Functionals"></a>Functionals</h2><h3 id="reduce族函数"><a href="#reduce族函数" class="headerlink" title="reduce族函数"></a>reduce族函数</h3><h4 id="reduce-函数"><a href="#reduce-函数" class="headerlink" title="reduce()函数"></a><code>reduce()</code>函数</h4><p><code>reduce()</code>函数对输入的向量滚动操作，<code>reduce(1:4, f)</code> 等价于 <code>f(f(f(1, 2), 3), 4)</code>：<img src="https://d33wubrfki0l68.cloudfront.net/9c239e1227c69b7a2c9c2df234c21f3e1c74dd57/eec0e/diagrams/functionals/reduce.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
+<pre><code class="hljs &#123;r&#125;">(list &lt;- map(1:4, ~sample(1:10, 10, replace &#x3D; T)))
+#&gt; [[1]]
+#&gt;  [1]  2  1  9  1  5  1 10  3  6  9
+#&gt; 
+#&gt; [[2]]
+#&gt;  [1]  7  8 10  1  6  6 10  1  2  8
+#&gt; 
+#&gt; [[3]]
+#&gt;  [1] 10  5  6  1  1  9  6 10  8  8
+#&gt; 
+#&gt; [[4]]
+#&gt;  [1]  5  2 10  1  5  2  9  9  4  8
+
+reduce(list, intersect)
+#&gt; [1]  1 10</code></pre>
+<h4 id="accumulate-函数"><a href="#accumulate-函数" class="headerlink" title="accumulate()函数"></a><code>accumulate()</code>函数</h4><p><code>accumulate()</code>在对输入向量滚动操作的基础上同步输出结果。</p>
+<pre><code class="hljs &#123;r&#125;">accumulate(1:4, &#96;+&#96;)
+#&gt; [1]  1  3  6 10
+
+reduce(1:4, &#96;+&#96;)
+#&gt; [1] 10</code></pre>
+<h3 id="预测函数"><a href="#预测函数" class="headerlink" title="预测函数"></a>预测函数</h3><h4 id="六类基础函数"><a href="#六类基础函数" class="headerlink" title="六类基础函数"></a>六类基础函数</h4><p><code>purrr</code>包提供6类预测函数，即对成功匹配的结果输出<code>TRUE</code>或其它特定值。</p>
+<ul>
+<li><p><code>some(.x, .p)</code>在有任意元素成功匹配时返回真；<code>every(.x, .p)</code>在所有元素匹配时返回真。</p>
+</li>
+<li><p><code>detect(.x, .p)</code>返回第一个成功匹配的值；<code>detect_index(.x, .p)</code>返回第一个成功匹配的值的序号。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;))
+detect(df, is.character)
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+detect_index(df, is.character)
+#&gt; [1] 2</code></pre>
+</li>
+<li><p><code>keep()</code>保留满足条件的向量；<code>discard()</code>舍弃满足条件的向量。</p>
+</li>
+</ul>
+<h4 id="map族函数的其它变种"><a href="#map族函数的其它变种" class="headerlink" title="map族函数的其它变种"></a>map族函数的其它变种</h4><p><code>map()</code>和<code>modify()</code>函数同样能够变换为预测函数，即只对满足条件的对象进行操作。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(
+  num1 &#x3D; c(0, 10, 20),
+  num2 &#x3D; c(5, 6, 7),
+  chr1 &#x3D; c(&quot;a&quot;, &quot;b&quot;, &quot;c&quot;),
+  stringsAsFactors &#x3D; FALSE
+)
+
+map_if(df, is.numeric, mean)
+#&gt; $num1
+#&gt; [1] 10
+#&gt; 
+#&gt; $num2
+#&gt; [1] 6
+#&gt; 
+#&gt; $chr1
+#&gt; [1] &quot;a&quot; &quot;b&quot; &quot;c&quot;
+
+modify_if(df, is.numeric, mean)
+#&gt;   num1 num2 chr1
+#&gt; 1   10    6    a
+#&gt; 2   10    6    b
+#&gt; 3   10    6    c</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a> 学习笔记。
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>学习</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>[CFA-1] 投资组合</title>
     <url>/2020/02/29/CFA/Portfolio_Management/</url>
     <content><![CDATA[<h2 id="Portfolio-Management"><a href="#Portfolio-Management" class="headerlink" title="Portfolio Management"></a>Portfolio Management</h2><h3 id="Overview"><a href="#Overview" class="headerlink" title="Overview"></a>Overview</h3><p><strong>「投资组合的好处：一定条件下，多元化有助于降低整体风险」</strong></p>
@@ -2285,6 +2292,86 @@ modify_if(df, is.numeric, mean)
       <tags>
         <tag>CFA</tag>
         <tag>笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>使用dplyr编程</title>
+    <url>/2020/08/19/R/%E4%BD%BF%E7%94%A8dplyr%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[<h2 id="使用dplyr编程"><a href="#使用dplyr编程" class="headerlink" title="使用dplyr编程"></a>使用<code>dplyr</code>编程</h2><h3 id="问题来源"><a href="#问题来源" class="headerlink" title="问题来源"></a>问题来源</h3><h4 id="dplyr中的变量评估方式"><a href="#dplyr中的变量评估方式" class="headerlink" title="dplyr中的变量评估方式"></a><code>dplyr</code>中的变量评估方式</h4><p><code>dplyr</code>包中的函数广泛使用<strong>tidy evaluation</strong>，其包含两种基本类型:</p>
+<ul>
+<li><p><data-masking>：允许直接使用数据框中的变量（data variables）来指定对象。例如在<code>arrange()</code>、<code>count()</code>、<code>filter()</code>、<code>group_by()</code>中可以直接使用<code>var</code>，而非<code>df$var</code>。</p>
+<pre><code class="hljs &#123;r&#125;"># Base R中的选定变量
+mtcars[mtcars$cyl&#x3D;&#x3D;4 &amp; mtcars$mpg &gt; 20, ]
+# dplyr中的选定变量
+mtcars %&gt;% filter(cyl &#x3D;&#x3D; 4 &amp; mpg &gt; 20)</code></pre>
+</li>
+<li><p><tidy-select>：允许直接使用位置、名称、类型等信息来指定对象。例如在<code>rename()</code>、<code>across()</code>、<code>select()</code>、<code>pull()</code>中使用<code>“var”</code>或<code>is.numeric</code>。</p>
+</li>
+</ul>
+<h4 id="Data-masking带来的问题及解决方案"><a href="#Data-masking带来的问题及解决方案" class="headerlink" title="Data masking带来的问题及解决方案"></a>Data masking带来的问题及解决方案</h4><p><data-masking>的方式提供了方便，但给间接的变量输入带来的困难。问题主要源自<data-masking>中将环境变量（env-variables）与数据变量（data-variables）混用。</p>
+<p>分别针对变量输入和字符型向量输入，可以使用以下两种方式来明确表达式中使用的是环境中给定的变量：</p>
+<ul>
+<li><p>使用<code></code>来指定变量输入。</p>
+<pre><code class="hljs &#123;r&#125;">my_summary &lt;- function(data, var)&#123;
+    data %&gt;% 
+    	 summarise(mean &#x3D; mean(&#123;&#123;var&#125;&#125;), min &#x3D; min(&#123;&#123;var&#125;&#125;), max &#x3D; max(&#123;&#123;var&#125;&#125;))
+&#125;
+mtcars %&gt;% my_summary(mpg)
+#&gt;       mean  min  max
+#&gt; 1 20.09062 10.4 33.9</code></pre>
+</li>
+<li><p>使用<code>.data[[var]]</code>来通过字符型向量输入指定变量。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 4:6, z &#x3D; 7:9)
+for (var in names(df))&#123;
+    df %&gt;% count(.data[[var]]) %&gt;% print()
+&#125;</code></pre>
+</li>
+</ul>
+<h3 id="几种常用情形"><a href="#几种常用情形" class="headerlink" title="几种常用情形"></a>几种常用情形</h3><h4 id="输入数据、调用参数"><a href="#输入数据、调用参数" class="headerlink" title="输入数据、调用参数"></a>输入数据、调用参数</h4><p>使用.data能够避免出现data-masking的问题。</p>
+<h4 id="输入参数"><a href="#输入参数" class="headerlink" title="输入参数"></a>输入参数</h4><p>使用<code></code>来处理参数输入的问题。</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise3 &lt;- function(data, mean_var, sd_var) &#123;
+  data %&gt;% 
+    summarise(mean &#x3D; mean(&#123;&#123; mean_var &#125;&#125;), sd &#x3D; mean(&#123;&#123; sd_var &#125;&#125;))
+&#125;</code></pre>
+<p>如果需要输入的参数变为变量名：</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise4 &lt;- function(data, expr) &#123;
+  data %&gt;% summarise(
+    &quot;mean_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; expr &#125;&#125;),
+    &quot;sum_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; sum(&#123;&#123; expr &#125;&#125;),
+    &quot;n_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; n()
+  )
+&#125;
+my_summarise5 &lt;- function(data, mean_var, sd_var) &#123;
+  data %&gt;% 
+    summarise(
+      &quot;mean_&#123;&#123;mean_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; mean_var &#125;&#125;), 
+      &quot;sd_&#123;&#123;sd_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; sd_var &#125;&#125;)
+    )
+&#125;</code></pre>
+<p>面对多个不特定参数的输入：</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(.data, ...) &#123;
+  .data %&gt;%
+    group_by(...) %&gt;%
+    summarise(mass &#x3D; mean(mass, na.rm &#x3D; TRUE), height &#x3D; mean(height, na.rm &#x3D; TRUE))
+&#125;
+starwars %&gt;% my_summarise(homeworld)
+starwars %&gt;% my_summarise(sex, gender)</code></pre>
+<h4 id="批量输入数据变量（data-variables）"><a href="#批量输入数据变量（data-variables）" class="headerlink" title="批量输入数据变量（data-variables）"></a>批量输入数据变量（data-variables）</h4><p>搭配<code>across()</code>使用</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(data, summary_vars) &#123;
+  data %&gt;%
+    summarise(across(&#123;&#123; summary_vars &#125;&#125;, ~ mean(., na.rm &#x3D; TRUE)))
+&#125;
+starwars %&gt;% 
+  group_by(species) %&gt;% 
+  my_summarise(c(mass, height))</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记源自：<a href="https://dplyr.tidyverse.org/articles/programming.html" target="_blank" rel="noopener">使用dplyr进行编程</a>
+<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>]]></content>
+      <categories>
+        <category>笔记</category>
+      </categories>
+      <tags>
+        <tag>R</tag>
+        <tag>Programming</tag>
       </tags>
   </entry>
 </search>

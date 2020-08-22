@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>[Advanced R] Ⅰ. 名称与对象 - Hexo</title>
+  <title>使用dplyr编程 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -139,7 +139,7 @@
 </nav>
 
     <div class="view intro-2" id="background" parallax=true
-         style="background: url('/img/binding-f1.png') no-repeat center center;
+         style="background: url('/img/path.png') no-repeat center center;
            background-size: cover;">
       <div class="full-bg-img">
         <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-02 20:20">
-      2020年8月2日 晚上
+    <time datetime="2020-08-19 15:20">
+      2020年8月19日 下午
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      1.3k 字
+      634 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      15
+      7
        分钟
     </span>
   
@@ -212,173 +212,74 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="Names-and-Values"><a href="#Names-and-Values" class="headerlink" title="Names and Values"></a>Names and Values</h2><blockquote>
-<p>  <strong>对象（object）并没有名字（name），只是名字有了对象」</strong></p>
-</blockquote>
-<h3 id="名字与对象的链接"><a href="#名字与对象的链接" class="headerlink" title="名字与对象的链接"></a>名字与对象的链接</h3><p>名字和对象是独立的，二者通过<code>&lt;-</code>相连。</p>
+              <h2 id="使用dplyr编程"><a href="#使用dplyr编程" class="headerlink" title="使用dplyr编程"></a>使用<code>dplyr</code>编程</h2><h3 id="问题来源"><a href="#问题来源" class="headerlink" title="问题来源"></a>问题来源</h3><h4 id="dplyr中的变量评估方式"><a href="#dplyr中的变量评估方式" class="headerlink" title="dplyr中的变量评估方式"></a><code>dplyr</code>中的变量评估方式</h4><p><code>dplyr</code>包中的函数广泛使用<strong>tidy evaluation</strong>，其包含两种基本类型:</p>
 <ul>
-<li>每个对象在R中都有自己的编号（如下的 “0x1deba3bd8f8”）。</li>
-<li>名字与对象直接相连，名字只是对象的<strong>查询编码（Reference）</strong>：<img src="https://d33wubrfki0l68.cloudfront.net/bdc72c04d3135f19fb3ab13731129eb84c9170af/f0ab9/diagrams/name-value/binding-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></li>
-</ul>
-<pre><code class="hljs &#123;r&#125;"># 变量与对象的关系
-x &lt;- c(1, 2, 3)
-y &lt;- x
-
-# x, y实际指向了同一个对象
-lobstr::obj_addr(x)
-# [1] &quot;0x1deba3bd8f8&quot;
-lobstr::obj_addr(y)
-# [1] &quot;0x1deba3bd8f8&quot;</code></pre>
-<h3 id="Copy-on-modify"><a href="#Copy-on-modify" class="headerlink" title="Copy-on-modify"></a>Copy-on-modify</h3><ol>
-<li><p><strong>Basic：</strong>对象是不可修改的，<strong>只能对复制的对象进行修改（Copy-on-modify）</strong></p>
-<ul>
-<li><p>修改y并不会改变x的值，只是通过复制对象，并在复本的基础上新生成了一个对象：<img src="https://d33wubrfki0l68.cloudfront.net/ef9f480effa2f1d0e401d1f94218d0cf118433c0/b56e9/diagrams/name-value/binding-3.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;"># 追踪x对象：如果复制发生，则将通知
-tracemem(x)
-#&gt; [1] &quot;&lt;000001DEBA3BD8F8&gt;&quot;
-y[[3]] &lt;- 4L
-#&gt; tracemem[0x000001deba3bd8f8 -&gt; 0x000001deba3b0d58]:
-
-# 修改y并不会改变x的值
-x
-#&gt; [1] 1 2 3
-y
-#&gt; [1] 1 2 4
-
-# 修改y实际上新生成了一个变量
-lobstr::obj_addr(y)
-#&gt; [1] &quot;0x1deba3b0d58&quot;</code></pre>
+<li><p><data-masking>：允许直接使用数据框中的变量（data variables）来指定对象。例如在<code>arrange()</code>、<code>count()</code>、<code>filter()</code>、<code>group_by()</code>中可以直接使用<code>var</code>，而非<code>df$var</code>。</p>
+<pre><code class="hljs &#123;r&#125;"># Base R中的选定变量
+mtcars[mtcars$cyl&#x3D;&#x3D;4 &amp; mtcars$mpg &gt; 20, ]
+# dplyr中的选定变量
+mtcars %&gt;% filter(cyl &#x3D;&#x3D; 4 &amp; mpg &gt; 20)</code></pre>
+</li>
+<li><p><tidy-select>：允许直接使用位置、名称、类型等信息来指定对象。例如在<code>rename()</code>、<code>across()</code>、<code>select()</code>、<code>pull()</code>中使用<code>“var”</code>或<code>is.numeric</code>。</p>
 </li>
 </ul>
-</li>
-<li><p><strong>Function：</strong>函数（Function）中的对象同样使用<strong>Copy-on-modify</strong>准则</p>
+<h4 id="Data-masking带来的问题及解决方案"><a href="#Data-masking带来的问题及解决方案" class="headerlink" title="Data masking带来的问题及解决方案"></a>Data masking带来的问题及解决方案</h4><p><data-masking>的方式提供了方便，但给间接的变量输入带来的困难。问题主要源自<data-masking>中将环境变量（env-variables）与数据变量（data-variables）混用。</p>
+<p>分别针对变量输入和字符型向量输入，可以使用以下两种方式来明确表达式中使用的是环境中给定的变量：</p>
 <ul>
-<li><p>函数的运行结果相当于建立了新的链接，其中没有涉及复制：<img src="https://d33wubrfki0l68.cloudfront.net/e8718027aabaed377da311f45b45a179588e4dcf/6bf90/diagrams/name-value/binding-f2.png" srcset="/img/loading.gif" style="zoom:33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">f &lt;- function(a) a
-x &lt;- c(1, 2, 3)
-tracemem(x)
-z &lt;- f(x)
-# 没有复制发生！</code></pre>
+<li><p>使用<code></code>来指定变量输入。</p>
+<pre><code class="hljs &#123;r&#125;">my_summary &lt;- function(data, var)&#123;
+    data %&gt;% 
+    	 summarise(mean &#x3D; mean(&#123;&#123;var&#125;&#125;), min &#x3D; min(&#123;&#123;var&#125;&#125;), max &#x3D; max(&#123;&#123;var&#125;&#125;))
+&#125;
+mtcars %&gt;% my_summary(mpg)
+#&gt;       mean  min  max
+#&gt; 1 20.09062 10.4 33.9</code></pre>
+</li>
+<li><p>使用<code>.data[[var]]</code>来通过字符型向量输入指定变量。</p>
+<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 4:6, z &#x3D; 7:9)
+for (var in names(df))&#123;
+    df %&gt;% count(.data[[var]]) %&gt;% print()
+&#125;</code></pre>
 </li>
 </ul>
-</li>
-<li><p><strong>List：</strong>列表（list）指向的不是值（value），而是查询编码（Reference）的集合</p>
-<ul>
-<li><p>当修改发生时，只是修改部分查询编码的指向：<img src="https://d33wubrfki0l68.cloudfront.net/b844bb5a3443e1344299627f5760e2ae3a9885b5/e1c76/diagrams/name-value/l-modify-2.png" srcset="/img/loading.gif" style="zoom: 33%;" /></p>
-<pre><code class="hljs &#123;r&#125;">l1 &lt;- c(1, 2, 3)
-l2 &lt;- l1
-l2[[3]] &lt;- 4L
-lobstr:ref(l1, l2)
-#&gt; o [1:0x1deb8aecdf0] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] &lt;dbl&gt; 
-#&gt; +-[3:0x1deba502778] &lt;dbl&gt; 
-#&gt; \-[4:0x1deba5027b0] &lt;dbl&gt; 
- 
-#&gt; o [5:0x1deba41de78] &lt;list&gt; 
-#&gt; +-[2:0x1deba502740] 
-#&gt; +-[3:0x1deba502778] 
-#&gt; \-[6:0x1deba5f0fd0] &lt;int&gt;</code></pre>
-</li>
-</ul>
-</li>
-<li><p><strong>Date Frame：</strong>数据框（Data frames）是向量的列表（list of vectors），适用相同的规制</p>
-<ul>
-<li>修改列时：仅有<strong>被修改的列指向的对象</strong>会发生改变。</li>
-<li>修改行时：<strong>所有列指向的对象</strong>都发生了改变。</li>
-</ul>
-</li>
-<li><p><strong>Character vectors：</strong>字符串向量（Character vectors）指向的是在全局中包含多种字符串的池。当修改发生时，是部分字符串的查询编码发生了改变，因而总体的对象也不同了</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- c(&quot;a&quot;, &quot;a&quot;, &quot;abc&quot;, &quot;d&quot;)
-y &lt;- x
-y[[1]] &lt;- &quot;c&quot;
-# 指向的对象不同了
-ref(x, y)
-#&gt; [1:0x1deb8b09248] &lt;chr&gt; 
-
-#&gt; [2:0x1deb8ab1b10] &lt;chr&gt; 
-
-# 实际是具体修改的字符串查询编码变化了
-ref(x, y, character &#x3D; T)
-#&gt; o [1:0x1deb8b09248] &lt;chr&gt; 
-#&gt; +-[2:0x1deb133d720] &lt;string: &quot;a&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] &lt;string: &quot;abc&quot;&gt; 
-#&gt; \-[4:0x1deb150d048] &lt;string: &quot;d&quot;&gt; 
- 
-#&gt; o [5:0x1deb8ab1b10] &lt;chr&gt; 
-#&gt; +-[6:0x1deb00e29f0] &lt;string: &quot;c&quot;&gt; 
-#&gt; +-[2:0x1deb133d720] 
-#&gt; +-[3:0x1deb550c728] 
-#&gt; \-[4:0x1deb150d048]</code></pre>
-</li>
-</ol>
-<h3 id="对象的大小（Object-size）"><a href="#对象的大小（Object-size）" class="headerlink" title="对象的大小（Object size）"></a>对象的大小（Object size）</h3><ol>
-<li><p>由于列表（list）实质上是储存了对象的查询编码，所以列表的大小可能远小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- runif(1e6)
-lobstr::obj_size(x)
-#&gt; 8,000,048 B
-y &lt;- list(x, x, x)
-lobstr::obj_size(y)
-#&gt; 8,000,128 B</code></pre>
-</li>
-<li><p>由于R中的字符串同样采用类似于list的字符串池（string pool）的方式，所以重复字符串后的大小也小于预期。</p>
-<pre><code class="hljs &#123;r&#125;">banana &lt;- &quot;bananas bananas bananas&quot;
-obj_size(banana)
-#&gt; 136 B
-obj_size(rep(banana, 100))
-#&gt; 928 B</code></pre>
-</li>
-<li><p>变量相加后的大小类似于<strong>并集</strong>的关系，如果二者没有相同的值，那么对象相加后的大小就等于两个单独的大小相加。</p>
-</li>
-</ol>
-<h3 id="立即修改"><a href="#立即修改" class="headerlink" title="立即修改"></a>立即修改</h3><p>并非所有对对象的修改都是<strong>copy-on-modify</strong>，有两类例外，他们是<strong>将对象本身立即修改的（modify-in-place）</strong>：</p>
-<ol>
-<li><p>仅有单一链接（binding）的对象</p>
-<p>单一链接（binding）的对象会直接对自身进行修改。但每次使用常规函数时，都会将对象的链接增加，并且不能再回到1。</p>
-<p>事实上，R中循环（loops）的缓慢正是因为其不断地在复制对象。<strong>此时可以考虑将data.frame转换为list来进入循环，因为list允许单独修改某一查询编码（Reference）。</strong></p>
-<pre><code class="hljs &#123;r&#125;">x &lt;- data.frame(matrix(runif(5 * 1e4), ncol &#x3D; 5))
-medians &lt;- sapply(x, median, numeric(i))
-tracemem(x)
-#&gt; [1] &quot;&lt;000001402BEBE6B0&gt;&quot;
-
-# 直接使用循环，对象在每次迭代中被复制了两次
-for (i in seq_along(medians)) x[[i]] &lt;- x[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402bebe6b0 -&gt; 0x0000014029bcf0b0]: 
-#&gt; tracemem[0x0000014029bcf0b0 -&gt; 0x0000014029bcf190]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf190 -&gt; 0x0000014029bcf580]: 
-#&gt; tracemem[0x0000014029bcf580 -&gt; 0x0000014029bcf6d0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029bcf6d0 -&gt; 0x0000014029b9d750]: 
-#&gt; tracemem[0x0000014029b9d750 -&gt; 0x0000014029b9d9f0]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9d9f0 -&gt; 0x0000014029b9dfa0]: 
-#&gt; tracemem[0x0000014029b9dfa0 -&gt; 0x0000014029b9e160]: [[&lt;-.data.frame [[&lt;- 
-#&gt; tracemem[0x0000014029b9e160 -&gt; 0x0000014029b9e550]: 
-#&gt; tracemem[0x0000014029b9e550 -&gt; 0x0000014029b9ea90]: [[&lt;-.data.frame [[&lt;- 
-
-# 将data.frame转换为list，仅有一次复制发生
-y &lt;- as.list(x)
-#&gt; tracemem[0x0000014029b9ea90 -&gt; 0x000001402f1245e0]: as.list.data.frame as.list 
-for (i in seq_along(medians)) y[[i]] &lt;- y[[i]] - medians[[i]]
-#&gt; tracemem[0x000001402f1245e0 -&gt; 0x000001402f47f7c0]:</code></pre>
-</li>
-</ol>
-<ol>
-<li><p>环境（environment）</p>
-<p>环境（environment）是一种特殊的对象，实质是多个对象和名称链接的集合，它总是立即修改的（modify-in-place）。</p>
-<pre><code class="hljs &#123;r&#125;">e1 &lt;- rlang::env(a &#x3D; 1, b &#x3D; 2, c &#x3D; 3)
-e2 &lt;- e1
-
-# 修改e1中的对象后，e2同步改变了
-e1$c &lt;- 4
-e2$c
-#&gt; [1] 4</code></pre>
-</li>
-</ol>
-<h3 id="清理内存"><a href="#清理内存" class="headerlink" title="清理内存"></a>清理内存</h3><p>使用<code>rm( )</code>只能删去名称与对象的链接，并不能删去对象。</p>
-<ul>
-<li>使用<code>gc( )</code>来清理内存，<code>gcinfo( TRUE )</code>来显示每次计算机清理内存的操作。</li>
-<li>使用<code>men_used( )</code>来查看已消耗的内存。</li>
-</ul>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span><a href="https://adv-r.hadley.nz/" target="_blank" rel="noopener">《Advanced R》</a>学习笔记。
+<h3 id="几种常用情形"><a href="#几种常用情形" class="headerlink" title="几种常用情形"></a>几种常用情形</h3><h4 id="输入数据、调用参数"><a href="#输入数据、调用参数" class="headerlink" title="输入数据、调用参数"></a>输入数据、调用参数</h4><p>使用.data能够避免出现data-masking的问题。</p>
+<h4 id="输入参数"><a href="#输入参数" class="headerlink" title="输入参数"></a>输入参数</h4><p>使用<code></code>来处理参数输入的问题。</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise3 &lt;- function(data, mean_var, sd_var) &#123;
+  data %&gt;% 
+    summarise(mean &#x3D; mean(&#123;&#123; mean_var &#125;&#125;), sd &#x3D; mean(&#123;&#123; sd_var &#125;&#125;))
+&#125;</code></pre>
+<p>如果需要输入的参数变为变量名：</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise4 &lt;- function(data, expr) &#123;
+  data %&gt;% summarise(
+    &quot;mean_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; expr &#125;&#125;),
+    &quot;sum_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; sum(&#123;&#123; expr &#125;&#125;),
+    &quot;n_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; n()
+  )
+&#125;
+my_summarise5 &lt;- function(data, mean_var, sd_var) &#123;
+  data %&gt;% 
+    summarise(
+      &quot;mean_&#123;&#123;mean_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; mean_var &#125;&#125;), 
+      &quot;sd_&#123;&#123;sd_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; sd_var &#125;&#125;)
+    )
+&#125;</code></pre>
+<p>面对多个不特定参数的输入：</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(.data, ...) &#123;
+  .data %&gt;%
+    group_by(...) %&gt;%
+    summarise(mass &#x3D; mean(mass, na.rm &#x3D; TRUE), height &#x3D; mean(height, na.rm &#x3D; TRUE))
+&#125;
+starwars %&gt;% my_summarise(homeworld)
+starwars %&gt;% my_summarise(sex, gender)</code></pre>
+<h4 id="批量输入数据变量（data-variables）"><a href="#批量输入数据变量（data-variables）" class="headerlink" title="批量输入数据变量（data-variables）"></a>批量输入数据变量（data-variables）</h4><p>搭配<code>across()</code>使用</p>
+<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(data, summary_vars) &#123;
+  data %&gt;%
+    summarise(across(&#123;&#123; summary_vars &#125;&#125;, ~ mean(., na.rm &#x3D; TRUE)))
+&#125;
+starwars %&gt;% 
+  group_by(species) %&gt;% 
+  my_summarise(c(mass, height))</code></pre>
+<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记源自：<a href="https://dplyr.tidyverse.org/articles/programming.html" target="_blank" rel="noopener">使用dplyr进行编程</a>
 <a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
             </article>
             <hr>
@@ -388,7 +289,7 @@ e2$c
                   <div class="post-meta mr-3">
                     <i class="iconfont icon-category"></i>
                     
-                      <a class="hover-with-bg" href="/categories/%E5%AD%A6%E4%B9%A0/">学习</a>
+                      <a class="hover-with-bg" href="/categories/%E7%AC%94%E8%AE%B0/">笔记</a>
                     
                   </div>
                 
@@ -411,18 +312,12 @@ e2$c
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/08/03/Advanced_R/3.%20Vectors/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[Advanced R] Ⅰ. 向量</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/02/29/CFA/Equity_Investment/">
-                        <span class="hidden-mobile">[CFA-1] 权益投资</span>
+                      <a href="/2020/08/17/Advanced_R/%E5%85%83%E7%BC%96%E7%A8%8B/">
+                        <span class="hidden-mobile">[Advanced R] 元编程.基本理念</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -595,7 +490,7 @@ e2$c
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Names and Values &nbsp;",
+        "使用dplyr编程 &nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
