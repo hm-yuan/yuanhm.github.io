@@ -17,7 +17,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>使用dplyr编程 - Hexo</title>
+  <title>对多列进行操作 - Hexo</title>
 
   <link  rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.4.1/css/bootstrap.min.css" />
 
@@ -152,8 +152,8 @@
               
   <div class="mt-3 post-meta">
     <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-    <time datetime="2020-08-19 15:20">
-      2020年8月19日 下午
+    <time datetime="2020-09-14 18:00">
+      2020年9月14日 晚上
     </time>
   </div>
 
@@ -163,7 +163,7 @@
     
     <span class="post-meta mr-2">
       <i class="iconfont icon-chart"></i>
-      634 字
+      846 字
     </span>
   
 
@@ -173,7 +173,7 @@
       <i class="iconfont icon-clock-fill"></i>
       
       
-      7
+      11
        分钟
     </span>
   
@@ -212,75 +212,121 @@
           <div class="post-content mx-auto" id="post">
             
             <article class="markdown-body">
-              <h2 id="使用dplyr编程"><a href="#使用dplyr编程" class="headerlink" title="使用dplyr编程"></a>使用<code>dplyr</code>编程</h2><h3 id="问题来源"><a href="#问题来源" class="headerlink" title="问题来源"></a>问题来源</h3><h4 id="dplyr中的变量评估方式"><a href="#dplyr中的变量评估方式" class="headerlink" title="dplyr中的变量评估方式"></a><code>dplyr</code>中的变量评估方式</h4><p><code>dplyr</code>包中的函数广泛使用<strong>tidy evaluation</strong>，其包含两种基本类型:</p>
+              <h2 id="对多列进行操作"><a href="#对多列进行操作" class="headerlink" title="对多列进行操作"></a>对多列进行操作</h2><pre><code class="hljs &#123;r&#125;">vignette(&quot;colwise&quot;)</code></pre>
+<h3 id="对列使用函数——across"><a href="#对列使用函数——across" class="headerlink" title="对列使用函数——across()"></a>对列使用函数——<code>across()</code></h3><h4 id="基本语法"><a href="#基本语法" class="headerlink" title="基本语法"></a>基本语法</h4><p><code>across()</code>中包含两个参数：</p>
 <ul>
-<li><p><data-masking>：允许直接使用数据框中的变量（data variables）来指定对象。例如在<code>arrange()</code>、<code>count()</code>、<code>filter()</code>、<code>group_by()</code>中可以直接使用<code>var</code>，而非<code>df$var</code>。</p>
-<pre><code class="hljs &#123;r&#125;"># Base R中的选定变量
-mtcars[mtcars$cyl&#x3D;&#x3D;4 &amp; mtcars$mpg &gt; 20, ]
-# dplyr中的选定变量
-mtcars %&gt;% filter(cyl &#x3D;&#x3D; 4 &amp; mpg &gt; 20)</code></pre>
-</li>
-<li><p><tidy-select>：允许直接使用位置、名称、类型等信息来指定对象。例如在<code>rename()</code>、<code>across()</code>、<code>select()</code>、<code>pull()</code>中使用<code>“var”</code>或<code>is.numeric</code>。</p>
-</li>
+<li><code>.cols</code>参数：选择要进行操作的列（使用<code>select()</code>）。</li>
+<li><code>.fns</code>参数：一个或多个（list of functions）需要使用的函数。</li>
 </ul>
-<h4 id="Data-masking带来的问题及解决方案"><a href="#Data-masking带来的问题及解决方案" class="headerlink" title="Data masking带来的问题及解决方案"></a>Data masking带来的问题及解决方案</h4><p><data-masking>的方式提供了方便，但给间接的变量输入带来的困难。问题主要源自<data-masking>中将环境变量（env-variables）与数据变量（data-variables）混用。</p>
-<p>分别针对变量输入和字符型向量输入，可以使用以下两种方式来明确表达式中使用的是环境中给定的变量：</p>
-<ul>
-<li><p>使用<code></code>来指定变量输入。</p>
-<pre><code class="hljs &#123;r&#125;">my_summary &lt;- function(data, var)&#123;
-    data %&gt;% 
-    	 summarise(mean &#x3D; mean(&#123;&#123;var&#125;&#125;), min &#x3D; min(&#123;&#123;var&#125;&#125;), max &#x3D; max(&#123;&#123;var&#125;&#125;))
-&#125;
-mtcars %&gt;% my_summary(mpg)
-#&gt;       mean  min  max
-#&gt; 1 20.09062 10.4 33.9</code></pre>
+<p>需要注意的是，<code>across()</code>不会对分组变量（grouping variables）进行操作</p>
+<h4 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h4><ul>
+<li><p><code>across()</code>可以与任意<a href="https://dplyr.tidyverse.org/" target="_blank" rel="noopener">dplyr</a>包中的函数配合，但主要与<code>mutate()</code>和<code>summarise()</code>配合使用，前者用于改变列，后者可用于统计。</p>
+<pre><code class="hljs &#123;r&#125;">iris %&gt;%
+	group_by(Species) %&gt;%
+	summarise(across(starts_with(&quot;Sepal&quot;), mean))
+
+#&gt; &#96;summarise()&#96; ungrouping output (override with &#96;.groups&#96; argument)
+#&gt; # A tibble: 3 x 3
+#&gt;   Species    Sepal.Length Sepal.Width
+#&gt;   &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+#&gt; 1 setosa             5.01        3.43
+#&gt; 2 versicolor         5.94        2.77
+#&gt; 3 virginica          6.59        2.97
+
+# 与mutate联用，对现有列进行操作
+iris %&gt;%
+	as_tibble() %&gt;%
+	mutate(across(where(is.factor), as.character))
+# 与filter联用，筛选特定条件的行
+iris %&gt;%
+    as_tibble() %&gt;%
+    mutate(across(where(is.numeric), ~ifelse(.x &gt; 5, NA, .x))) %&gt;%
+    filter(across(everything(), ~!is.na(.x)))</code></pre>
 </li>
-<li><p>使用<code>.data[[var]]</code>来通过字符型向量输入指定变量。</p>
-<pre><code class="hljs &#123;r&#125;">df &lt;- data.frame(x &#x3D; 1:3, y &#x3D; 4:6, z &#x3D; 7:9)
-for (var in names(df))&#123;
-    df %&gt;% count(.data[[var]]) %&gt;% print()
-&#125;</code></pre>
+<li><p><code>across()</code>在使用时，注意其遵从dplyr包中函数的计算顺序。</p>
+<pre><code class="hljs &#123;r&#125;">iris %&gt;%
+	summarise(n &#x3D; n(), across(where(is.numeric), sd))
+#&gt;    n Sepal.Length Sepal.Width Petal.Length Petal.Width
+#&gt; 1 NA    0.8280661   0.4358663     1.765298   0.7622377
+
+iris %&gt;%
+	summarise(across(where(is.numeric), sd), n &#x3D; n())
+#&gt;   Sepal.Length Sepal.Width Petal.Length Petal.Width   n
+#&gt; 1    0.8280661   0.4358663     1.765298   0.7622377 150</code></pre>
 </li>
-</ul>
-<h3 id="几种常用情形"><a href="#几种常用情形" class="headerlink" title="几种常用情形"></a>几种常用情形</h3><h4 id="输入数据、调用参数"><a href="#输入数据、调用参数" class="headerlink" title="输入数据、调用参数"></a>输入数据、调用参数</h4><p>使用.data能够避免出现data-masking的问题。</p>
-<h4 id="输入参数"><a href="#输入参数" class="headerlink" title="输入参数"></a>输入参数</h4><p>使用<code></code>来处理参数输入的问题。</p>
-<pre><code class="hljs &#123;r&#125;">my_summarise3 &lt;- function(data, mean_var, sd_var) &#123;
-  data %&gt;% 
-    summarise(mean &#x3D; mean(&#123;&#123; mean_var &#125;&#125;), sd &#x3D; mean(&#123;&#123; sd_var &#125;&#125;))
-&#125;</code></pre>
-<p>如果需要输入的参数变为变量名：</p>
-<pre><code class="hljs &#123;r&#125;">my_summarise4 &lt;- function(data, expr) &#123;
-  data %&gt;% summarise(
-    &quot;mean_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; expr &#125;&#125;),
-    &quot;sum_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; sum(&#123;&#123; expr &#125;&#125;),
-    &quot;n_&#123;&#123;expr&#125;&#125;&quot; :&#x3D; n()
-  )
-&#125;
-my_summarise5 &lt;- function(data, mean_var, sd_var) &#123;
-  data %&gt;% 
+<li><p>连续使用<code>across()</code>可以进行多次操作</p>
+<pre><code class="hljs &#123;r&#125;">iris %&gt;%
+    as_tibble() %&gt;%
     summarise(
-      &quot;mean_&#123;&#123;mean_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; mean_var &#125;&#125;), 
-      &quot;sd_&#123;&#123;sd_var&#125;&#125;&quot; :&#x3D; mean(&#123;&#123; sd_var &#125;&#125;)
+        across(where(is.numeric), sd),
+        across(where(is.factor), nlevels),
+        n &#x3D; n()
     )
-&#125;</code></pre>
-<p>面对多个不特定参数的输入：</p>
-<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(.data, ...) &#123;
-  .data %&gt;%
-    group_by(...) %&gt;%
-    summarise(mass &#x3D; mean(mass, na.rm &#x3D; TRUE), height &#x3D; mean(height, na.rm &#x3D; TRUE))
-&#125;
-starwars %&gt;% my_summarise(homeworld)
-starwars %&gt;% my_summarise(sex, gender)</code></pre>
-<h4 id="批量输入数据变量（data-variables）"><a href="#批量输入数据变量（data-variables）" class="headerlink" title="批量输入数据变量（data-variables）"></a>批量输入数据变量（data-variables）</h4><p>搭配<code>across()</code>使用</p>
-<pre><code class="hljs &#123;r&#125;">my_summarise &lt;- function(data, summary_vars) &#123;
-  data %&gt;%
-    summarise(across(&#123;&#123; summary_vars &#125;&#125;, ~ mean(., na.rm &#x3D; TRUE)))
-&#125;
-starwars %&gt;% 
-  group_by(species) %&gt;% 
-  my_summarise(c(mass, height))</code></pre>
-<section class="footnotes"><div class="footnote-list"><ol><li><span id="fn:1" class="footnote-text"><span>笔记源自：<a href="https://dplyr.tidyverse.org/articles/programming.html" target="_blank" rel="noopener">使用dplyr进行编程</a>
-<a href="#fnref:1" rev="footnote" class="footnote-backref"> ↩</a></span></span></li></ol></div></section>
+#&gt;  Sepal.Length Sepal.Width Petal.Length Petal.Width Species     n
+#&gt;         &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;   &lt;int&gt; &lt;int&gt;
+#&gt; 1        0.828       0.436         1.77       0.762       3   150</code></pre>
+</li>
+</ul>
+<h4 id="类purrr包的使用"><a href="#类purrr包的使用" class="headerlink" title="类purrr包的使用"></a>类purrr包的使用</h4><p>通过对函数简写的支持，来达到类似于purrr包的效果</p>
+<pre><code class="hljs &#123;R&#125;">iris %&gt;%
+	group_by(Species) %&gt;%
+	summarise(across(starts_with(&quot;Sepal&quot;), ~ mean(.x, na.rm &#x3D; T)))
+#&gt; &#96;summarise()&#96; ungrouping output (override with &#96;.groups&#96; argument)
+#&gt; # A tibble: 3 x 3
+#&gt;   Species    Sepal.Length Sepal.Width
+#&gt;   &lt;fct&gt;             &lt;dbl&gt;       &lt;dbl&gt;
+#&gt; 1 setosa             5.01        3.43
+#&gt; 2 versicolor         5.94        2.77
+#&gt; 3 virginica          6.59        2.97
+
+iris %&gt;% 
+	summarise(across(where(is.factor), ~ length(unique(.x))))
+#&gt;   Species
+#&gt; 1       3</code></pre>
+<h4 id="通过list命名生成新的列"><a href="#通过list命名生成新的列" class="headerlink" title="通过list命名生成新的列"></a>通过list命名生成新的列</h4><ul>
+<li><p>本质是对不同的列使用不同的函数。</p>
+<pre><code class="hljs &#123;r&#125;">iris %&gt;%
+	group_by(Species) %&gt;%
+	summarise(across(starts_with(&quot;Sepal&quot;), list(double &#x3D; ~. * 2， triple &#x3D; ~. * 3)))
+#&gt; &#96;summarise()&#96; regrouping output by &#39;Species&#39; (override with &#96;.groups&#96; argument)
+#&gt; # A tibble: 150 x 5
+#&gt; # Groups:   Species [3]
+#&gt;    Species Sepal.Length_double Sepal.Length_triple Sepal.Width_double Sepal.Width_triple
+#&gt;    &lt;fct&gt;                 &lt;dbl&gt;               &lt;dbl&gt;              &lt;dbl&gt;              &lt;dbl&gt;
+#&gt;  1 setosa                 10.2                15.3                7                 10.5
+#&gt;  2 setosa                  9.8                14.7                6                  9  
+#&gt;  3 setosa                  9.4                14.1                6.4                9.6
+#&gt;  4 setosa                  9.2                13.8                6.2                9.3
+#&gt;  5 setosa                 10                  15                  7.2               10.8
+#&gt;  6 setosa                 10.8                16.2                7.8               11.7
+#&gt;  7 setosa                  9.2                13.8                6.8               10.2
+#&gt;  8 setosa                 10                  15                  6.8               10.2
+#&gt;  9 setosa                  8.8                13.2                5.8                8.7
+#&gt; 10 setosa                  9.8                14.7                6.2                9.3
+#&gt; # ... with 140 more rows</code></pre>
+</li>
+<li><p>可以使用<code>across()</code>中的<code>.names</code>参数来设定新生成变量的命名。</p>
+<pre><code class="hljs &#123;r&#125;">iris %&gt;%
+	group_by(Species) %&gt;%
+	summarise(across(starts_with(&quot;Sepal&quot;), list(double &#x3D; ~. * 2, triple &#x3D; ~. * 3), .names &#x3D; &quot;&#123;.fn&#125;.&#123;.col&#125;&quot;))</code></pre>
+</li>
+</ul>
+<h4 id="与mutate-的比较"><a href="#与mutate-的比较" class="headerlink" title="与mutate_*()的比较"></a>与<code>mutate_*()</code>的比较</h4><ol>
+<li><p><code>across()</code>与<code>mutate_*()</code>间可以互相替代：</p>
+<ul>
+<li>可以使用<code>where()</code>来替代<code>mutate_if()</code></li>
+<li>可以使用<code>vars()</code>来替代<code>mutate_at()</code></li>
+<li>可以使用<code>everything()</code>来替代<code>mutate_all</code></li>
+</ul>
+</li>
+<li><p><code>across()</code>仍可完成更多的工作：</p>
+<ul>
+<li>可以使用更多的函数表达式</li>
+<li>减少输入函数的数量</li>
+</ul>
+</li>
+</ol>
+
             </article>
             <hr>
             <div>
@@ -312,18 +358,12 @@ starwars %&gt;%
                   <div class="post-prev col-6">
                     
                     
-                      <a href="/2020/09/14/R/%E5%AF%B9%E5%A4%9A%E5%88%97%E8%BF%9B%E8%A1%8C%E6%93%8D%E4%BD%9C/">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">对多列进行操作</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </div>
                   <div class="post-next col-6">
                     
                     
-                      <a href="/2020/08/17/Advanced_R/%E5%85%83%E7%BC%96%E7%A8%8B/">
-                        <span class="hidden-mobile">[Advanced R] 元编程.基本理念</span>
+                      <a href="/2020/08/19/R/%E4%BD%BF%E7%94%A8dplyr%E7%BC%96%E7%A8%8B/">
+                        <span class="hidden-mobile">使用dplyr编程</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -496,7 +536,7 @@ starwars %&gt;%
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "使用dplyr编程 &nbsp;",
+        "Column-wise operations&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
